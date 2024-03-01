@@ -43,7 +43,7 @@ To install 42free, you can use the following command:
 
 - With curl:
   ```bash
-  bash <(curl -s https://raw.githubusercontent.com/itislu/42free/main/install.sh)
+  bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
   ```
 
 - With wget:
