@@ -69,14 +69,14 @@ do
     fi
 
     # Get the size of the directory or file to be moved
-    size="$(du -sh $source_path | cut -f1)B"
-    size_in_bytes=$(du -sb $source_path | cut -f1)
+    size="$(du -sh "$source_path" | cut -f1)B"
+    size_in_bytes=$(du -sb "$source_path" | cut -f1)
 
     # Get the available space in the target directory
     available_space_in_bytes=$(df --output=avail -B1 "$target_base" | tail -n1)
 
     # Check if the target directory would go above its maximum recommended size after moving
-    if (( available_space_in_bytes - size_in_bytes < $max_size * 1024**3 )); then
+    if (( available_space_in_bytes - size_in_bytes < max_size * 1024**3 )); then
         echo -e "This operation would cause the \e[1m$target_name\e[0m directory to go above \e[1m${max_size}GB\e[0m."
         echo -e "Do you still wish to continue? (y/n)"
         read -n 1 -r
@@ -95,15 +95,14 @@ do
     fi
 
     # Move the directory or file
-    mv $source_path $target_path
-    if [ $? -ne 0 ]; then
+    if ! mv "$source_path" "$target_path"; then
         echo -e "\e[1;31mError moving $source_path to $target_path.\e[0m"
         continue
     fi
 
     # If reverse flag is not active, create a symbolic link
     if ! $reverse; then
-        ln -s $target_path $source_path
+        ln -s "$target_path" "$source_path"
     else
       # If reverse flag is active, delete empty parent directories
         first_dir_after_base="${source_base}${arg%%/*}"
