@@ -1,11 +1,15 @@
 #!/bin/bash
 
+sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
+
 # Check if the first argument is -h or --help
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo -e "\e[1mMove directories or files to free up storage.\e[0m"
-    echo -e "\e[4mUsage:\e[0m 42free [-r|--reverse] target1 [target2 ...]"
-    echo -e "    The target paths have to be relative to your home / sgoinfre directory or"
-    echo -e "    have to start with the path to your home / sgoinfre directory."
+    echo -e "The files get moved from $HOME"
+    echo -e "                      to $sgoinfre.\n"
+    echo -e "\e[4mUsage:\e[0m \e[1m42free [-r|--reverse] target1 [target2 ...]\e[0m"
+    echo -e "    The target paths have to be relative to your home (or sgoinfre) directory or"
+    echo -e "    have to start with the path to your home (or sgoinfre) directory."
     echo -e "\n\e[4mOptions:\e[0m"
     echo -e "    -r, --reverse  Reverse the operation and move the directories or files"
     echo -e "                   back to their original location."
@@ -17,8 +21,8 @@ fi
 # Check if the first argument is -r or --reverse
 if [ "$1" = "-r" ] || [ "$1" = "--reverse" ]; then
     reverse=true
-    source_base="/nfs/sgoinfre/goinfre/Perso/$USER/"
-    target_base="/nfs/homes/$USER/"
+    source_base="$sgoinfre"
+    target_base="$HOME"
     source_name="sgoinfre"
     target_name="home"
     max_size=5
@@ -27,8 +31,8 @@ if [ "$1" = "-r" ] || [ "$1" = "--reverse" ]; then
     shift
 else
     reverse=false
-    source_base="/nfs/homes/$USER/"
-    target_base="/nfs/sgoinfre/goinfre/Perso/$USER/"
+    source_base="$HOME"
+    target_base="$sgoinfre"
     source_name="home"
     target_name="sgoinfre"
     max_size=30
@@ -77,7 +81,8 @@ do
 
     # Check if the target directory would go above its maximum recommended size after moving
     if (( available_space_in_bytes - size_in_bytes < max_size * 1024**3 )); then
-        echo -e "This operation would cause the \e[1m$target_name\e[0m directory to go above \e[1m${max_size}GB\e[0m."
+        echo -e "This operation would cause the \e[1m$target_name\e[0m directory"
+        echo -e "to go above \e[1m${max_size}GB\e[0m."
         echo -e "Do you still wish to continue? (y/n)"
         read -n 1 -r
         echo
