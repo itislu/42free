@@ -2,7 +2,7 @@
 
 sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
 
-# Check if the first argument is -h or --help
+# Print help message
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo -e "\e[1mMove directories or files to free up storage.\e[0m"
     echo -e "The files get moved from $HOME"
@@ -13,12 +13,22 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo -e "\n\e[4mOptions:\e[0m"
     echo -e "    -r, --reverse  Reverse the operation and move the directories or files"
     echo -e "                   back to their original location."
+    echo -e "    -s, --suggest  Display some suggestions to move."
     echo -e "    -h, --help     Display this help message."
     echo
     exit 0
 fi
 
-# Check if the first argument is -r or --reverse
+# Print suggestions
+if [ "$1" = "-s" ] || [ "$1" = "--suggest" ]; then
+    echo -e "\e[1mSome suggestions to move:\e[0m"
+    echo -e "    - ~/.cache"
+    echo -e "    - ~/.local/share/Trash"
+    echo -e "    - ~/.var/app/*/cache"
+    exit 0
+fi
+
+# Check which direction the script should move the directories or files
 if [ "$1" = "-r" ] || [ "$1" = "--reverse" ]; then
     reverse=true
     source_base="$sgoinfre"
