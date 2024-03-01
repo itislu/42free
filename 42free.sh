@@ -52,15 +52,15 @@ fi
 for arg in "$@"
 do
     # Check if the argument is an absolute path and construct the source and target paths
-    if [[ "$arg" = $source_base* ]]; then
+    if [[ "$arg" = $source_base/* ]]; then
         source_path="$arg"
-        target_path="${target_base}${arg#$source_base}"
+        target_path="$target_base/${arg#$source_base}"
     elif [[ "$arg" = /* ]]; then
         echo -e "Absolute paths have to start with the path to your \e[1m$source_name\e[0m directory."
         continue
     else
-        source_path="${source_base}${arg}"
-        target_path="${target_base}${arg}"
+        source_path="$source_base/$arg"
+        target_path="$target_base/$arg"
     fi
 
     # Check if the source directory or file exists
@@ -110,7 +110,7 @@ do
         ln -s "$target_path" "$source_path"
     else
       # If reverse flag is active, delete empty parent directories
-        first_dir_after_base="${source_base}${arg%%/*}"
+        first_dir_after_base="$source_base/${arg%%/*}"
         find "$first_dir_after_base" -type d -empty -delete
         if [ -d "$first_dir_after_base" ] && [ -z "$(ls -A "$first_dir_after_base")" ]; then
             rmdir "$first_dir_after_base"

@@ -4,7 +4,7 @@
 script_url="https://raw.githubusercontent.com/itislu/42free/main/42free.sh"
 
 # Define the destination directory and filename
-dest_dir="$HOME/.scripts/"
+dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
 
 # Download the script
@@ -30,7 +30,7 @@ fi
 if ! grep "42free=" "$RC_FILE" &> /dev/null; then
     echo -e "\e[33m42free alias not present.\e[0m"
     echo -e "\e[33mAdding alias in file: $RC_FILE\e[0m"
-    echo -e "\nalias 42free='bash $dest_dir$dest_file'\n" >> "$RC_FILE"
+    echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
 fi
 
 echo -e "\e[1;32mInstallation completed.\e[0m"
