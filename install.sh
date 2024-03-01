@@ -15,20 +15,27 @@ curl -Lo "$dest_dir/$dest_file" "$script_url"
 chmod +x "$dest_dir/$dest_file"
 
 # Determine the shell and set the appropriate RC file
-RC_FILE="$HOME/.bashrc"
-if [[ "$SHELL" == *"zsh"* ]]; then
+if [[ "$SHELL" == *"bash"* ]]; then
+    RC_FILE="$HOME/.bashrc"
+elif [[ "$SHELL" == *"zsh"* ]]; then
     RC_FILE="$HOME/.zshrc"
+elif [[ "$SHELL" == *"fish"* ]]; then
+    RC_FILE="$HOME/.config/fish/config.fish"
+else
+    echo -e "\e[1;31mUnsupported shell. Please set an alias for your shell manually.\e[0m"
+    exit 1
 fi
 
 # Add an alias to the user's shell RC file if it doesn't exist
 if ! grep "42free=" $RC_FILE &> /dev/null; then
-    echo "42free alias not present"
-    echo "Adding alias in file: $RC_FILE"
+    echo -e "\e[1;33m42free alias not present.\e[0m"
+    echo -e "\e[1;33mAdding alias in file: $RC_FILE\e[0m"
     echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> $RC_FILE
 fi
 
-echo "Installation completed. You can now use the \`42free\` command."
-echo "For information on how to use 42free, run \`42free -h\`."
+echo -e "\e[1;32mInstallation completed.\e[0m"
+echo -e "\e[1;32mYou can now use the \`42free\` command.\e[0m"
+echo -e "For information on how to use 42free, run \`\e[1m42free -h\e[0m\`."
 
 # Start the default shell to make the alias available immediately
 exec $SHELL
