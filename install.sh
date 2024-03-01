@@ -27,10 +27,10 @@ else
 fi
 
 # Add an alias to the user's shell RC file if it doesn't exist
-if ! grep "42free=" $RC_FILE &> /dev/null; then
+if ! grep "42free=" "$RC_FILE" &> /dev/null; then
     echo -e "\e[33m42free alias not present.\e[0m"
     echo -e "\e[33mAdding alias in file: $RC_FILE\e[0m"
-    echo -e "\nalias 42free='bash $dest_dir$dest_file'\n" >> $RC_FILE
+    echo -e "\nalias 42free='bash $dest_dir$dest_file'\n" >> "$RC_FILE"
 fi
 
 echo -e "\e[1;32mInstallation completed.\e[0m"
