@@ -27,8 +27,8 @@ if ! grep "42free=" $RC_FILE &> /dev/null; then
     echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> $RC_FILE
 fi
 
-# Source the RC file to make the alias available immediately
-source $RC_FILE
-
 echo "Installation completed. You can now use the \`42free\` command."
 echo "For information on how to use 42free, run \`42free -h\`."
+
+# Start the default shell to make the alias available immediately
+exec $SHELL
