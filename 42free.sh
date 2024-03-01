@@ -3,7 +3,7 @@
 # Check if the first argument is -h or --help
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo -e "\e[1mMove directories or files to free up storage.\e[0m"
-    echo -e "\e[4mUsage:\e[0m $0 [-r|--reverse] target1 [target2 ...]"
+    echo -e "\e[4mUsage:\e[0m 42free [-r|--reverse] target1 [target2 ...]"
     echo -e "    The target paths have to be relative to your home / sgoinfre directory or"
     echo -e "    have to start with the path to your home / sgoinfre directory."
     echo -e "\n\e[4mOptions:\e[0m"
