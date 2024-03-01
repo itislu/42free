@@ -118,11 +118,7 @@ do
     fi
 
     # Print success message
-    if ! $reverse; then
-        echo -e "\e[93m$source_path\e[0m successfully $operation."
-        echo -e "\e[1m$size\e[0m $outcome."
-    else
-        echo -e "\e[92m$target_path\e[0m successfully $operation."
-        echo -e "\e[1m$size\e[0m $outcome."
-    fi
+    echo -e "\e[93m$source_path\e[0m successfully $operation"
+    echo -e "to \e[92m$target_path\e[0m."
+    echo -e "\e[1m$size\e[0m $outcome."
 done
