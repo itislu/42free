@@ -79,9 +79,8 @@ pretty_print()
 prompt_user()
 {
     pretty_print "$1"
-    read -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    read -r
+    if [[ ! $REPLY =~ ^[Yy](es)?$ ]]; then
         return 1
     fi
     return 0
