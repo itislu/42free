@@ -9,24 +9,24 @@ no_targets=1
 unknown_option=2
 
 # Colors and styles
-sty_reset="\e[0m"
-sty_bold="\e[1m"
-sty_underlined="\e[4m"
+sty_res="\e[0m"
+sty_bol="\e[1m"
+sty_und="\e[4m"
 sty_red="\e[31m"
-sty_blue="\e[34m"
-sty_bright_green="\e[92m"
-sty_bright_yellow="\e[93m"
+sty_blu="\e[34m"
+sty_bri_gre="\e[92m"
+sty_bri_yel="\e[93m"
 
 manual_msg="\
-${sty_bold}Move directories or files to free up storage.${sty_reset}
+${sty_bol}Move directories or files to free up storage.${sty_res}
 The files get moved from '$HOME' to '$sgoinfre'.
 
-${sty_underlined}Usage:${sty_reset} ${sty_bold}42free target1 [target2 ...]${sty_reset}
+${sty_und}Usage:${sty_res} ${sty_bol}42free target1 [target2 ...]${sty_res}
     The target paths can be absolute or relative to your current directory.
     You can only move directories and files inside of your home and sgoinfre directories.
     42free will automatically detect if the given argument is the source or the destination.
 
-${sty_underlined}Options:${sty_reset} You can pass options anywhere in the arguments.
+${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --reverse  Reverse the operation and move the directories or files
                    back to their original location in home.
     -s, --suggest  Display some suggestions to move and exit.
@@ -34,38 +34,38 @@ ${sty_underlined}Options:${sty_reset} You can pass options anywhere in the argum
     -v, --version  Display version information and exit.
     --             Stop interpreting options.
 
-${sty_underlined}Exit codes:${sty_reset}
+${sty_und}Exit codes:${sty_res}
     0: Success
     1: No targets provided
     2: Unknown option
 
-To contribute, report bugs or share improvement ideas, visit ${sty_underlined}${sty_blue}https://github.com/itislu/42free${sty_reset}.
+To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}.
 "
 
 suggest_msg="\
-${sty_bold}Some suggestions to move:${sty_reset}
+${sty_bol}Some suggestions to move:${sty_res}
     - ~/.cache
     - ~/.local/share/Trash
     - ~/.var/app/*/cache"
 
 version_msg="\
-${sty_bold}42free v1.0.0${sty_reset}
+${sty_bol}42free v1.0.0${sty_res}
 A script made for 42 students to move directories or files to free up storage.
-For more information, visit ${sty_underlined}${sty_blue}https://github.com/itislu/42free${sty_reset}."
+For more information, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}."
 
 no_targets_msg="\
-${sty_bold}${sty_red}No targets provided.${sty_reset}
+${sty_bol}${sty_red}No targets provided.${sty_res}
 Please provide the directories or files to move as arguments.
 
-For more information how to use this script, run '${sty_bold}42free -h${sty_reset}'."
+For more information how to use this script, run '${sty_bol}42free -h${sty_res}'."
 
 no_space_prompt_msg="\
-${sty_bold}${sty_red}This operation would cause the '${sty_reset}${sty_bold}$target_name${sty_bold}${sty_red}' directory to go above ${sty_reset}${sty_bold}${max_size}GB${sty_bold}${sty_red}.${sty_reset}
-${sty_bold}Do you still wish to continue? (y/n)${sty_reset}"
+${sty_bol}${sty_red}This operation would cause the '${sty_res}${sty_bol}$target_name${sty_bol}${sty_red}' directory to go above ${sty_res}${sty_bol}${max_size}GB${sty_bol}${sty_red}.${sty_res}
+${sty_bol}Do you still wish to continue? (y/n)${sty_res}"
 
 success_msg="\
-'${sty_bright_yellow}$source_path${sty_reset}' successfully $operation to '${sty_bright_green}$target_path${sty_reset}'.
-${sty_bold}$size${sty_reset} $outcome."
+'${sty_bri_yel}$source_path${sty_res}' successfully $operation to '${sty_bri_gre}$target_path${sty_res}'.
+${sty_bol}$size${sty_res} $outcome."
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
@@ -145,10 +145,10 @@ do
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
         arg_path="$arg"
-        invalid_path_msg="Absolute paths have to lead to a path in your ${sty_bold}home${sty_reset} or ${sty_bold}sgoinfre${sty_reset} directory. Skip."
+        invalid_path_msg="Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory. Skip."
     else
         arg_path="$current_dir/$arg"
-        invalid_path_msg="The current directory is not in your ${sty_bold}home${sty_reset} or ${sty_bold}sgoinfre${sty_reset} directory. Skip."
+        invalid_path_msg="The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory. Skip."
     fi
 
     # Construct the source and target paths
@@ -166,7 +166,7 @@ do
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
-        pretty_print "'${sty_bold}${sty_red}$source_path${sty_reset}' does not exist."
+        pretty_print "'${sty_bol}${sty_red}$source_path${sty_res}' does not exist."
         continue
     fi
 
@@ -197,7 +197,7 @@ do
 
     # Move the directory or file
     if ! mv "$source_path" "$target_path"; then
-        pretty_print "${sty_bold}${sty_red}Error moving '$source_path' to '$target_path'.${sty_reset}"
+        pretty_print "${sty_bol}${sty_red}Error moving '$source_path' to '$target_path'.${sty_res}"
         continue
     fi
 
