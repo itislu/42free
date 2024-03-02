@@ -8,6 +8,62 @@ unknown_option=2
 current_dir=$(pwd)
 sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
 
+manual_msg="\
+\e[1mMove directories or files to free up storage.\e[0m
+The files get moved from '$HOME' to '$sgoinfre'.
+
+\e[4mUsage:\e[0m \e[1m42free target1 [target2 ...]\e[0m
+    The target paths can be absolute or relative to your current directory.
+    You can only move directories and files inside of your home and sgoinfre directories.
+    42free will automatically detect if the given argument is the source or the destination.
+
+\e[4mOptions:\e[0m You can pass options anywhere in the arguments.
+    -r, --reverse  Reverse the operation and move the directories or files
+                   back to their original location in home.
+    -s, --suggest  Display some suggestions to move and exit.
+    -h, --help     Display this help message and exit.
+    -v, --version  Display version information and exit.
+    --             Stop interpreting options.
+
+\e[4mExit codes:\e[0m
+    0: Success
+    1: No targets provided
+    2: Unknown option
+
+To contribute, report bugs or share improvement ideas, visit \e[4;34mhttps://github.com/itislu/42free\e[0m.
+"
+
+suggest_msg="\
+\e[1mSome suggestions to move:\e[0m
+    - ~/.cache
+    - ~/.local/share/Trash
+    - ~/.var/app/*/cache"
+
+version_msg="\
+\e[1m42free v1.0.0\e[0m
+A script made for 42 students to move directories or files to free up storage.
+For more information, visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
+
+no_targets_msg="\
+\e[1;31mNo targets provided.\e[0m
+Please provide the directories or files to move as arguments.
+
+For more information how to use this script, run '\e[1m42free -h\e[0m'."
+
+no_space_prompt_msg="\
+\e[1;31mThis operation would cause the '\e[1;0m$target_name\e[1;31m' directory to go above \e[1;0m${max_size}GB\e[1;31m.\e[0m
+\e[1mDo you still wish to continue? (y/n)\e[0m"
+
+success_msg="\
+'\e[93m$source_path\e[0m' successfully $operation to '\e[92m$target_path\e[0m'.
+\e[1m$size\e[0m $outcome."
+
+# Automatically detects the size of the terminal window and preserves word boundaries at the edges
+pretty_print()
+{
+    printf "%b" "$1" | fmt -sw $(tput cols)
+}
+
 # Process options
 args=()
 reverse=false
@@ -18,46 +74,16 @@ while (( $# )); do
             ;;
         -s|--suggest)
             # Print some suggestions
-            echo -e "\e[1mSome suggestions to move:\e[0m"
-            echo -e "    - ~/.cache"
-            echo -e "    - ~/.local/share/Trash"
-            echo -e "    - ~/.var/app/*/cache"
-            exit $success
+            pretty_print "$suggest_msg"
             ;;
         -h|--help)
             # Print help message
-            echo -e "\e[1mMove directories or files to free up storage.\e[0m"
-            echo -e "The files get moved from $HOME"
-            echo -e "                      to $sgoinfre."
-            echo
-            echo -e "\e[4mUsage:\e[0m \e[1m42free target1 [target2 ...]\e[0m"
-            echo -e "    The target paths can be absolute or relative to your current directory."
-            echo -e "    You can only move directories and files inside of your home and sgoinfre directories."
-            echo -e "    42free will automatically detect if the given argument is the source or the destination."
-            echo
-            echo -e "\e[4mOptions:\e[0m You can pass options anywhere in the arguments."
-            echo -e "    -r, --reverse  Reverse the operation and move the directories or files"
-            echo -e "                   back to their original location in home."
-            echo -e "    -s, --suggest  Display some suggestions to move and exit."
-            echo -e "    -h, --help     Display this help message and exit."
-            echo -e "    -v, --version  Display version information and exit."
-            echo -e "    --             Stop interpreting options."
-            echo
-            echo -e "\e[4mExit codes:\e[0m"
-            echo -e "    0: Success"
-            echo -e "    1: No targets provided"
-            echo -e "    2: Unknown option"
-            echo
-            echo -e "To contribute, report bugs or share improvement ideas,"
-            echo -e "visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
-            echo
+            pretty_print "$manual_msg"
             exit $success
             ;;
         -v|--version)
             # Print version information
-            echo -e "\e[1m42free v1.0.0\e[0m"
-            echo -e "A script made for 42 students to move directories or files to free up storage."
-            echo -e "For more information, visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
+            pretty_print "$version_msg"
             exit $success
             ;;
         --)
@@ -67,7 +93,7 @@ while (( $# )); do
             ;;
         -*)
             # Unknown option
-            echo "Unknown option: $1"
+            pretty_print "Unknown option: '$1'"
             exit $unknown_option
             ;;
         *)
@@ -100,9 +126,7 @@ fi
 
 # Check if the script received any targets
 if [ $# -eq 0 ]; then
-    echo -e "\e[1;31mNo targets provided.\e[0m"
-    echo -e "Please provide the directories or files to move as arguments."
-    echo -e "\nFor more information how to use this script, run \e[1m42free -h\e[0m."
+    pretty_print "$no_targets_msg"
     exit $no_targets
 fi
 
@@ -112,10 +136,10 @@ do
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
         arg_path="$arg"
-        error_msg="Absolute paths have to lead to a path in your \e[1mhome\e[0m or \e[1msgoinfre\e[0m directory. Skip."
+        invalid_path_msg="Absolute paths have to lead to a path in your \e[1mhome\e[0m or \e[1msgoinfre\e[0m directory. Skip."
     else
         arg_path="$current_dir/$arg"
-        error_msg="The current directory is not in your \e[1mhome\e[0m or \e[1msgoinfre\e[0m directory. Skip."
+        invalid_path_msg="The current directory is not in your \e[1mhome\e[0m or \e[1msgoinfre\e[0m directory. Skip."
     fi
 
     # Construct the source and target paths
@@ -127,13 +151,13 @@ do
         source_path="$source_base/${target_path#"$target_base/"}"
     else
         # If the result is neither in the source nor target base directory, skip the argument
-        echo -e "$error_msg"
+        pretty_print "$invalid_path_msg"
         continue
     fi
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
-        echo -e "\e[1;31m$source_path\e[0m does not exist."
+        pretty_print "'\e[1;31m$source_path\e[0m' does not exist."
         continue
     fi
 
@@ -146,9 +170,7 @@ do
 
     # Check if the target directory would go above its maximum recommended size after moving
     if (( available_space_in_bytes - size_in_bytes < max_size * 1024**3 )); then
-        echo -e "This operation would cause the \e[1m$target_name\e[0m directory"
-        echo -e "to go above \e[1m${max_size}GB\e[0m."
-        echo -e "Do you still wish to continue? (y/n)"
+        pretty_print "$no_space_prompt_msg"
         read -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -166,7 +188,7 @@ do
 
     # Move the directory or file
     if ! mv "$source_path" "$target_path"; then
-        echo -e "\e[1;31mError moving $source_path to $target_path.\e[0m"
+        pretty_print "\e[1;31mError moving '$source_path' to '$target_path'.\e[0m"
         continue
     fi
 
@@ -183,7 +205,5 @@ do
     fi
 
     # Print success message
-    echo -e "\e[93m$source_path\e[0m successfully $operation"
-    echo -e "to \e[92m$target_path\e[0m."
-    echo -e "\e[1m$size\e[0m $outcome."
+    pretty_print "$success_msg"
 done

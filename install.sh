@@ -10,7 +10,7 @@ dest_file="42free.sh"
 # Download the script
 mkdir -p "$dest_dir"
 curl -Lo "$dest_dir/$dest_file" "$script_url"
-echo -e "$dest_file downloaded into $dest_dir."
+echo -e "'$dest_file' downloaded into '$dest_dir'."
 
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
@@ -36,7 +36,7 @@ fi
 
 echo -e "\e[1;32mInstallation completed.\e[0m"
 echo -e "You can now use the 42free command."
-echo -e "For help, run \e[1m42free -h\e[0m."
+echo -e "For help, run '\e[1m42free -h\e[0m'."
 
 # Start the default shell to make the alias available immediately
 exec $SHELL
