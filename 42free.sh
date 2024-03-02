@@ -3,51 +3,94 @@
 current_dir=$(pwd)
 sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
 
-# Print help message
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    echo -e "\e[1mMove directories or files to free up storage.\e[0m"
-    echo -e "The files get moved from $HOME"
-    echo -e "                      to $sgoinfre.\n"
-    echo -e "\e[4mUsage:\e[0m \e[1m42free [-r|--reverse] target1 [target2 ...]\e[0m"
-    echo -e "    The target paths can be absolute or relative to your current directory."
-    echo -e "    You can only move directories and files inside of your home and sgoinfre directories."
-    echo -e "    42free will automatically detect if the given argument is the source or the destination."
-    echo -e "\n\e[4mOptions:\e[0m"
-    echo -e "    -r, --reverse  Reverse the operation and move the directories or files"
-    echo -e "                   back to their original location in home."
-    echo -e "    -s, --suggest  Display some suggestions to move."
-    echo -e "    -h, --help     Display this help message."
-    echo
-    exit 0
-fi
+# Process options
+args=()
+reverse=false
+while (( $# )); do
+    case "$1" in
+        -r|--reverse)
+            reverse=true
+            ;;
+        -s|--suggest)
+            # Print some suggestions
+            echo -e "\e[1mSome suggestions to move:\e[0m"
+            echo -e "    - ~/.cache"
+            echo -e "    - ~/.local/share/Trash"
+            echo -e "    - ~/.var/app/*/cache"
+            exit 0
+            ;;
+        -h|--help)
+            # Print help message
+            echo -e "\e[1mMove directories or files to free up storage.\e[0m"
+            echo -e "The files get moved from $HOME"
+            echo -e "                      to $sgoinfre."
+            echo
+            echo -e "\e[4mUsage:\e[0m \e[1m42free target1 [target2 ...]\e[0m"
+            echo -e "    The target paths can be absolute or relative to your current directory."
+            echo -e "    You can only move directories and files inside of your home and sgoinfre directories."
+            echo -e "    42free will automatically detect if the given argument is the source or the destination."
+            echo
+            echo -e "\e[4mOptions:\e[0m You can pass options anywhere in the arguments."
+            echo -e "    -r, --reverse  Reverse the operation and move the directories or files"
+            echo -e "                   back to their original location in home."
+            echo -e "    -s, --suggest  Display some suggestions to move and exit."
+            echo -e "    -h, --help     Display this help message and exit."
+            echo -e "    -v, --version  Display version information and exit."
+            echo -e "    --             Stop interpreting options."
+            echo
+            echo -e "\e[4mExit codes:\e[0m"
+            echo -e "    0: Success"
+            echo -e "    1: No targets provided"
+            echo -e "    2: Unknown option"
+            echo
+            echo -e "To contribute, report bugs or share improvement ideas,"
+            echo -e "visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
+            echo
+            exit 0
+            ;;
+        -v|--version)
+            # Print version information
+            echo -e "\e[1m42free v1.0.0\e[0m"
+            echo -e "A script made for 42 students to move directories or files to free up storage."
+            echo -e "For more information, visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
+            exit 0
+            ;;
+        --)
+            # End of options
+            shift
+            break
+            ;;
+        -*)
+            # Unknown option
+            echo "Unknown option: $1"
+            exit 2
+            ;;
+        *)
+            # Non-option argument
+            args+=("$1")
+            ;;
+    esac
+    shift
+done
 
-# Print suggestions
-if [ "$1" = "-s" ] || [ "$1" = "--suggest" ]; then
-    echo -e "\e[1mSome suggestions to move:\e[0m"
-    echo -e "    - ~/.cache"
-    echo -e "    - ~/.local/share/Trash"
-    echo -e "    - ~/.var/app/*/cache"
-    exit 0
-fi
+# Set positional parameters to non-option arguments
+set -- "${args[@]}"
 
 # Check which direction the script should move the directories or files
-if [ "$1" = "-r" ] || [ "$1" = "--reverse" ]; then
-    reverse=true
-    source_base="$sgoinfre"
-    target_base="$HOME"
-    target_name="home"
-    max_size=5
-    operation="moved back"
-    outcome="reclaimed"
-    shift
-else
-    reverse=false
+if ! $reverse; then
     source_base="$HOME"
     target_base="$sgoinfre"
     target_name="sgoinfre"
     max_size=30
     operation="moved"
     outcome="freed"
+else
+    source_base="$sgoinfre"
+    target_base="$HOME"
+    target_name="home"
+    max_size=5
+    operation="moved back"
+    outcome="reclaimed"
 fi
 
 # Check if the script received any targets

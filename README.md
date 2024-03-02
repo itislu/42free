@@ -66,13 +66,13 @@ The arguments can be specified as absolute or relative paths.
 42free target1 [target2 ...]
 ```
 
-You can use the `-r` or `--reverse` option to move any directories or files back to their original location.
+**You can pass options to change the behavior of 42free:**
 
-```bash
-42free -r target1 [target2 ...]
-```
+- You can use the `-r` option to move any directories and files back to their original location.
 
-You can always run `42free -h` or `42free --help` to see the manual.
+- To get some suggested directories to move, run `42free -s`.
+
+- To see the manual, run `42free -h`.
 
 ---
 
