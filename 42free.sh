@@ -222,8 +222,12 @@ do
     fi
 
     # Move the directory or file
-    if ! mv "$source_path" "$target_path"; then
-        pretty_print "$print_error Could not move ${sty_bol}'$source_path'${sty_res} to '${sty_bol}$target_path${sty_res}'."
+    mv_stderr=$(mv "$source_path" "$target_path" 2>&1)
+    mv_status=$?
+    if [ $mv_status -ne 0 ]; then
+        mv_stderr=${mv_stderr#mv: }
+        pretty_print "$print_error Could not move ${sty_bol}'$source_path'${sty_res} to '${sty_bol}$(dirname "$target_path")${sty_res}'."
+        pretty_print "$mv_stderr."
         continue
     fi
 
