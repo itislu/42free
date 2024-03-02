@@ -185,15 +185,21 @@ do
         continue
     fi
 
+    # Get the current size of the target directory
+    if [ -z "$target_dir_size_in_bytes" ]; then
+        pretty_print "Getting the current size of the $target_name directory..."
+        target_dir_size_in_bytes=$(du -sb "$target_base" 2>/dev/null | cut -f1)
+    fi
+
     # Get the size of the directory or file to be moved
     size="$(du -sh "$source_path" | cut -f1)B"
     size_in_bytes=$(du -sb "$source_path" | cut -f1)
 
-    # Get the available space in the target directory
-    available_space_in_bytes=$(df --output=avail -B1 "$target_base" | tail -n1)
+    # Convert max_size from GB to bytes
+    max_size_in_bytes=$((max_size * 1024 * 1024 * 1024))
 
     # Check if the target directory would go above its maximum recommended size
-    if (( available_space_in_bytes - size_in_bytes < max_size * 1024**3 )); then
+    if (( target_dir_size_in_bytes + size_in_bytes > max_size_in_bytes )); then
         pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
             pretty_print "Skipping ${sty_bol}$arg${sty_res}."
@@ -220,6 +226,9 @@ do
         pretty_print "$print_error Could not move ${sty_bol}'$source_path'${sty_res} to '${sty_bol}$target_path${sty_res}'."
         continue
     fi
+
+    # Update the size of the target directory
+    target_dir_size_in_bytes=$((target_dir_size_in_bytes + size_in_bytes))
 
     # If reverse flag is not active, leave a symbolic link behind
     if ! $reverse; then
