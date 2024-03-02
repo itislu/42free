@@ -116,10 +116,10 @@ do
     # Construct the source and target paths
     if [[ "$arg_path" = $source_base/* ]]; then
         source_path="$arg_path"
-        target_path="$target_base/${source_path#$source_base}"
+        target_path="$target_base/${source_path#"$source_base/"}"
     elif [[ "$arg_path" = $target_base/* ]]; then
         target_path="$arg_path"
-        source_path="$source_base/${target_path#$target_base}"
+        source_path="$source_base/${target_path#"$target_base/"}"
     else
         # If the result is neither in the source nor target base directory, skip the argument
         echo -e "$error_msg"
