@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Exit codes
+success=0
+no_targets=1
+unknown_option=2
+
 current_dir=$(pwd)
 sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
 
@@ -17,7 +22,7 @@ while (( $# )); do
             echo -e "    - ~/.cache"
             echo -e "    - ~/.local/share/Trash"
             echo -e "    - ~/.var/app/*/cache"
-            exit 0
+            exit $success
             ;;
         -h|--help)
             # Print help message
@@ -46,14 +51,14 @@ while (( $# )); do
             echo -e "To contribute, report bugs or share improvement ideas,"
             echo -e "visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
             echo
-            exit 0
+            exit $success
             ;;
         -v|--version)
             # Print version information
             echo -e "\e[1m42free v1.0.0\e[0m"
             echo -e "A script made for 42 students to move directories or files to free up storage."
             echo -e "For more information, visit \e[4;34mhttps://github.com/itislu/42free\e[0m."
-            exit 0
+            exit $success
             ;;
         --)
             # End of options
@@ -63,7 +68,7 @@ while (( $# )); do
         -*)
             # Unknown option
             echo "Unknown option: $1"
-            exit 2
+            exit $unknown_option
             ;;
         *)
             # Non-option argument
@@ -97,8 +102,8 @@ fi
 if [ $# -eq 0 ]; then
     echo -e "\e[1;31mNo targets provided.\e[0m"
     echo -e "Please provide the directories or files to move as arguments."
-    echo -e "\nFor more information how to use this script, run \e[1m$0 -h\e[0m."
-    exit 1
+    echo -e "\nFor more information how to use this script, run \e[1m42free -h\e[0m."
+    exit $no_targets
 fi
 
 # Loop over all arguments
@@ -165,7 +170,7 @@ do
         continue
     fi
 
-    # If reverse flag is not active, create a symbolic link
+    # If reverse flag is not active, leave a symbolic link behind
     if ! $reverse; then
         ln -s "$target_path" "$source_path"
     else
