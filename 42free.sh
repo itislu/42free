@@ -17,14 +17,20 @@ sty_blu="\e[34m"
 sty_bri_gre="\e[92m"
 sty_bri_yel="\e[93m"
 
-manual_msg="\
-${sty_bol}Move directories or files to free up storage.${sty_res}
-The files get moved from '$HOME' to '$sgoinfre'.
+print_error="${sty_bol}${sty_red}ERROR:${sty_res}"
+print_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
+print_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
+
+msg_manual="\
+
+        ${sty_bol}${sty_bri_yel}📁 Move directories or files to free up storage 📁${sty_res}
+          ${sty_und}                                              ${sty_res}
+
+The files get moved from '$HOME' to '$sgoinfre'.${sty_res}
 
 ${sty_und}Usage:${sty_res} ${sty_bol}42free target1 [target2 ...]${sty_res}
     The target paths can be absolute or relative to your current directory.
-    You can only move directories and files inside of your home and sgoinfre directories.
-    42free will automatically detect if the given argument is the source or the destination.
+    42free will automatically detect if an argument is the source or the destination.
 
 ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --reverse  Reverse the operation and move the directories or files
@@ -40,37 +46,44 @@ ${sty_und}Exit codes:${sty_res}
     2: Unknown option
 
 To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}.
+
 "
 
-suggest_msg="\
+msg_suggest="\
 ${sty_bol}Some suggestions to move:${sty_res}
     - ~/.cache
     - ~/.local/share/Trash
     - ~/.var/app/*/cache"
 
-version_msg="\
+msg_version="\
 ${sty_bol}42free v1.0.0${sty_res}
 A script made for 42 students to move directories or files to free up storage.
 For more information, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}."
 
-no_targets_msg="\
-${sty_bol}${sty_red}No targets provided.${sty_res}
+msg_no_targets="\
+$print_error ${sty_bol}No targets provided.${sty_res}
 Please provide the directories or files to move as arguments.
+Run '42free -s' for some suggestions.
+Run '42free -h' for more information."
 
-For more information how to use this script, run '${sty_bol}42free -h${sty_res}'."
-
-no_space_prompt_msg="\
-${sty_bol}${sty_red}This operation would cause the '${sty_res}${sty_bol}$target_name${sty_bol}${sty_red}' directory to go above ${sty_res}${sty_bol}${max_size}GB${sty_bol}${sty_red}.${sty_res}
-${sty_bol}Do you still wish to continue? (y/n)${sty_res}"
-
-success_msg="\
-'${sty_bri_yel}$source_path${sty_res}' successfully $operation to '${sty_bri_gre}$target_path${sty_res}'.
-${sty_bol}$size${sty_res} $outcome."
+prompt_continue="Do you still wish to continue? ${sty_bol}(y/n)${sty_res}"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
 {
     printf "%b" "$1" | fmt -sw $(tput cols)
+}
+
+# Prompt the user for confirmation
+prompt_user()
+{
+    pretty_print "$1"
+    read -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        return 1
+    fi
+    return 0
 }
 
 # Process options
@@ -83,16 +96,16 @@ while (( $# )); do
             ;;
         -s|--suggest)
             # Print some suggestions
-            pretty_print "$suggest_msg"
+            pretty_print "$msg_suggest"
             ;;
         -h|--help)
             # Print help message
-            pretty_print "$manual_msg"
+            pretty_print "$msg_manual"
             exit $success
             ;;
         -v|--version)
             # Print version information
-            pretty_print "$version_msg"
+            pretty_print "$msg_version"
             exit $success
             ;;
         --)
@@ -135,7 +148,7 @@ fi
 
 # Check if the script received any targets
 if [ $# -eq 0 ]; then
-    pretty_print "$no_targets_msg"
+    pretty_print "$msg_no_targets"
     exit $no_targets
 fi
 
@@ -145,10 +158,10 @@ do
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
         arg_path="$arg"
-        invalid_path_msg="Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory. Skip."
+        invalid_path_msg="$print_error Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
     else
         arg_path="$current_dir/$arg"
-        invalid_path_msg="The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory. Skip."
+        invalid_path_msg="$print_error The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
     fi
 
     # Construct the source and target paths
@@ -161,12 +174,13 @@ do
     else
         # If the result is neither in the source nor target base directory, skip the argument
         pretty_print "$invalid_path_msg"
+        pretty_print "Skipping ${sty_bol}$arg${sty_res}."
         continue
     fi
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
-        pretty_print "'${sty_bol}${sty_red}$source_path${sty_res}' does not exist."
+        pretty_print "$print_error '${sty_red}$source_path${sty_res}' does not exist."
         continue
     fi
 
@@ -177,12 +191,10 @@ do
     # Get the available space in the target directory
     available_space_in_bytes=$(df --output=avail -B1 "$target_base" | tail -n1)
 
-    # Check if the target directory would go above its maximum recommended size after moving
+    # Check if the target directory would go above its maximum recommended size
     if (( available_space_in_bytes - size_in_bytes < max_size * 1024**3 )); then
-        pretty_print "$no_space_prompt_msg"
-        read -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
+        if ! prompt_user "$prompt_continue"; then
             continue
         fi
     fi
@@ -197,7 +209,7 @@ do
 
     # Move the directory or file
     if ! mv "$source_path" "$target_path"; then
-        pretty_print "${sty_bol}${sty_red}Error moving '$source_path' to '$target_path'.${sty_res}"
+        pretty_print "$print_error Could not move ${sty_bol}'$source_path'${sty_res} to '${sty_bol}$target_path${sty_res}'."
         continue
     fi
 
@@ -214,5 +226,6 @@ do
     fi
 
     # Print success message
-    pretty_print "$success_msg"
+    pretty_print "$print_success '${sty_bri_yel}$source_path${sty_res}' successfully $operation to '${sty_bri_gre}$target_path${sty_res}'."
+    pretty_print "${sty_bol}$size${sty_res} $outcome."
 done
