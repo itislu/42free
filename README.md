@@ -2,21 +2,21 @@
 
 ### 42free is a bash script that helps you manage your limited storage on 42 campuses.
 
-#### Easy to use.
+**Easy to use.**
 - 42free is designed to be easy to use and flexible, allowing you to specify which directories and files to free the space of.
 
-#### No data loss.
+**No data loss.**
 - You will not lose any data by running 42free, it only moves the data.
   All programs that need the moved directories and files will continue to work normally.
 
-#### Run and forget.
+**Run and forget.**
 - You only need to run it once for every directory or file you want to free.
   From that point onwards, they will accumulate their space outside of your home directory.
 
-#### Reversable.
+**Reversable.**
 - You can always restore the moved directories and files back to their original position.
 
-#### Aware of limits.
+**Aware of limits.**
 - 42free will detect if moving more files to sgoinfre would go over the allowed storage limit and will warn you.
 
 ---
