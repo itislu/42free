@@ -1,5 +1,6 @@
 #!/bin/bash
 
+current_dir=$(pwd)
 sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
 
 # Print help message
@@ -8,11 +9,12 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo -e "The files get moved from $HOME"
     echo -e "                      to $sgoinfre.\n"
     echo -e "\e[4mUsage:\e[0m \e[1m42free [-r|--reverse] target1 [target2 ...]\e[0m"
-    echo -e "    The target paths have to be relative to your home (or sgoinfre) directory or"
-    echo -e "    have to start with the path to your home (or sgoinfre) directory."
+    echo -e "    The target paths can be absolute or relative to your current directory."
+    echo -e "    You can only move directories and files inside of your home and sgoinfre directories."
+    echo -e "    42free will automatically detect if the given argument is the source or the destination."
     echo -e "\n\e[4mOptions:\e[0m"
     echo -e "    -r, --reverse  Reverse the operation and move the directories or files"
-    echo -e "                   back to their original location."
+    echo -e "                   back to their original location in home."
     echo -e "    -s, --suggest  Display some suggestions to move."
     echo -e "    -h, --help     Display this help message."
     echo
@@ -33,7 +35,6 @@ if [ "$1" = "-r" ] || [ "$1" = "--reverse" ]; then
     reverse=true
     source_base="$sgoinfre"
     target_base="$HOME"
-    source_name="sgoinfre"
     target_name="home"
     max_size=5
     operation="moved back"
@@ -43,7 +44,6 @@ else
     reverse=false
     source_base="$HOME"
     target_base="$sgoinfre"
-    source_name="home"
     target_name="sgoinfre"
     max_size=30
     operation="moved"
@@ -61,24 +61,31 @@ fi
 # Loop over all arguments
 for arg in "$@"
 do
-    # Check if the argument is an absolute path and construct the source and target paths
-    if [[ "$arg" = $source_base/* ]]; then
-        source_path="$arg"
-        target_path="$target_base/${arg#$source_base}"
-    elif [[ "$arg" = /* ]]; then
-        echo -e "Absolute paths have to start with the path to your \e[1m$source_name\e[0m directory."
-        continue
+    # Check if argument is an absolute or relative path
+    if [[ "$arg" = /* ]]; then
+        arg_path="$arg"
+        error_msg="Absolute paths have to lead to a path in your \e[1mhome\e[0m or \e[1msgoinfre\e[0m directory. Skip."
     else
-        source_path="$source_base/$arg"
-        target_path="$target_base/$arg"
+        arg_path="$current_dir/$arg"
+        error_msg="The current directory is not in your \e[1mhome\e[0m or \e[1msgoinfre\e[0m directory. Skip."
+    fi
+
+    # Construct the source and target paths
+    if [[ "$arg_path" = $source_base/* ]]; then
+        source_path="$arg_path"
+        target_path="$target_base/${source_path#$source_base}"
+    elif [[ "$arg_path" = $target_base/* ]]; then
+        target_path="$arg_path"
+        source_path="$source_base/${target_path#$target_base}"
+    else
+        # If the result is neither in the source nor target base directory, skip the argument
+        echo -e "$error_msg"
+        continue
     fi
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
         echo -e "\e[1;31m$source_path\e[0m does not exist."
-        if [[ "$arg" != /* ]]; then
-            echo -e "Please provide the path relative to your \e[1m$source_name\e[0m directory."
-        fi
         continue
     fi
 

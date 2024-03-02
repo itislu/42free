@@ -59,9 +59,8 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 ## Usage
 
 You can use 42free by running the `42free` command followed by any amount of directories or files you want to move.
-The arguments can be specified as ...
-- paths relative to your home or sgoinfre directory,
-- absolute paths.
+The arguments can be specified as absolute or relative paths.
+42free will automatically detect if the given argument is the source you want to move, or the destination you want to move the source to.
 
 ```bash
 42free target1 [target2 ...]
