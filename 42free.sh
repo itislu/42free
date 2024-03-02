@@ -66,7 +66,8 @@ Please provide the directories or files to move as arguments.
 Run '42free -s' for some suggestions.
 Run '42free -h' for more information."
 
-prompt_continue="Do you still wish to continue? ${sty_bol}(y/n)${sty_res}"
+prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
+prompt_replace="Do you wish to replace it? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
@@ -195,6 +196,7 @@ do
     if (( available_space_in_bytes - size_in_bytes < max_size * 1024**3 )); then
         pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
+            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
             continue
         fi
     fi
@@ -205,6 +207,12 @@ do
     # Check if the target path is a symbolic link
     if $reverse && [ -L "$target_path" ]; then
         rm "$target_path"
+    elif [ -e "$target_path" ]; then
+        pretty_print "$print_warning '${sty_bol}$target_path${sty_res}' already exists."
+        if ! prompt_user "$prompt_replace"; then
+            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            continue
+        fi
     fi
 
     # Move the directory or file
