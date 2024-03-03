@@ -110,6 +110,11 @@ prompt_user()
     return 0
 }
 
+print_skip_arg()
+{
+    pretty_print "Skipping ${sty_bol}$1${sty_res}."
+}
+
 # Process options
 args=()
 reverse=false
@@ -248,7 +253,7 @@ for arg in "$@"; do
     else
         # If the result is neither in the source nor target base directory, skip the argument
         pretty_print "$invalid_path_msg"
-        pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+        print_skip_arg "$arg"
         continue
     fi
 
@@ -264,12 +269,12 @@ for arg in "$@"; do
         if ! $reverse && [[ "$(readlink "$source_path")" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
             pretty_print "${sty_bol}${sty_bri_cya}$source_subpath${sty_res} has already been moved to sgoinfre."
             pretty_print "It is located at '${sty_bol}$(readlink "$source_path")${sty_res}'."
-            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            print_skip_arg "$arg"
             continue
         fi
         pretty_print "$print_warning '${sty_bol}$source_path${sty_res}' is a symbolic link."
         if ! prompt_user "$prompt_continue"; then
-            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            print_skip_arg "$arg"
             continue
         fi
     fi
@@ -281,7 +286,7 @@ for arg in "$@"; do
     elif [ -e "$target_path" ]; then
         pretty_print "$print_warning '${sty_bol}$target_path${sty_res}' already exists."
         if ! prompt_user "$prompt_replace"; then
-            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            print_skip_arg "$arg"
             continue
         fi
     fi
@@ -303,7 +308,7 @@ for arg in "$@"; do
     if (( target_dir_size_in_bytes + size_in_bytes > max_size_in_bytes )); then
         pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
-            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            print_skip_arg "$arg"
             continue
         fi
     fi
