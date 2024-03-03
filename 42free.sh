@@ -8,9 +8,8 @@ sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
 # Exit codes
 success=0
-no_targets=1
+user_abort=1
 unknown_option=2
-user_abort=3
 
 # Colors and styles
 sty_res="\e[0m"
@@ -51,9 +50,8 @@ ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
 
 ${sty_und}Exit codes:${sty_res}
     0: Success
-    1: No targets provided
+    1: User aborted
     2: Unknown option
-    3: User aborted
 
 To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}.
 
@@ -69,12 +67,6 @@ msg_version="\
 ${sty_bol}42free v1.0.0${sty_res}
 A script made for 42 students to move directories or files to free up storage.
 For more information, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}."
-
-msg_no_targets="\
-$print_error ${sty_bol}No targets provided.${sty_res}
-Please provide the directories or files to move as arguments.
-Run '42free -s' for some suggestions.
-Run '42free -h' for more information."
 
 msg_sgoinfre_permissions="\
 $print_warning The permissions of your personal sgoinfre directory are not set to '${sty_bol}rwx------${sty_res}'.
@@ -147,6 +139,12 @@ done
 # Set positional parameters to non-option arguments
 set -- "${args[@]}"
 
+# Check if the script received any targets
+if [ $# -eq 0 ]; then
+    pretty_print "$msg_manual"
+    exit $success
+fi
+
 # Check if the permissions of user's sgoinfre directory are rwx------
 if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
     pretty_print "$msg_sgoinfre_permissions"
@@ -180,12 +178,6 @@ else
     max_size=5
     operation="moved back"
     outcome="reclaimed"
-fi
-
-# Check if the script received any targets
-if [ $# -eq 0 ]; then
-    pretty_print "$msg_no_targets"
-    exit $no_targets
 fi
 
 # Loop over all arguments
