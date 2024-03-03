@@ -18,6 +18,7 @@ sty_red="\e[31m"
 sty_blu="\e[34m"
 sty_bri_gre="\e[92m"
 sty_bri_yel="\e[93m"
+sty_bri_cya="\e[96m"
 
 print_error="${sty_bol}${sty_red}ERROR:${sty_res}"
 print_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
@@ -198,6 +199,22 @@ do
     if [ ! -e "$source_path" ]; then
         pretty_print "$print_error '${sty_red}$source_path${sty_res}' does not exist."
         continue
+    fi
+
+    # Check if the source file is a symbolic link
+    if [ -L "$source_path" ]; then
+        # If the source directory or file has already been moved to sgoinfre, skip it
+        if ! $reverse && [[ "$(readlink "$source_path")" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
+            pretty_print "${sty_bol}${sty_bri_cya}$arg${sty_res} has already been moved to sgoinfre."
+            pretty_print "It is located at '${sty_bol}$(readlink "$source_path")${sty_res}'."
+            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            continue
+        fi
+        pretty_print "$print_warning '${sty_bol}$source_path${sty_res}' is a symbolic link."
+        if ! prompt_user "$prompt_continue"; then
+            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            continue
+        fi
     fi
 
     # When moving files back to home, first remove the symbolic link
