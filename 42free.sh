@@ -324,7 +324,7 @@ for arg in "$@"; do
 
     # Move the directory or file
     pretty_print "Moving '${sty_bol}$source_subpath${sty_res}' to ${sty_bol}$target_name${sty_res}..."
-    mv_stderr=$(mv "$source_path" "$target_path" 2>&1)
+    mv_stderr=$(mv -T "$source_path" "$target_path" 2>&1)
     mv_status=$?
     if [ $mv_status -ne 0 ]; then
         mv_stderr=${mv_stderr#mv: }
