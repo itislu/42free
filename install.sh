@@ -7,6 +7,18 @@ script_url="https://raw.githubusercontent.com/itislu/42free/main/42free.sh"
 dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
 
+# Exit codes
+download_failed=1
+install_failed=2
+
+# Colors and styles
+sty_res="\e[0m"
+sty_bol="\e[1m"
+sty_red="\e[31m"
+sty_yel="\e[33m"
+sty_bri_gre="\e[92m"
+sty_bri_yel="\e[93m"
+
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
 {
@@ -21,9 +33,9 @@ elif command -v wget &>/dev/null; then
     downloader="wget"
     downloader_opts="-qO"
 else
-    pretty_print "Neither \e[1;31mcurl\e[0m nor \e[1;31mwget\e[0m was found."
+    pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
     pretty_print "Please install one of them and try again."
-    exit 1
+    exit $download_failed
 fi
 
 # Download the script
@@ -31,10 +43,10 @@ mkdir -p "$dest_dir"
 $downloader $downloader_opts "$dest_dir/$dest_file" "$script_url"
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
-    pretty_print "\e[1;31mFailed to download file with $downloader.\e[0m"
-    exit 1
+    pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
+    exit $download_failed
 fi
-pretty_print "'$dest_file' downloaded into '$dest_dir'."
+pretty_print "${sty_yel}'$dest_file' downloaded into '$dest_dir'.${sty_res}"
 
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
@@ -47,22 +59,22 @@ elif [[ "$SHELL" == *"zsh"* ]]; then
 elif [[ "$SHELL" == *"fish"* ]]; then
     RC_FILE="$HOME/.config/fish/config.fish"
 else
-    pretty_print "\e[1;93mUnsupported shell. Please set an alias for your shell manually.\e[0m"
-    exit 2
+    pretty_print "${sty_bol}${sty_bri_yel}Unsupported shell. Please set an alias for your shell manually.${sty_res}"
+    exit $install_failed
 fi
 
 # Add an alias to the user's shell RC file if it doesn't exist
 if ! grep "42free=" "$RC_FILE" &>/dev/null; then
-    pretty_print "\e[33m42free alias not present.\e[0m"
-    pretty_print "\e[33mAdding 42free alias in file '$RC_FILE'.\e[0m"
+    pretty_print "${sty_yel}42free alias not present.${sty_res}"
+    pretty_print "${sty_yel}Adding 42free alias in file '$RC_FILE'.${sty_res}"
     echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
 else
-    pretty_print "\e[33m42free alias already present.\e[0m"
+    pretty_print "${sty_yel}42free alias already present.${sty_res}"
 fi
 
-pretty_print "\e[1;32mInstallation completed.\e[0m"
+pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
 pretty_print "You can now use the 42free command."
-pretty_print "For help, run '\e[1m42free -h\e[0m'."
+pretty_print "For help, run '${sty_bol}42free -h${sty_res}'."
 
 # Start the default shell to make the alias available immediately
 exec $SHELL 2>/dev/null
