@@ -103,7 +103,7 @@ pretty_print()
 prompt_user()
 {
     pretty_print "$1"
-    read -r
+    read -rp "> "
     if [[ ! $REPLY =~ ^[Yy](es)?$ ]]; then
         return 1
     fi
