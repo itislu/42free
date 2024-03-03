@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_dir=$(pwd)
+current_dir=$(pwd -P)
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
