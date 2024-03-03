@@ -4,11 +4,13 @@ current_dir=$(pwd -P)
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
+sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
 # Exit codes
 success=0
 no_targets=1
 unknown_option=2
+user_abort=3
 
 # Colors and styles
 sty_res="\e[0m"
@@ -47,6 +49,7 @@ ${sty_und}Exit codes:${sty_res}
     0: Success
     1: No targets provided
     2: Unknown option
+    3: User aborted
 
 To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}.
 
@@ -69,7 +72,15 @@ Please provide the directories or files to move as arguments.
 Run '42free -s' for some suggestions.
 Run '42free -h' for more information."
 
+msg_sgoinfre_permissions="\
+$print_warning The permissions of your personal sgoinfre directory are not set to '${sty_bol}rwx------${sty_res}'.
+They are currently set to '${sty_bol}$sgoinfre_permissions${sty_res}'.
+It is ${sty_bol}highly${sty_res} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
+
+msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
+
 prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
+prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_replace="Do you wish to replace it? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
@@ -131,6 +142,24 @@ done
 
 # Set positional parameters to non-option arguments
 set -- "${args[@]}"
+
+# Check if the permissions of user's sgoinfre directory are rwx------
+if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
+    pretty_print "$msg_sgoinfre_permissions"
+    if prompt_user "$prompt_change_permissions"; then
+        if chmod 700 "$sgoinfre"; then
+            pretty_print "$print_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
+        else
+            pretty_print "$print_error Failed to change the permissions of '$sgoinfre'."
+            if ! prompt_user "$prompt_continue"; then
+                exit $user_abort
+            fi
+            pretty_print "$msg_sgoinfre_permissions_keep"
+        fi
+    else
+        pretty_print "$msg_sgoinfre_permissions_keep"
+    fi
+fi
 
 # Check which direction the script should move the directories or files
 if ! $reverse; then
