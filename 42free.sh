@@ -59,9 +59,9 @@ To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_blu
 
 msg_suggest="\
 ${sty_bol}Some suggestions to move:${sty_res}
-    - ~/.cache
-    - ~/.local/share/Trash
-    - ~/.var/app/*/cache"
+  - ~/.cache
+  - ~/.local/share/Trash
+  - ~/.var/app/*/cache"
 
 msg_version="\
 ${sty_bol}42free v1.0.0${sty_res}
@@ -107,6 +107,7 @@ while (( $# )); do
         -s|--suggest)
             # Print some suggestions
             pretty_print "$msg_suggest"
+            exit $success
             ;;
         -h|--help)
             # Print help message
