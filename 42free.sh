@@ -122,6 +122,10 @@ while (( $# )); do
         --)
             # End of options
             shift
+            while (( $# )); do
+                args+=("$1")
+                shift
+            done
             break
             ;;
         -*)
@@ -182,8 +186,7 @@ else
 fi
 
 # Loop over all arguments
-for arg in "$@"
-do
+for arg in "$@"; do
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
         arg_path="$arg"
