@@ -65,4 +65,7 @@ pretty_print "You can now use the 42free command."
 pretty_print "For help, run '\e[1m42free -h\e[0m'."
 
 # Start the default shell to make the alias available immediately
-exec $SHELL
+exec $SHELL 2>/dev/null
+
+# If exec failed, inform the user to open a new shell
+pretty_print "Please open a new shell to make the 42free command available."
