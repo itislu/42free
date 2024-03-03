@@ -16,25 +16,37 @@ sty_res="\e[0m"
 sty_bol="\e[1m"
 sty_und="\e[4m"
 sty_red="\e[31m"
-sty_blu="\e[34m"
+sty_bri_red="\e[91m"
 sty_bri_gre="\e[92m"
 sty_bri_yel="\e[93m"
+sty_bri_blu="\e[94m"
 sty_bri_cya="\e[96m"
 
-print_error="${sty_bol}${sty_red}ERROR:${sty_res}"
+header="\
+               ${sty_bol}${sty_bri_yel}📁  42free  📁${sty_res}"
+tagline="\
+           ${sty_bol}${sty_bri_yel}Never run \`ncdu\` again${sty_res}"
+delim_small="\
+      --------------------------------"
+delim_big="\
+    ${sty_und}                                    ${sty_res}"
+
+print_error="${sty_bol}${sty_bri_red}ERROR:${sty_res}"
 print_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
 print_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
 
 msg_manual="\
-
-        ${sty_bol}${sty_bri_yel}📁 Move directories or files to free up storage 📁${sty_res}
-          ${sty_und}                                              ${sty_res}
+$header
+$tagline
+$delim_big
 
 The files get moved from '$HOME' to '$sgoinfre'.
 
 A symbolic link is left behind in the original location.
 You only need to run 42free once for every directory or file you want to free the space of.
 All programs will then access them through the symlink and they will accumulate their space outside of your home directory.
+
+$delim_small
 
 ${sty_und}Usage:${sty_res} ${sty_bol}42free target1 [target2 ...]${sty_res}
     The target paths can be absolute or relative to your current directory.
@@ -53,20 +65,22 @@ ${sty_und}Exit codes:${sty_res}
     1: User aborted
     2: Unknown option
 
-To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}.
+$delim_small
+
+To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}.
 
 "
 
 msg_suggest="\
 ${sty_bol}Some suggestions to move:${sty_res}
-  - ~/.cache
-  - ~/.local/share/Trash
-  - ~/.var/app/*/cache"
+   ~/.cache
+   ~/.local/share/Trash
+   ~/.var/app/*/cache"
 
 msg_version="\
 ${sty_bol}42free v1.0.0${sty_res}
 A script made for 42 students to move directories or files to free up storage.
-For more information, visit ${sty_und}${sty_blu}https://github.com/itislu/42free${sty_res}."
+For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
 
 msg_sgoinfre_permissions="\
 $print_warning The permissions of your personal sgoinfre directory are not set to '${sty_bol}rwx------${sty_res}'.
@@ -185,8 +199,18 @@ else
     outcome="reclaimed"
 fi
 
+# Print header
+pretty_print "$header"
+pretty_print "$delim_big"
+echo
+
 # Loop over all arguments
 for arg in "$@"; do
+    # Print a delimiter if not the first iteration
+    if [ -n "$arg_path" ]; then
+        pretty_print "$delim_small"
+    fi
+
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
         arg_path="$arg"
@@ -230,7 +254,7 @@ for arg in "$@"; do
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
-        pretty_print "$print_error '${sty_red}$source_path${sty_res}' does not exist."
+        pretty_print "$print_error '${sty_bri_red}$source_path${sty_res}' does not exist."
         continue
     fi
 
