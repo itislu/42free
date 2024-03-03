@@ -200,6 +200,18 @@ do
         continue
     fi
 
+    # When moving files back to home, first remove the symbolic link
+    if $reverse && [ -L "$target_path" ]; then
+        rm "$target_path"
+    # Check if an existing directory or file would get replaced
+    elif [ -e "$target_path" ]; then
+        pretty_print "$print_warning '${sty_bol}$target_path${sty_res}' already exists."
+        if ! prompt_user "$prompt_replace"; then
+            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
+            continue
+        fi
+    fi
+
     # Get the current size of the target directory
     if [ -z "$target_dir_size_in_bytes" ]; then
         pretty_print "Getting the current size of the $target_name directory..."
@@ -224,17 +236,6 @@ do
 
     # Create the parent directories for the target path
     mkdir -p "$(dirname "$target_path")"
-
-    # Check if the target path is a symbolic link
-    if $reverse && [ -L "$target_path" ]; then
-        rm "$target_path"
-    elif [ -e "$target_path" ]; then
-        pretty_print "$print_warning '${sty_bol}$target_path${sty_res}' already exists."
-        if ! prompt_user "$prompt_replace"; then
-            pretty_print "Skipping ${sty_bol}$arg${sty_res}."
-            continue
-        fi
-    fi
 
     # Move the directory or file
     mv_stderr=$(mv "$source_path" "$target_path" 2>&1)
