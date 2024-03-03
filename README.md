@@ -1,22 +1,27 @@
-# 42free
+# 📁 42free 📁
 
-### 42free is a bash script that helps you manage your limited storage on 42 campuses.
+### 42free is a shell script that helps you manage your limited storage on 42 campuses.
+
+**Never run `ncdu` again.**
+- You only need to run 42free once for every directory or file you want to free the space of.
+  From that point onwards, they will accumulate their space outside of your home directory.
 
 **Easy to use.**
-- 42free is designed to be easy to use and flexible, allowing you to specify which directories and files to free the space of.
+- 42free is designed to be easy to use. You don't have to go to a certain directory or pass full paths.
+  You can use it from any directory and you can pass multiple arguments at once. It will detect what you want to do.
 
 **No data loss.**
 - You will not lose any data by running 42free, it only moves the data.
   All programs that need the moved directories and files will continue to work normally.
 
-**Run and forget.**
-- You only need to run it once for every directory or file you want to free.
-  From that point onwards, they will accumulate their space outside of your home directory.
+**You are in control.**
+- 42free will prompt you for confirmation if it encounters any unusual situation before doing anything.
+  It will not overwrite files without asking you.
 
 **Reversable.**
-- You can always restore the moved directories and files back to their original position.
+- You can always restore the moved directories and files back to their original location.
 
-**Aware of limits.**
+**Storage limit aware.**
 - 42free will detect if moving more files to sgoinfre would go over the allowed storage limit and will warn you.
 
 ---
@@ -25,7 +30,9 @@
 
 42free works by moving directories or files from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
 
-This works because the allowed space in sgoinfre is usually much larger than the allowed space in your home directory.
+The allowed space in sgoinfre is usually much higher than in your home directory.
+
+Applications that need the moved files will just follow the symbolic link and access them from sgoinfre.
 
 ---
 
@@ -39,7 +46,7 @@ This works because the allowed space in sgoinfre is usually much larger than the
 
 ## Installation
 
-To install 42free, you can use the following command:
+To install 42free, you can use the following commands (which doesn't matter):
 
 - With curl:
   ```bash
@@ -52,13 +59,15 @@ To install 42free, you can use the following command:
   ```
 
 This will download the `42free.sh` script into a hidden `.scripts` directory in your home directory.
+
 It will also add an alias `42free` to your shell's RC file (either `.bashrc` or `.zshrc`) so you can use it from any directory.
 
 ---
 
 ## Usage
 
-You can use 42free by running the `42free` command followed by any amount of directories or files you want to move.
+Use 42free by running the `42free` command followed by any amount of directories or files you want to free the space of.
+
 The arguments can be specified as absolute or relative paths.
 42free will automatically detect if the given argument is the source you want to move, or the destination you want to move the source to.
 
@@ -66,13 +75,14 @@ The arguments can be specified as absolute or relative paths.
 42free target1 [target2 ...]
 ```
 
-**You can pass options to change the behavior of 42free:**
-
-- You can use the `-r` option to move any directories and files back to their original location.
-
-- To get some suggested directories to move, run `42free -s`.
-
-- To see the manual, run `42free -h`.
+> [!TIP]
+> **You can pass options anywhere in your command to change the behavior of 42free:**
+>
+> - Use the `-r` option to move any directories and files back to their original location.
+>
+> - To get some suggested directories to free, run `42free -s`.
+>
+> - To see the manual, run `42free -h`.
 
 ---
 
@@ -90,7 +100,7 @@ The arguments can be specified as absolute or relative paths.
 
 ---
 
-## Fun fact
+## 🐬 Fun fact
 
 The English translation for the French word _goinfre_ is "glutton" (definition of glutton: an excessively greedy eater).
 
