@@ -1,7 +1,9 @@
 #!/bin/bash
 
 current_dir=$(pwd)
-sgoinfre="/nfs/sgoinfre/goinfre/Perso/$USER"
+sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
+sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
+sgoinfre="$sgoinfre_root"
 
 # Exit codes
 success=0
@@ -162,6 +164,20 @@ do
     else
         arg_path="$current_dir/$arg"
         invalid_path_msg="$print_error The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
+    fi
+
+    # Make sure all mount points of sgoinfre work
+    if [[ "$arg_path" = $sgoinfre_alt/* ]]; then
+        sgoinfre="$sgoinfre_alt"
+    else
+        sgoinfre="$sgoinfre_root"
+    fi
+
+    # Update variables with updated sgoinfre path
+    if ! $reverse; then
+        target_base="$sgoinfre"
+    else
+        source_base="$sgoinfre"
     fi
 
     # Construct the source and target paths
