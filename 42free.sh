@@ -31,7 +31,11 @@ msg_manual="\
         ${sty_bol}${sty_bri_yel}📁 Move directories or files to free up storage 📁${sty_res}
           ${sty_und}                                              ${sty_res}
 
-The files get moved from '$HOME' to '$sgoinfre'.${sty_res}
+The files get moved from '$HOME' to '$sgoinfre'.
+
+A symbolic link is left behind in the original location.
+You only need to run 42free once for every directory or file you want to free the space of.
+All programs will then access them through the symlink and they will accumulate their space outside of your home directory.
 
 ${sty_und}Usage:${sty_res} ${sty_bol}42free target1 [target2 ...]${sty_res}
     The target paths can be absolute or relative to your current directory.
