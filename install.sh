@@ -16,10 +16,10 @@ pretty_print()
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
     downloader="curl"
-    downloader_opts="-Lo"
+    downloader_opts="-sSLo"
 elif command -v wget &>/dev/null; then
     downloader="wget"
-    downloader_opts="-O"
+    downloader_opts="-qO"
 else
     pretty_print "Neither \e[1;31mcurl\e[0m nor \e[1;31mwget\e[0m was found."
     pretty_print "Please install one of them and try again."
