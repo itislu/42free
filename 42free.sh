@@ -239,7 +239,7 @@ do
     else
       # If reverse flag is active, delete empty parent directories
         first_dir_after_base="$source_base/${arg%%/*}"
-        find "$first_dir_after_base" -type d -empty -delete 2> /dev/null
+        find "$first_dir_after_base" -type d -empty -delete 2>/dev/null
         if [ -d "$first_dir_after_base" ] && [ -z "$(ls -A "$first_dir_after_base")" ]; then
             rmdir "$first_dir_after_base"
         fi

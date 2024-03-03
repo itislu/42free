@@ -13,9 +13,27 @@ pretty_print()
     printf "%b" "$1" | fmt -sw $(tput cols)
 }
 
+# Check if curl or wget is available
+if command -v curl &>/dev/null; then
+    downloader="curl"
+    downloader_opts="-Lo"
+elif command -v wget &>/dev/null; then
+    downloader="wget"
+    downloader_opts="-O"
+else
+    pretty_print "Neither \e[1;31mcurl\e[0m nor \e[1;31mwget\e[0m was found."
+    pretty_print "Please install one of them and try again."
+    exit 1
+fi
+
 # Download the script
 mkdir -p "$dest_dir"
-curl -Lo "$dest_dir/$dest_file" "$script_url"
+$downloader $downloader_opts "$dest_dir/$dest_file" "$script_url"
+exit_status=$?
+if [ $exit_status -ne 0 ]; then
+    pretty_print "\e[1;31mFailed to download file with $downloader.\e[0m"
+    exit 1
+fi
 pretty_print "'$dest_file' downloaded into '$dest_dir'."
 
 # Make the script executable
@@ -30,11 +48,11 @@ elif [[ "$SHELL" == *"fish"* ]]; then
     RC_FILE="$HOME/.config/fish/config.fish"
 else
     pretty_print "\e[1;93mUnsupported shell. Please set an alias for your shell manually.\e[0m"
-    exit 1
+    exit 2
 fi
 
 # Add an alias to the user's shell RC file if it doesn't exist
-if ! grep "42free=" "$RC_FILE" &> /dev/null; then
+if ! grep "42free=" "$RC_FILE" &>/dev/null; then
     pretty_print "\e[33m42free alias not present.\e[0m"
     pretty_print "\e[33mAdding 42free alias in file '$RC_FILE'.\e[0m"
     echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
