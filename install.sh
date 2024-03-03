@@ -77,7 +77,9 @@ pretty_print "You can now use the 42free command."
 pretty_print "For help, run '${sty_bol}42free -h${sty_res}'."
 
 # Start the default shell to make the alias available immediately
-exec $SHELL 2>/dev/null
+if [ -x "$SHELL" ]; then
+    exec $SHELL
+fi
 
 # If exec failed, inform the user to open a new shell
 pretty_print "Please open a new shell to make the 42free command available."
