@@ -112,7 +112,7 @@ prompt_user()
 
 print_skip_arg()
 {
-    pretty_print "Skipping ${sty_bol}$1${sty_res}."
+    pretty_print "Skipping '$1'."
 }
 
 # Process options
@@ -257,6 +257,12 @@ for arg in "$@"; do
         continue
     fi
 
+    # Construct useful variables from the paths
+    source_dirname=$(dirname "$source_path")
+    source_basename=$(basename "$source_path")
+    target_dirname=$(dirname "$target_path")
+    target_basename=$(basename "$target_path")
+
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
         pretty_print "$print_error '${sty_bri_red}$source_path${sty_res}' does not exist."
@@ -267,12 +273,12 @@ for arg in "$@"; do
     if [ -L "$source_path" ]; then
         # If the source directory or file has already been moved to sgoinfre, skip it
         if ! $reverse && [[ "$(readlink "$source_path")" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
-            pretty_print "${sty_bol}${sty_bri_cya}$source_subpath${sty_res} has already been moved to sgoinfre."
-            pretty_print "It is located at '${sty_bol}$(readlink "$source_path")${sty_res}'."
+            pretty_print "'${sty_bol}${sty_bri_cya}$source_basename${sty_res}' has already been moved to sgoinfre."
+            pretty_print "It is located at '$(readlink "$source_path")'."
             print_skip_arg "$arg"
             continue
         fi
-        pretty_print "$print_warning '${sty_bol}$source_path${sty_res}' is a symbolic link."
+        pretty_print "$print_warning '${sty_bol}${sty_bri_cya}$source_basename${sty_res}' is a symbolic link."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
             continue
@@ -284,7 +290,7 @@ for arg in "$@"; do
         rm "$target_path"
     # Check if an existing directory or file would get replaced
     elif [ -e "$target_path" ]; then
-        pretty_print "$print_warning '${sty_bol}$target_path${sty_res}' already exists."
+        pretty_print "$print_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
         if ! prompt_user "$prompt_replace"; then
             print_skip_arg "$arg"
             continue
@@ -317,16 +323,16 @@ for arg in "$@"; do
     mkdir -p "$(dirname "$target_path")"
 
     # Move the directory or file
-    pretty_print "Moving ${sty_bol}$source_subpath${sty_res} to ${sty_bol}$target_name${sty_res}..."
+    pretty_print "Moving '${sty_bol}$source_subpath${sty_res}' to ${sty_bol}$target_name${sty_res}..."
     mv_stderr=$(mv "$source_path" "$target_path" 2>&1)
     mv_status=$?
     if [ $mv_status -ne 0 ]; then
         mv_stderr=${mv_stderr#mv: }
-        pretty_print "$print_error Could not move ${sty_bol}'$source_path'${sty_res} to '${sty_bol}$(dirname "$target_path")${sty_res}'."
+        pretty_print "$print_error Could not move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirname${sty_res}'."
         pretty_print "$mv_stderr."
         continue
     else
-        pretty_print "$print_success '${sty_bri_yel}$source_path${sty_res}' successfully $operation to '${sty_bri_gre}$target_path${sty_res}'."
+        pretty_print "$print_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirname${sty_res}'."
     fi
 
     # Update the size of the target directory
