@@ -8,8 +8,14 @@ sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
 # Exit codes
 success=0
-user_abort=1
-unknown_option=2
+input_error=1
+minor_error=2
+major_error=3
+
+# Flags
+bad_input=false
+arg_skipped=false
+syscmd_failed=false
 
 # Colors and styles
 sty_res="\e[0m"
@@ -62,8 +68,15 @@ ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
 
 ${sty_und}Exit codes:${sty_res}
     0: Success
-    1: User aborted
-    2: Unknown option
+    1: Input error
+       An argument was invalid.
+         (no arguments, unknown option, invalid path, file does not exist)
+    2: Minor error
+       An argument was skipped.
+         (symbolic link, file conflict, no space left)
+    3: Major error
+       An operation failed.
+         (sgoinfre permissions, move failed, restore failed, cleanup failed)
 
 $delim_small
 
@@ -150,7 +163,7 @@ while (( $# )); do
         -*)
             # Unknown option
             pretty_print "Unknown option: '$1'"
-            exit $unknown_option
+            exit $input_error
             ;;
         *)
             # Non-option argument
@@ -166,7 +179,7 @@ set -- "${args[@]}"
 # Check if the script received any targets
 if [ $# -eq 0 ]; then
     pretty_print "$msg_manual"
-    exit $success
+    exit $input_error
 fi
 
 # Check if the permissions of user's sgoinfre directory are rwx------
@@ -177,8 +190,9 @@ if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
             pretty_print "$print_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
         else
             pretty_print "$print_error Failed to change the permissions of '$sgoinfre'."
+            syscmd_failed=true
             if ! prompt_user "$prompt_continue"; then
-                exit $user_abort
+                exit $major_error
             fi
             pretty_print "$msg_sgoinfre_permissions_keep"
         fi
@@ -254,6 +268,7 @@ for arg in "$@"; do
         # If the result is neither in the source nor target base directory, skip the argument
         pretty_print "$invalid_path_msg"
         print_skip_arg "$arg"
+        bad_input=true
         continue
     fi
 
@@ -266,6 +281,7 @@ for arg in "$@"; do
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
         pretty_print "$print_error '${sty_bri_red}$source_path${sty_res}' does not exist."
+        bad_input=true
         continue
     fi
 
@@ -281,6 +297,7 @@ for arg in "$@"; do
         pretty_print "$print_warning '${sty_bol}${sty_bri_cya}$source_basename${sty_res}' is a symbolic link."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
+            arg_skipped=true
             continue
         fi
     fi
@@ -293,6 +310,7 @@ for arg in "$@"; do
         pretty_print "$print_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
         if ! prompt_user "$prompt_replace"; then
             print_skip_arg "$arg"
+            arg_skipped=true
             continue
         fi
     fi
@@ -315,6 +333,7 @@ for arg in "$@"; do
         pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
+            arg_skipped=true
             continue
         fi
     fi
@@ -330,6 +349,7 @@ for arg in "$@"; do
         mv_stderr=${mv_stderr#mv: }
         pretty_print "$print_error Could not move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirname${sty_res}'."
         pretty_print "$mv_stderr."
+        syscmd_failed=true
         continue
     else
         pretty_print "$print_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirname${sty_res}'."
@@ -354,3 +374,13 @@ for arg in "$@"; do
     # Print result
     pretty_print "${sty_bol}$size${sty_res} $outcome."
 done
+
+if $syscmd_failed; then
+    exit $major_error
+elif $arg_skipped; then
+    exit $minor_error
+elif $bad_input; then
+    exit $input_error
+else
+    exit $success
+fi
