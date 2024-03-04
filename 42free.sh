@@ -6,6 +6,9 @@ sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
+restore_error=1
+cleanup_error=2
+
 # Exit codes
 success=0
 input_error=1
@@ -103,6 +106,7 @@ It is ${sty_bol}highly${sty_res} recommended to change the permissions so that o
 msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
 
 prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
+prompt_continue_with_rest="Do you wish to continue with the other arguments? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_replace="Do you wish to replace it? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 
@@ -123,13 +127,40 @@ prompt_user()
     return 0
 }
 
+print_stderr()
+{
+    pretty_print "${sty_und}STDERR:${sty_res} $1"
+}
+
 print_skip_arg()
 {
     pretty_print "Skipping '$1'."
 }
 
+restore_after_mv_error()
+{
+    local source_path=$1
+    local target_base=$2
+    local stderr
+
+    if ! mv -f "$source_path" "$target_path" 2>/dev/null; then
+        # If mv fails, fall back to cp and rm
+        if ! stderr=$(cp -RPf --preserve=all "$source_path" "$target_path" 2>&1); then
+            echo "$stderr"
+            return $restore_error
+        fi
+        # If cp is successful, try to remove the source
+        if ! stderr=$(rm -rf "$source_path" 2>&1); then
+            echo "$stderr"
+            return $cleanup_error
+        fi
+    fi
+    return $success
+}
+
 # Process options
 args=()
+args_amount=0
 reverse=false
 while (( $# )); do
     case "$1" in
@@ -156,6 +187,7 @@ while (( $# )); do
             shift
             while (( $# )); do
                 args+=("$1")
+                args_amount=$((args_amount + 1))
                 shift
             done
             break
@@ -168,16 +200,14 @@ while (( $# )); do
         *)
             # Non-option argument
             args+=("$1")
+            args_amount=$((args_amount + 1))
             ;;
     esac
     shift
 done
 
-# Set positional parameters to non-option arguments
-set -- "${args[@]}"
-
 # Check if the script received any targets
-if [ $# -eq 0 ]; then
+if [ -z "${args[*]}" ]; then
     pretty_print "$msg_manual"
     exit $input_error
 fi
@@ -224,9 +254,12 @@ pretty_print "$delim_big"
 echo
 
 # Loop over all arguments
-for arg in "$@"; do
+args_index=0
+for arg in "${args[@]}"; do
+    args_index=$((args_index + 1))
+
     # Print a delimiter if not the first iteration
-    if [ -n "$arg_path" ]; then
+    if [ $args_index -gt 1 ]; then
         pretty_print "$delim_small"
     fi
 
@@ -273,10 +306,9 @@ for arg in "$@"; do
     fi
 
     # Construct useful variables from the paths
-    source_dirname=$(dirname "$source_path")
+    source_dirpath=$(dirname "$source_path")
     source_basename=$(basename "$source_path")
-    target_dirname=$(dirname "$target_path")
-    target_basename=$(basename "$target_path")
+    target_dirpath=$(dirname "$target_path")
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
@@ -325,11 +357,14 @@ for arg in "$@"; do
     size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
     size_in_bytes=$(du -sb "$source_path" 2>/dev/null | cut -f1)
 
+    # Get the size of any target that will be replaced
+    existing_target_size_in_bytes="$(du -sb "$target_path" 2>/dev/null | cut -f1)"
+
     # Convert max_size from GB to bytes
     max_size_in_bytes=$((max_size * 1024 * 1024 * 1024))
 
     # Check if the target directory would go above its maximum recommended size
-    if (( target_dir_size_in_bytes + size_in_bytes > max_size_in_bytes )); then
+    if (( target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
         pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
@@ -338,25 +373,58 @@ for arg in "$@"; do
         fi
     fi
 
+    pretty_print "Moving '$source_basename' to '$target_dirpath'..."
+
+    # Temporarily rename already existing directory or file as a backup
+    target_backup="$target_path~42free_backup_existing_files~"
+    mv -n "$target_path" "$target_backup" 2>/dev/null
+
     # Create the parent directories for the target path
     mkdir -p "$(dirname "$target_path")"
 
     # Move the directory or file
-    pretty_print "Moving '${sty_bol}$source_subpath${sty_res}' to ${sty_bol}$target_name${sty_res}..."
-    mv_stderr=$(mv -T "$source_path" "$target_path" 2>&1)
-    mv_status=$?
-    if [ $mv_status -ne 0 ]; then
-        mv_stderr=${mv_stderr#mv: }
-        pretty_print "$print_error Could not move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirname${sty_res}'."
-        pretty_print "$mv_stderr."
+    if ! stderr=$(mv -f "$source_path" "$target_path" 2>&1); then
+        pretty_print "$print_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
+        print_stderr "$stderr"
         syscmd_failed=true
+
+        if ! $reverse; then
+            # Move all involved files back to their original locations
+            pretty_print "Try to close all programs and try again."
+            pretty_print "Restoring '$source_basename' to '$source_dirpath'..."
+            stderr=$(restore_after_mv_error "$target_path" "$source_base")
+            ret=$?
+            if [ $ret -eq $restore_error ]; then
+                pretty_print "$print_error Could not fully restore '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$source_dirpath${sty_res}'."
+                print_stderr "$stderr"
+                pretty_print "Try to move it manually."
+            else
+                pretty_print "'${sty_bol}$source_path${sty_res}' fully restored."
+                if [ $ret -eq $cleanup_error ]; then
+                    pretty_print "$print_error Could not fully remove already partially copied '${sty_bol}$source_basename${sty_res}' from '${sty_bol}$target_dirpath${sty_res}'."
+                    print_stderr "$stderr"
+                    pretty_print "Try to remove the rest of '${sty_bol}$target_path${sty_res}' manually."
+                else
+                    # Restore any existing files that would have been replaced
+                    mv -n "$target_backup" "$target_path" 2>/dev/null
+                fi
+            fi
+        else
+            pretty_print "Try to move the rest manually."
+        fi
+
+        # If not last argument, ask user if they want to continue with the other arguments
+        if [ $args_index -lt $args_amount ] && ! prompt_user "$prompt_continue_with_rest"; then
+            pretty_print "Skipping the rest of the arguments."
+            break
+        fi
+
+        # Force recalculation of the target directory size in next iteration
+        unset target_dir_size_in_bytes
         continue
-    else
-        pretty_print "$print_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirname${sty_res}'."
     fi
 
-    # Update the size of the target directory
-    target_dir_size_in_bytes=$((target_dir_size_in_bytes + size_in_bytes))
+    pretty_print "$print_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirpath${sty_res}'."
 
     # If reverse flag is not active, leave a symbolic link behind
     if ! $reverse; then
@@ -370,6 +438,12 @@ for arg in "$@"; do
             rmdir "$first_dir_after_base"
         fi
     fi
+
+    # Remove backup
+    rm -rf "$target_backup" 2>/dev/null
+
+    # Update the size of the target directory
+    target_dir_size_in_bytes=$((target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes))
 
     # Print result
     pretty_print "${sty_bol}$size${sty_res} $outcome."
