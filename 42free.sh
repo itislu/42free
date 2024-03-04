@@ -375,7 +375,8 @@ for arg in "${args[@]}"; do
     pretty_print "Moving '$source_basename' to '$target_dirpath'..."
 
     # Temporarily rename already existing directory or file as a backup
-    target_backup="$target_path~42free_backup_existing_files~"
+    timestamp=$(date +%Y%m%d%H%M%S)
+    target_backup="${target_path}~42free_backup_${timestamp}~"
     mv -n "$target_path" "$target_backup" 2>/dev/null
 
     # Create the parent directories for the target path
