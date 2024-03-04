@@ -31,7 +31,7 @@ sty_bri_yel="\e[93m"
 sty_bri_blu="\e[94m"
 sty_bri_cya="\e[96m"
 
-header="\
+header="
                ${sty_bol}${sty_bri_yel}📁  42free  📁${sty_res}"
 tagline="\
            ${sty_bol}${sty_bri_yel}Never run \`ncdu\` again${sty_res}"
@@ -40,7 +40,7 @@ delim_small="\
 delim_big="\
     ${sty_und}                                    ${sty_res}"
 
-print_error="${sty_bol}${sty_bri_red}ERROR:${sty_res}"
+print_error="${sty_bol}${sty_red}ERROR:${sty_res}"
 print_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
 print_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
 
@@ -57,7 +57,7 @@ All programs will then access them through the symlink and they will accumulate 
 
 $delim_small
 
-${sty_und}Usage:${sty_res} ${sty_bol}42free target1 [target2 ...]${sty_res}
+${sty_und}Usage:${sty_res} ${sty_bol}42free target1${sty_res} [${sty_bol}target2${sty_res} ...]
     The target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
 
@@ -84,8 +84,7 @@ ${sty_und}Exit codes:${sty_res}
 $delim_small
 
 To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}.
-
-"
+\n"
 
 msg_suggest="\
 ${sty_bol}Some suggestions to move:${sty_res}
@@ -95,7 +94,7 @@ ${sty_bol}Some suggestions to move:${sty_res}
 
 msg_version="\
 ${sty_bol}42free v1.0.0${sty_res}
-A script made for 42 students to move directories or files to free up storage.
+A script made for 42 students to take advantage of symbolic links to free up storage.
 For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
 
 msg_sgoinfre_permissions="\
@@ -245,7 +244,7 @@ else
     target_name="home"
     max_size=5
     operation="moved back"
-    outcome="reclaimed"
+    outcome="occupied"
 fi
 
 # Print header
