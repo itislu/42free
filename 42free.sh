@@ -132,7 +132,9 @@ prompt_user()
 
 print_stderr()
 {
-    pretty_print "${sty_und}STDERR:${sty_res} $stderr"
+    while IFS= read -r line; do
+        pretty_print "STDERR: $line"
+    done <<< "$stderr"
 }
 
 print_skip_arg()
