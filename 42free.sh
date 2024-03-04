@@ -60,6 +60,7 @@ $delim_small
 ${sty_und}Usage:${sty_res} ${sty_bol}42free target1${sty_res} [${sty_bol}target2${sty_res} ...]
     The target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
+    Closing all programs first will help to avoid errors during the move.
 
 ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --reverse  Reverse the operation and move the directories or files
@@ -89,8 +90,10 @@ To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri
 msg_suggest="\
 ${sty_bol}Some suggestions to move:${sty_res}
    ~/.cache
+   ~/.var/app/*/cache
    ~/.local/share/Trash
-   ~/.var/app/*/cache"
+
+Close all programs first to avoid errors during the move."
 
 msg_version="\
 ${sty_bol}42free v1.0.0${sty_res}

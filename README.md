@@ -71,6 +71,8 @@ Use 42free by running the `42free` command followed by any amount of directories
 The arguments can be specified as absolute or relative paths.
 42free will automatically detect if the given argument is the source you want to move, or the destination you want to move the source to.
 
+Closing all programs first will help to avoid errors during the move.
+
 ```bash
 42free target1 [target2 ...]
 ```
