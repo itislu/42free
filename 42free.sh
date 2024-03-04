@@ -304,8 +304,8 @@ for arg in "$@"; do
     fi
 
     # Get the size of the directory or file to be moved
-    size="$(du -sh "$source_path" | cut -f1)B"
-    size_in_bytes=$(du -sb "$source_path" | cut -f1)
+    size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
+    size_in_bytes=$(du -sb "$source_path" 2>/dev/null | cut -f1)
 
     # Convert max_size from GB to bytes
     max_size_in_bytes=$((max_size * 1024 * 1024 * 1024))
