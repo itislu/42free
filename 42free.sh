@@ -6,6 +6,7 @@ sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
+stderr=""
 restore_error=1
 cleanup_error=2
 
@@ -131,7 +132,7 @@ prompt_user()
 
 print_stderr()
 {
-    pretty_print "${sty_und}STDERR:${sty_res} $1"
+    pretty_print "${sty_und}STDERR:${sty_res} $stderr"
 }
 
 print_skip_arg()
@@ -143,17 +144,14 @@ restore_after_mv_error()
 {
     local source_path=$1
     local target_base=$2
-    local stderr
 
     if ! mv -f "$source_path" "$target_path" 2>/dev/null; then
         # If mv fails, fall back to cp and rm
-        if ! stderr=$(cp -RPf --preserve=all "$source_path" "$target_path" 2>&1); then
-            echo "$stderr"
+        if ! cp -RPf --preserve=all "$source_path" "$target_path"; then
             return $restore_error
         fi
         # If cp is successful, try to remove the source
-        if ! stderr=$(rm -rf "$source_path" 2>&1); then
-            echo "$stderr"
+        if ! rm -rf "$source_path"; then
             return $cleanup_error
         fi
     fi
@@ -388,24 +386,24 @@ for arg in "${args[@]}"; do
     # Move the directory or file
     if ! stderr=$(mv -f "$source_path" "$target_path" 2>&1); then
         pretty_print "$print_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
-        print_stderr "$stderr"
+        print_stderr
         syscmd_failed=true
 
         if ! $reverse; then
             # Move all involved files back to their original locations
             pretty_print "Try to close all programs and try again."
             pretty_print "Restoring '$source_basename' to '$source_dirpath'..."
-            stderr=$(restore_after_mv_error "$target_path" "$source_base")
+            stderr=$(restore_after_mv_error "$target_path" "$source_base" 2>&1)
             ret=$?
             if [ $ret -eq $restore_error ]; then
                 pretty_print "$print_error Could not fully restore '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$source_dirpath${sty_res}'."
-                print_stderr "$stderr"
+                print_stderr
                 pretty_print "Try to move it manually."
             else
                 pretty_print "'${sty_bol}$source_path${sty_res}' fully restored."
                 if [ $ret -eq $cleanup_error ]; then
                     pretty_print "$print_error Could not fully remove already partially copied '${sty_bol}$source_basename${sty_res}' from '${sty_bol}$target_dirpath${sty_res}'."
-                    print_stderr "$stderr"
+                    print_stderr
                     pretty_print "Try to remove the rest of '${sty_bol}$target_path${sty_res}' manually."
                 else
                     # Restore any existing files that would have been replaced
