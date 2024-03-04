@@ -46,7 +46,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ## Installation
 
-To install 42free, you can use the following commands (which doesn't matter):
+To install 42free, you can use the following commands (it doesn't matter which):
 
 - With curl:
   ```bash
