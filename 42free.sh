@@ -7,8 +7,6 @@ sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
 stderr=""
-restore_error=1
-cleanup_error=2
 
 # Exit codes
 success=0
@@ -111,23 +109,12 @@ msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoin
 prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
-prompt_replace="Do you wish to replace it? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
+prompt_replace="Do you wish to continue and replace any duplicate files? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
 {
     printf "%b" "$1" | fmt -sw $(tput cols)
-}
-
-# Prompt the user for confirmation
-prompt_user()
-{
-    pretty_print "$1"
-    read -rp "> "
-    if [[ ! $REPLY =~ ^[Yy](es)?$ ]]; then
-        return 1
-    fi
-    return 0
 }
 
 print_stderr()
@@ -142,22 +129,60 @@ print_skip_arg()
     pretty_print "Skipping '$1'."
 }
 
-restore_after_mv_error()
+# Prompt the user for confirmation
+prompt_user()
 {
-    local source_path=$1
-    local target_base=$2
-
-    if ! mv -f "$source_path" "$target_path" 2>/dev/null; then
-        # If mv fails, fall back to cp and rm
-        if ! cp -RPf --preserve=all "$source_path" "$target_path"; then
-            return $restore_error
-        fi
-        # If cp is successful, try to remove the source
-        if ! rm -rf "$source_path"; then
-            return $cleanup_error
-        fi
+    pretty_print "$1"
+    read -rp "> "
+    if [[ ! $REPLY =~ ^[Yy](es)?$ ]]; then
+        return 1
     fi
-    return $success
+    return 0
+}
+
+prompt_restore()
+{
+    pretty_print "Do you wish to leave (${sty_bol}l${sty_res}) it like that or restore (${sty_bol}r${sty_res}) what was already moved to '$target_path' back to '$source_path'? (${sty_bol}l${sty_res}/${sty_bol}r${sty_res})"
+    while true; do
+        read -rp "> "
+        if [[ $REPLY =~ ^[Rr](estore)?$ ]]; then
+            return 0
+        elif [[ $REPLY =~ ^[Ll](eave)?$ ]]; then
+            return 1
+        else
+            pretty_print "Invalid option. Please enter ${sty_bol}l${sty_res} for 'leave' or ${sty_bol}r${sty_res} for 'restore'. (${sty_bol}l${sty_res}/${sty_bol}r${sty_res})"
+        fi
+    done
+}
+
+restore_after_error()
+{
+    local restore_from=$1
+    local restore_to=$2
+
+    stderr=$(rsync -a --remove-source-files "$restore_from" "$restore_to/" 2>&1); ret=$?
+    cleanup_empty_dirs "$restore_from"
+    if [ $ret -ne 0 ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+cleanup_empty_dirs()
+{
+    local dir=$1
+
+    find "$dir" -type d -empty -delete 2>/dev/null
+    while [ "$dir" != "$HOME" ] && [ "$dir" != "$sgoinfre" ]; do
+        rmdir "$dir" 2>/dev/null
+        dir=$(dirname "$dir")
+    done
+}
+
+get_timestamp()
+{
+    date +%Y%m%d%H%M%S
 }
 
 # Process options
@@ -218,10 +243,11 @@ fi
 if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_user "$prompt_change_permissions"; then
-        if chmod 700 "$sgoinfre"; then
+        if stderr=$(chmod 700 "$sgoinfre"); then
             pretty_print "$print_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
         else
             pretty_print "$print_error Failed to change the permissions of '$sgoinfre'."
+            print_stderr
             syscmd_failed=true
             if ! prompt_user "$prompt_continue"; then
                 exit $major_error
@@ -336,11 +362,8 @@ for arg in "${args[@]}"; do
         fi
     fi
 
-    # When moving files back to home, first remove the symbolic link
-    if $reverse && [ -L "$target_path" ]; then
-        rm "$target_path"
     # Check if an existing directory or file would get replaced
-    elif [ -e "$target_path" ]; then
+    if [ -e "$target_path" ] && ! ($reverse && [ -L "$target_path" ]); then
         pretty_print "$print_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
         if ! prompt_user "$prompt_replace"; then
             print_skip_arg "$arg"
@@ -375,45 +398,67 @@ for arg in "${args[@]}"; do
         fi
     fi
 
-    pretty_print "Moving '$source_basename' to '$target_dirpath'..."
+    # When moving files back to home, first remove the symbolic link
+    if $reverse && [ -L "$target_path" ]; then
+        rm -f "$target_path" 2>/dev/null
+    fi
 
-    # Temporarily rename already existing directory or file as a backup
-    timestamp=$(date +%Y%m%d%H%M%S)
-    target_backup="${target_path}~42free_backup_${timestamp}~"
-    mv -n "$target_path" "$target_backup" 2>/dev/null
-
-    # Create the parent directories for the target path
-    mkdir -p "$(dirname "$target_path")"
-
-    # Move the directory or file
-    if ! stderr=$(mv -f "$source_path" "$target_path" 2>&1); then
-        pretty_print "$print_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
+    # Create the same directory structure as in the source
+    if ! stderr=$(mkdir -p "$target_dirpath" 2>&1); then
+        pretty_print "$print_error Cannot create the directory structure for '$target_path'."
         print_stderr
         syscmd_failed=true
+        # If not last argument, ask user if they want to continue with the other arguments
+        if [ $args_index -lt $args_amount ] && ! prompt_user "$prompt_continue_with_rest"; then
+            pretty_print "Skipping the rest of the arguments."
+            break
+        fi
+        continue
+    fi
 
-        if ! $reverse; then
-            # Move all involved files back to their original locations
-            pretty_print "Try to close all programs and try again."
-            pretty_print "Restoring '$source_basename' to '$source_dirpath'..."
-            stderr=$(restore_after_mv_error "$target_path" "$source_base" 2>&1)
-            ret=$?
-            if [ $ret -eq $restore_error ]; then
-                pretty_print "$print_error Could not fully restore '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$source_dirpath${sty_res}'."
-                print_stderr
-                pretty_print "Try to move it manually."
+    # Move the directory or file
+    pretty_print "Moving '$source_basename' to '$target_dirpath'..."
+    if ! stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1); then
+        pretty_print "$print_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
+        syscmd_failed=true
+
+        cleanup_empty_dirs "$source_path"
+        if [ -d "$source_path" ]; then
+            # Rename the directory with the files that could not be moved
+            source_old="$source_path~42free-old_$(get_timestamp)~"
+            if mv -T "$source_path" "$source_old" 2>/dev/null; then
+                link="$source_path"
+                ln -sT "$target_path" "$link" 2>/dev/null
+                pretty_print "Symbolic link created and the files that could not be moved are left in '${sty_bol}$source_old${sty_res}'."
             else
-                pretty_print "'${sty_bol}$source_path${sty_res}' fully restored."
-                if [ $ret -eq $cleanup_error ]; then
-                    pretty_print "$print_error Could not fully remove already partially copied '${sty_bol}$source_basename${sty_res}' from '${sty_bol}$target_dirpath${sty_res}'."
-                    print_stderr
-                    pretty_print "Try to remove the rest of '${sty_bol}$target_path${sty_res}' manually."
+                source_old="$source_path"
+                link="$source_path~42free_tmp~"
+                ln -sT "$target_path" "$link" 2>/dev/null
+                pretty_print "Symbolic link left behind with a tmp name."
+            fi
+
+            # Calculate and print how much space was already partially moved
+            leftover_size_in_bytes=$(du -sb "$source_old" 2>/dev/null | cut -f1)
+            outcome_size_in_bytes=$((size_in_bytes - leftover_size_in_bytes))
+            outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_bytes)"
+            pretty_print "${sty_bol}$outcome_size${sty_res} of ${sty_bol}$size${sty_res} $outcome."
+
+            # Ask user if they wish to restore what was already moved or leave the partial copy
+            if prompt_restore; then
+                pretty_print "Restoring '$source_basename' to '$source_dirpath'..."
+                rm -f "$link" 2>/dev/null;
+                mv -T "$source_old" "$source_path" 2>/dev/null
+                if restore_after_error "$target_path" "$source_dirpath"; then
+                    pretty_print "'${sty_bol}$source_basename${sty_res}' has been restored to '${sty_bol}$source_dirpath${sty_res}'."
                 else
-                    # Restore any existing files that would have been replaced
-                    mv -n "$target_backup" "$target_path" 2>/dev/null
+                    pretty_print "$print_error Could not fully restore '$source_basename' to '$source_dirpath'."
+                    pretty_print "The rest of the partial copy is left in '${sty_bol}$target_path${sty_res}'."
                 fi
+            else
+                pretty_print "Try to close all programs and move the rest from '${sty_bol}$source_old${sty_res}' manually."
             fi
         else
-            pretty_print "Try to move the rest manually."
+            pretty_print "Try to close all programs and try again."
         fi
 
         # If not last argument, ask user if they want to continue with the other arguments
@@ -426,24 +471,29 @@ for arg in "${args[@]}"; do
         unset target_dir_size_in_bytes
         continue
     fi
-
     pretty_print "$print_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirpath${sty_res}'."
+    cleanup_empty_dirs "$source_path"
 
-    # If reverse flag is not active, leave a symbolic link behind
     if ! $reverse; then
-        ln -s "$target_path" "$source_path"
-        pretty_print "Symbolic link left behind."
-    else
-      # If reverse flag is active, delete empty parent directories
-        first_dir_after_base="$source_base/${arg%%/*}"
-        find "$first_dir_after_base" -type d -empty -delete 2>/dev/null
-        if [ -d "$first_dir_after_base" ] && [ -z "$(ls -A "$first_dir_after_base")" ]; then
-            rmdir "$first_dir_after_base"
+        # Create the symbolic link
+        if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
+            pretty_print "Symbolic link left behind."
+        else
+            pretty_print "$print_warning Cannot create symbolic link with name '$source_basename'."
+            print_stderr
+            syscmd_failed=true
+            # Create the symbolic link with a tmp name
+            if stderr=$(ln -sT "$target_path" "$source_path~42free_tmp~" 2>&1); then
+                pretty_print "Symbolic link left behind with a tmp name."
+            else
+                print_stderr
+            fi
+            if ! prompt_user "$prompt_continue_with_rest"; then
+                pretty_print "Skipping the rest of the arguments."
+                break
+            fi
         fi
     fi
-
-    # Remove backup
-    rm -rf "$target_backup" 2>/dev/null
 
     # Update the size of the target directory
     target_dir_size_in_bytes=$((target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes))
