@@ -124,6 +124,15 @@ print_stderr()
     done <<< "$stderr"
 }
 
+print_one_stderr()
+{
+    line=$(head -n 1 <<< "$stderr")
+    pretty_print "STDERR: $line"
+    if [[ $(wc -l <<< "$stderr") -gt 1 ]]; then
+        pretty_print "STDERR: ..."
+    fi
+}
+
 print_skip_arg()
 {
     pretty_print "Skipping '$1'."
@@ -432,6 +441,7 @@ for arg in "${args[@]}"; do
     pretty_print "Moving '$source_basename' to '$target_dirpath'..."
     if ! stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1); then
         pretty_print "$print_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
+        print_one_stderr
         syscmd_failed=true
 
         cleanup_empty_dirs "$source_path"
