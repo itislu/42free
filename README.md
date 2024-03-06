@@ -104,7 +104,7 @@ Closing all programs first will help to avoid errors during the move.
 
 ## 🐬 Fun fact
 
-The English translation for the French word _goinfre_ is "glutton" (definition of glutton: an excessively greedy eater).
+The English translation for the French word _goinfre_ (/ɡwɛ̃fʁ/ - pronounced 'gwah(n)-fruh') is "glutton" (definition of glutton: an excessively greedy eater).
 
 Knowing that, goinfre might also be a reference to the character _Ford Prefect_ from _The Hitchhiker's Guide to the Galaxy_, who is the friend and savior of _Arthur_.
 He is known to be an excessive eater and drinker.
