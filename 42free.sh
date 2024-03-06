@@ -350,7 +350,7 @@ for arg in "${args[@]}"; do
     if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } || \
        { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }
     then
-        pretty_print "$print_error '$source_basename' is already in $target_name."
+        pretty_print "$print_error '$source_subpath' is already in $target_name."
         pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
         print_skip_arg "$arg"
         bad_input=true
@@ -361,12 +361,12 @@ for arg in "${args[@]}"; do
     if [ -L "$source_path" ]; then
         # If the source directory or file has already been moved to sgoinfre, skip it
         if ! $reverse && [[ "$(readlink "$source_path")" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
-            pretty_print "'${sty_bol}${sty_bri_cya}$source_basename${sty_res}' has already been moved to sgoinfre."
+            pretty_print "'${sty_bol}${sty_bri_cya}$source_subpath${sty_res}' has already been moved to sgoinfre."
             pretty_print "It is located at '$(readlink "$source_path")'."
             print_skip_arg "$arg"
             continue
         fi
-        pretty_print "$print_warning '${sty_bol}${sty_bri_cya}$source_basename${sty_res}' is a symbolic link."
+        pretty_print "$print_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -402,7 +402,7 @@ for arg in "${args[@]}"; do
 
     # Check if the target directory would go above its maximum recommended size
     if (( target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
-        pretty_print "$print_warning This operation would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
+        pretty_print "$print_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
             arg_skipped=true
