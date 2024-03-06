@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_dir=$(pwd -P)
+current_dir=$(pwd)
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
@@ -300,13 +300,12 @@ for arg in "${args[@]}"; do
         invalid_path_msg="$print_error The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
     fi
 
-    # Make sure all mount points of sgoinfre work
+    # Make sure all defined mount points of sgoinfre work with the script
     if [[ "$arg_path" = $sgoinfre_alt/* ]]; then
         sgoinfre="$sgoinfre_alt"
     else
         sgoinfre="$sgoinfre_root"
     fi
-
     # Update variables with updated sgoinfre path
     if ! $reverse; then
         target_base="$sgoinfre"
@@ -341,6 +340,19 @@ for arg in "${args[@]}"; do
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
         pretty_print "$print_error '${sty_bri_red}$source_path${sty_res}' does not exist."
+        bad_input=true
+        continue
+    fi
+
+    # Check if the real base path of source is not actually already in target
+    real_arg_path=$(realpath "$arg_path")
+    real_arg_dirpath=$(dirname "$real_arg_path")
+    if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } || \
+       { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }
+    then
+        pretty_print "$print_error '$source_basename' is already in $target_name."
+        pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
+        print_skip_arg "$arg"
         bad_input=true
         continue
     fi
