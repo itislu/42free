@@ -370,9 +370,10 @@ for arg in "${args[@]}"; do
     # Check if the source file is a symbolic link
     if [ -L "$source_path" ]; then
         # If the source directory or file has already been moved to sgoinfre, skip it
-        if ! $reverse && [[ "$(readlink "$source_path")" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
+        real_source_path=$(realpath "$source_path")
+        if ! $reverse && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
             pretty_print "'${sty_bol}${sty_bri_cya}$source_subpath${sty_res}' has already been moved to sgoinfre."
-            pretty_print "It is located at '$(readlink "$source_path")'."
+            pretty_print "It is located at '$real_source_path'."
             print_skip_arg "$arg"
             continue
         fi
