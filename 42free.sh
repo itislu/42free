@@ -41,9 +41,9 @@ delim_small="\
 delim_big="\
     ${sty_und}                                    ${sty_res}"
 
-print_error="${sty_bol}${sty_red}ERROR:${sty_res}"
-print_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
-print_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
+indicator_error="${sty_bol}${sty_red}ERROR:${sty_res}"
+indicator_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
+indicator_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
 
 msg_manual="\
 $header
@@ -103,7 +103,7 @@ A script made for 42 students to take advantage of symbolic links to free up sto
 For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
 
 msg_sgoinfre_permissions="\
-$print_warning The permissions of your personal sgoinfre directory are not set to '${sty_bol}rwx------${sty_res}'.
+$indicator_warning The permissions of your personal sgoinfre directory are not set to '${sty_bol}rwx------${sty_res}'.
 They are currently set to '${sty_bol}$sgoinfre_permissions${sty_res}'.
 It is ${sty_bol}highly${sty_res} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
 
@@ -209,7 +209,7 @@ get_latest_version_number()
         downloader_opts="-q"
     else
         if [[ "$1" != "silent" ]]; then
-            pretty_print "$print_error Cannot check for updates."
+            pretty_print "$indicator_error Cannot check for updates."
             pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
             pretty_print "Please install one of them and try again."
         fi
@@ -219,7 +219,7 @@ get_latest_version_number()
     # Fetch the latest version from the git tags on GitHub
     if ! latest_version=$($downloader $downloader_opts "https://api.github.com/repos/itislu/42free/tags"); then
         if [[ "$1" != "silent" ]]; then
-            pretty_print "$print_error Cannot check for updates."
+            pretty_print "$indicator_error Cannot check for updates."
         fi
         return $major_error
     fi
@@ -314,9 +314,9 @@ if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_user "$prompt_change_permissions"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
-            pretty_print "$print_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
+            pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
         else
-            pretty_print "$print_error Failed to change the permissions of '$sgoinfre'."
+            pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
             print_stderr
             syscmd_failed=true
             if ! prompt_user "$prompt_continue"; then
@@ -364,10 +364,10 @@ for arg in "${args[@]}"; do
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
         arg_path="$arg"
-        invalid_path_msg="$print_error Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
+        invalid_path_msg="$indicator_error Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
     else
         arg_path="$current_dir/$arg"
-        invalid_path_msg="$print_error The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
+        invalid_path_msg="$indicator_error The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
     fi
 
     # Make sure all defined mount points of sgoinfre work with the script
@@ -409,7 +409,7 @@ for arg in "${args[@]}"; do
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
-        pretty_print "$print_error '${sty_bri_red}$source_path${sty_res}' does not exist."
+        pretty_print "$indicator_error '${sty_bri_red}$source_path${sty_res}' does not exist."
         bad_input=true
         continue
     fi
@@ -421,7 +421,7 @@ for arg in "${args[@]}"; do
     if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } || \
        { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }
     then
-        pretty_print "$print_error '$source_subpath' is already in $target_name."
+        pretty_print "$indicator_error '$source_subpath' is already in $target_name."
         pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
         print_skip_arg "$arg"
         bad_input=true
@@ -438,7 +438,7 @@ for arg in "${args[@]}"; do
             print_skip_arg "$arg"
             continue
         fi
-        pretty_print "$print_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
+        pretty_print "$indicator_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -448,7 +448,7 @@ for arg in "${args[@]}"; do
 
     # Check if an existing directory or file would get replaced
     if [ -e "$target_path" ] && ! ($reverse && [ -L "$target_path" ]); then
-        pretty_print "$print_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
+        pretty_print "$indicator_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
         if ! prompt_user "$prompt_replace"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -474,7 +474,7 @@ for arg in "${args[@]}"; do
 
     # Check if the target directory would go above its maximum recommended size
     if (( target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
-        pretty_print "$print_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
+        pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -489,7 +489,7 @@ for arg in "${args[@]}"; do
 
     # Create the same directory structure as in the source
     if ! stderr=$(mkdir -p "$target_dirpath" 2>&1); then
-        pretty_print "$print_error Cannot create the directory structure for '$target_path'."
+        pretty_print "$indicator_error Cannot create the directory structure for '$target_path'."
         print_stderr
         syscmd_failed=true
         # If not last argument, ask user if they want to continue with the other arguments
@@ -503,7 +503,7 @@ for arg in "${args[@]}"; do
     # Move the directory or file
     pretty_print "Moving '$source_basename' to '$target_dirpath'..."
     if ! stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1); then
-        pretty_print "$print_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
+        pretty_print "$indicator_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
         print_one_stderr
         syscmd_failed=true
 
@@ -536,7 +536,7 @@ for arg in "${args[@]}"; do
                 if restore_after_error "$target_path" "$source_dirpath"; then
                     pretty_print "'${sty_bol}$source_basename${sty_res}' has been restored to '${sty_bol}$source_dirpath${sty_res}'."
                 else
-                    pretty_print "$print_error Could not fully restore '$source_basename' to '$source_dirpath'."
+                    pretty_print "$indicator_error Could not fully restore '$source_basename' to '$source_dirpath'."
                     pretty_print "The rest of the partial copy is left in '${sty_bol}$target_path${sty_res}'."
                 fi
             else
@@ -556,7 +556,7 @@ for arg in "${args[@]}"; do
         unset target_dir_size_in_bytes
         continue
     fi
-    pretty_print "$print_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirpath${sty_res}'."
+    pretty_print "$indicator_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirpath${sty_res}'."
     cleanup_empty_dirs "$source_path"
 
     if ! $reverse; then
@@ -564,7 +564,7 @@ for arg in "${args[@]}"; do
         if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
             pretty_print "Symbolic link left behind."
         else
-            pretty_print "$print_warning Cannot create symbolic link with name '$source_basename'."
+            pretty_print "$indicator_warning Cannot create symbolic link with name '$source_basename'."
             print_stderr
             syscmd_failed=true
             # Create the symbolic link with a tmp name
