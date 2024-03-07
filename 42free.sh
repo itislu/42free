@@ -2,13 +2,13 @@
 
 current_version="1.0.0"
 
+# Standard variables
+stderr=""
 current_dir=$(pwd)
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
-
-stderr=""
 
 # Exit codes
 success=0
@@ -41,10 +41,12 @@ delim_small="\
 delim_big="\
     ${sty_und}                                    ${sty_res}"
 
+# Indicators
 indicator_error="${sty_bol}${sty_red}ERROR:${sty_res}"
 indicator_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
 indicator_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
 
+# Messages
 msg_manual="\
 $header
 $tagline
@@ -109,6 +111,7 @@ It is ${sty_bol}highly${sty_res} recommended to change the permissions so that o
 
 msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
 
+# Prompts
 prompt_update="Do you wish to update? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
