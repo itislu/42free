@@ -113,6 +113,7 @@ prompt_update="Do you wish to update? (${sty_bol}y${sty_res}/${sty_bol}n${sty_re
 prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
+prompt_symlink="Do you wish to create a symbolic link to it? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_replace="Do you wish to continue and replace any duplicate files? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
@@ -409,8 +410,26 @@ for arg in "${args[@]}"; do
 
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
-        pretty_print "$indicator_error '${sty_bri_red}$source_path${sty_res}' does not exist."
-        bad_input=true
+        # Check if the source directory or file has already been moved to sgoinfre and is missing a symbolic link
+        if ! $reverse && [ -e "$target_path" ]; then
+            pretty_print "'${sty_bri_yel}$source_path${sty_res}' has already been moved to sgoinfre."
+            pretty_print "It is located at '${sty_bri_gre}$target_path${sty_res}'."
+            if prompt_user "$prompt_symlink"; then
+                if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
+                    pretty_print "$indicator_success Symbolic link created."
+                else
+                    pretty_print "$indicator_error Cannot create symbolic link."
+                    print_stderr
+                    syscmd_failed=true
+                fi
+            else
+                print_skip_arg "$arg"
+                arg_skipped=true
+            fi
+        else
+            pretty_print "$indicator_error '${sty_bri_red}$source_path${sty_res}' does not exist."
+            bad_input=true
+        fi
         continue
     fi
 
