@@ -8,6 +8,7 @@ dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
 
 # Exit codes
+success=0
 download_failed=1
 install_failed=2
 
@@ -38,6 +39,13 @@ else
     exit $download_failed
 fi
 
+# Check if it's an update or a fresh install
+if [[ $1 == "update" ]]; then
+    pretty_print "${sty_yel}Updating '$dest_file' in '$dest_dir'...${sty_res}"
+else
+    pretty_print "${sty_yel}Downloading '$dest_file' into '$dest_dir'...${sty_res}"
+fi
+
 # Download the script
 mkdir -p "$dest_dir"
 $downloader $downloader_opts "$dest_dir/$dest_file" "$script_url"
@@ -46,7 +54,6 @@ if [ $exit_status -ne 0 ]; then
     pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
     exit $download_failed
 fi
-pretty_print "${sty_yel}'$dest_file' downloaded into '$dest_dir'.${sty_res}"
 
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
@@ -68,18 +75,30 @@ if ! grep "42free=" "$RC_FILE" &>/dev/null; then
     pretty_print "${sty_yel}42free alias not present.${sty_res}"
     pretty_print "${sty_yel}Adding 42free alias in file '$RC_FILE'.${sty_res}"
     echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
+    new_alias=true
 else
-    pretty_print "${sty_yel}42free alias already present.${sty_res}"
+    if [[ $1 != "update" ]]; then
+        pretty_print "${sty_yel}42free alias already present.${sty_res}"
+    fi
+    new_alias=false
 fi
 
-pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
-pretty_print "You can now use the 42free command."
-pretty_print "For help, run '${sty_bol}42free -h${sty_res}'."
-
-# Start the default shell to make the alias available immediately
-if [ -x "$SHELL" ]; then
-    exec $SHELL
+# Check if it's an update or a fresh install
+if [[ $1 == "update" ]]; then
+    pretty_print "${sty_bol}${sty_bri_gre}Update completed.${sty_res}"
+else
+    pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
+    pretty_print "You can now use the 42free command."
+    pretty_print "For help, run '${sty_bol}42free -h${sty_res}'."
 fi
 
-# If exec failed, inform the user to open a new shell
-pretty_print "Please open a new shell to make the 42free command available."
+if [[ $new_alias == true ]]; then
+    # Start the default shell to make the alias available immediately
+    if [ -x "$SHELL" ]; then
+        exec $SHELL
+    fi
+    # If exec failed, inform the user to open a new shell
+    pretty_print "Please open a new shell to make the 42free command available."
+fi
+
+exit $success

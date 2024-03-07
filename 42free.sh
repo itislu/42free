@@ -1,5 +1,7 @@
 #!/bin/bash
 
+current_version="1.0.0"
+
 current_dir=$(pwd)
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
@@ -66,6 +68,7 @@ ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
                    back to their original location in home.
     -s, --suggest  Display some suggestions to move and exit.
     -h, --help     Display this help message and exit.
+    -u, --update   Check for a new version of 42free.
     -v, --version  Display version information and exit.
     --             Stop interpreting options.
 
@@ -95,7 +98,7 @@ ${sty_bol}Some suggestions to move:${sty_res}
 Close all programs first to avoid errors during the move."
 
 msg_version="\
-${sty_bol}42free v1.0.0${sty_res}
+${sty_bol}42free v$current_version${sty_res}
 A script made for 42 students to take advantage of symbolic links to free up storage.
 For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
 
@@ -106,6 +109,7 @@ It is ${sty_bol}highly${sty_res} recommended to change the permissions so that o
 
 msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
 
+prompt_update="Do you wish to update? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
 prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
@@ -194,6 +198,58 @@ get_timestamp()
     date +%Y%m%d%H%M%S
 }
 
+get_latest_version_number()
+{
+    # Check if curl or wget is available
+    if command -v curl &>/dev/null; then
+        downloader="curl"
+        downloader_opts="-sSL"
+    elif command -v wget &>/dev/null; then
+        downloader="wget"
+        downloader_opts="-q"
+    else
+        if [[ "$1" != "silent" ]]; then
+            pretty_print "$print_error Cannot check for updates."
+            pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
+            pretty_print "Please install one of them and try again."
+        fi
+        return $major_error
+    fi
+
+    # Fetch the latest version from the git tags on GitHub
+    if ! latest_version=$($downloader $downloader_opts "https://api.github.com/repos/itislu/42free/tags"); then
+        if [[ "$1" != "silent" ]]; then
+            pretty_print "$print_error Cannot check for updates."
+        fi
+        return $major_error
+    fi
+    echo "$latest_version" | grep -m 1 '"name":' | cut -d '"' -f 4
+    return 0
+}
+
+update()
+{
+    if ! latest_version=$(get_latest_version_number "$1"); then
+        return $?
+    fi
+
+    # Compare the latest version with the current version number
+    if [[ "${latest_version#v}" != "${current_version#v}" ]]; then
+        pretty_print "A new version of 42free is available."
+        pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
+        pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
+        if prompt_user "$prompt_update"; then
+            bash <($downloader $downloader_opts "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update
+            return $?
+        else
+            pretty_print "Not updating."
+        fi
+    elif [[ "$1" != "silent" ]]; then
+        pretty_print "You are already using the latest version of 42free."
+    fi
+    return $success
+}
+
 # Process options
 args=()
 args_amount=0
@@ -207,6 +263,10 @@ while (( $# )); do
             # Print some suggestions
             pretty_print "$msg_suggest"
             exit $success
+            ;;
+        -u|--update)
+            update
+            exit $?
             ;;
         -h|--help)
             # Print help message
@@ -244,6 +304,7 @@ done
 
 # Check if the script received any targets
 if [ -z "${args[*]}" ]; then
+    update silent
     pretty_print "$msg_manual"
     exit $input_error
 fi
