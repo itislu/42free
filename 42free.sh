@@ -555,14 +555,16 @@ for arg in "${args[@]}"; do
             source_old="$source_path~42free-old_$(get_timestamp)~"
             if mv -T "$source_path" "$source_old" 2>/dev/null; then
                 link="$source_path"
-                ln -sT "$target_path" "$link" 2>/dev/null
-                pretty_print "Symbolic link created and the files that could not be moved are left in '${sty_bol}$source_old${sty_res}'."
+                link_create_msg="Symbolic link created and the files that could not be moved are left in '${sty_bol}$source_old${sty_res}'."
             else
                 source_old="$source_path"
                 link="$source_path~42free_tmp~"
-                ln -sT "$target_path" "$link" 2>/dev/null
-                pretty_print "Symbolic link left behind with a tmp name."
+                link_create_msg="Symbolic link left behind with a tmp name."
             fi
+
+            # Create the symbolic link
+            ln -sT "$target_path" "$link" 2>/dev/null
+            pretty_print "$link_create_msg"
 
             # Calculate and print how much space was already partially moved
             leftover_size_in_bytes=$(du -sb "$source_old" 2>/dev/null | cut -f1)
