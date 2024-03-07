@@ -500,9 +500,29 @@ for arg in "${args[@]}"; do
         continue
     fi
 
-    # Move the directory or file
+    # Start to move the directory or file in the background
     pretty_print "Moving '$source_basename' to '$target_dirpath'..."
-    if ! stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1); then
+    stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
+    rsync_pid=$!
+
+    # Wait for rsync to finish, checking every second
+    for (( i=0; i<100; i++ )); do
+        if ! kill -0 $rsync_pid 2>/dev/null; then
+            break
+        fi
+        # If rsync is still running after 10 seconds, print a message
+        if [[ i -eq 10 ]]; then
+            pretty_print "This can take a bit of time..."
+        fi
+        sleep 1
+    done
+
+    # Wait for rsync to finish
+    wait $rsync_pid 2>/dev/null
+    rsync_status=$?
+
+    # Check the exit status of rsync
+    if [[ $rsync_status -ne 0 ]]; then
         pretty_print "$indicator_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
         print_one_stderr
         syscmd_failed=true
