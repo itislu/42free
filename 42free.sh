@@ -505,8 +505,13 @@ for arg in "${args[@]}"; do
     fi
 
     # When moving files back to home, first remove the symbolic link
-    if $reverse && [ -L "$target_path" ]; then
-        rm -f "$target_path" 2>/dev/null
+    if $reverse; then
+        if [ -L "$target_path" ]; then
+            rm -f "$target_path" 2>/dev/null
+        fi
+        if [ -L "$target_path~42free_tmp~" ]; then
+            rm -f "$target_path~42free_tmp~" 2>/dev/null
+        fi
     fi
 
     # Create the same directory structure as in the source
