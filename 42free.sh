@@ -622,7 +622,8 @@ for arg in "${args[@]}"; do
             else
                 print_stderr
             fi
-            if ! prompt_user "$prompt_continue_with_rest"; then
+            # If not last argument, ask user if they want to continue with the other arguments
+            if [ $args_index -lt $args_amount ] && ! prompt_user "$prompt_continue_with_rest"; then
                 pretty_print "Skipping the rest of the arguments."
                 break
             fi
