@@ -95,7 +95,6 @@ msg_suggest="\
 ${sty_bol}Some suggestions to move:${sty_res}
    ~/.cache
    ~/.var/app/*/cache
-   ~/.local/share/Trash
 
 Close all programs first to avoid errors during the move."
 
