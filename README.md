@@ -26,24 +26,6 @@
 
 ---
 
-## How it works
-
-42free works by moving directories or files from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
-
-The allowed space in sgoinfre is usually much higher than in your home directory.
-
-Applications that need the moved files will just follow the symbolic link and access them from sgoinfre.
-
----
-
-## Confirmed to work for the following 42 campuses:
-
-| Campus | home | sgoinfre |
-| --- | --- | --- |
-| 🇦🇹 42 Vienna | 5GB | 30GB |
-
----
-
 ## Installation
 
 To install 42free, you can use the following commands (it doesn't matter which):
@@ -61,6 +43,24 @@ To install 42free, you can use the following commands (it doesn't matter which):
 This will download the `42free.sh` script into a hidden `.scripts` directory in your home directory.
 
 It will also add an alias `42free` to your shell's RC file (either `.bashrc` or `.zshrc`) so you can use it from any directory.
+
+---
+
+## How it works
+
+42free works by moving directories or files from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
+
+The allowed space in sgoinfre is usually much higher than in your home directory.
+
+Applications that need the moved files will just follow the symbolic link and access them from sgoinfre.
+
+---
+
+## Confirmed to work for the following 42 campuses:
+
+| Campus | home | sgoinfre |
+| --- | --- | --- |
+| 🇦🇹 42 Vienna | 5GB | 30GB |
 
 ---
 
