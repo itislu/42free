@@ -46,24 +46,6 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 ---
 
-## How it works
-
-42free works by moving directories or files from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
-
-The allowed space in sgoinfre is usually much higher than in your home directory.
-
-Applications that need the moved files will just follow the symbolic link and access them from sgoinfre.
-
----
-
-## Confirmed to work for the following 42 campuses:
-
-| Campus | home | sgoinfre |
-| --- | --- | --- |
-| 🇦🇹 42 Vienna | 5GB | 30GB |
-
----
-
 ## Usage
 
 Use 42free by running the `42free` command followed by any amount of directories or files you want to free the space of.
@@ -85,6 +67,24 @@ Closing all programs first will help to avoid errors during the move.
 > - To get some suggested directories to free, run `42free -s`.
 >
 > - To see the manual, run `42free -h`.
+
+---
+
+## How it works
+
+42free works by moving directories or files from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
+
+The allowed space in sgoinfre is usually much higher than in your home directory.
+
+Applications that need the moved files will just follow the symbolic link and access them from sgoinfre.
+
+---
+
+## Confirmed to work for the following 42 campuses:
+
+| Campus | home | sgoinfre |
+| --- | --- | --- |
+| 🇦🇹 42 Vienna | 5GB | 30GB |
 
 ---
 
