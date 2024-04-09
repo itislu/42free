@@ -3,11 +3,11 @@
 ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
 
 **Never run `ncdu` again.**
-- You only need to run 42free once for every directory or file you want to free the space of.
+- You only need to run 42free once for every file or directory you want to free the space of.
   From that point onwards, they will accumulate their space outside of your home directory.
 
 **Easy to use.**
-- 42free is designed to be easy to use. You don't have to go to a certain directory or pass full paths.
+- 42free is designed to be easy to use. You don't have to go to a certain directory or give full paths as arguments.
   You can use it from any directory and you can pass multiple arguments at once. It will detect what you want to do.
 
 **No data loss.**
@@ -42,15 +42,15 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 ## Usage
 
-- Use 42free by running the `42free` command followed by any amount of directories or files you want to free the space of.
+```bash
+42free file_or_dir
+```
+
+- Use 42free by running the `42free` command followed by any amount of files or directories you want to free the space of.
 
 - The arguments can be specified as absolute or relative paths.
 
 - Closing all programs first will help to avoid errors during the move.
-
-```bash
-42free target1 [target2 ...]
-```
 
 > [!TIP]
 > **You can pass options anywhere in your command to change the behavior of 42free:**
@@ -65,7 +65,7 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 ## How it works
 
-42free works by moving directories or files from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
+42free works by moving files and directories from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
 
 The allowed space in sgoinfre is usually much higher than in your home directory.
 
