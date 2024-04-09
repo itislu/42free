@@ -26,7 +26,7 @@
 
 ---
 
-## Installation
+## 🛠️ Installation
 
 To install 42free, you can use the following command:
 
@@ -40,7 +40,7 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 ---
 
-## Usage
+## 👩‍💻 Usage
 
 ```bash
 42free file_or_dir
@@ -63,7 +63,7 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 ---
 
-## How it works
+## 💡 How it works
 
 42free works by moving files and directories from your home directory to the sgoinfre directory and leaving behind a symbolic link in the original directory.
 
@@ -73,7 +73,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ---
 
-## Confirmed to work for the following 42 campuses:
+## 🌍 Confirmed to work for the following 42 campuses:
 
 | Campus | home | sgoinfre |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 - If this script worked for you and your peers, please let me (and others) know by posting in the [Discussions](https://github.com/itislu/42free/discussions) page.
   All confirmed campuses will be added to the [table](https://github.com/itislu/42free/edit/main/README.md#confirmed-to-work-for-the-following-42-campuses) above.
