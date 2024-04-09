@@ -2,6 +2,18 @@
 
 ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
 
+* [📌 Overview](#-overview)
+* [🛠️ Installation](#%EF%B8%8F-installation)
+* [👩‍💻 Usage](#-usage)
+* [💡 How it works](#-how-it-works)
+* [🌍 Confirmed to work for the following campuses](#-confirmed-to-work-for-the-following-campuses)
+* [🤝 Contributing](#-contributing)
+* [🐬 Fun fact](#-fun-fact)
+
+---
+
+## 📌 Overview
+
 **Never run `ncdu` again.**
 - You only need to run 42free once for every file or directory you want to free the space of.
   From that point onwards, they will accumulate their space outside of your home directory.
@@ -73,7 +85,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ---
 
-## 🌍 Confirmed to work for the following 42 campuses:
+## 🌍 Confirmed to work for the following campuses
 
 | Campus | home | sgoinfre |
 | --- | --- | --- |
