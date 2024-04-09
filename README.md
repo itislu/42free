@@ -28,17 +28,11 @@
 
 ## Installation
 
-To install 42free, you can use the following commands (it doesn't matter which):
+To install 42free, you can use the following command:
 
-- With curl:
-  ```bash
-  bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
-  ```
-
-- With wget:
-  ```bash
-  bash <(wget -qO- https://raw.githubusercontent.com/itislu/42free/main/install.sh)
-  ```
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
+```
 
 This will download the `42free.sh` script into a hidden `.scripts` directory in your home directory.
 
@@ -48,12 +42,11 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 ## Usage
 
-Use 42free by running the `42free` command followed by any amount of directories or files you want to free the space of.
+- Use 42free by running the `42free` command followed by any amount of directories or files you want to free the space of.
 
-The arguments can be specified as absolute or relative paths.
-42free will automatically detect if the given argument is the source you want to move, or the destination you want to move the source to.
+- The arguments can be specified as absolute or relative paths.
 
-Closing all programs first will help to avoid errors during the move.
+- Closing all programs first will help to avoid errors during the move.
 
 ```bash
 42free target1 [target2 ...]
