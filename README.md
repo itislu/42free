@@ -1,6 +1,10 @@
+<div align="center">
+  
 # 📁 42free 📁
 
 ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
+
+</div>
 
 * [📌 Overview](#-overview)
 * [🛠️ Installation](#%EF%B8%8F-installation)
