@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_version="1.0.0"
+current_version="0.0.1"
 
 # Standard variables
 stderr=""
