@@ -93,7 +93,7 @@ ${sty_und}Exit codes:${sty_res}
          (symbolic link, file conflict, no space left)
     3: Major error
        An operation failed.
-         (sgoinfre permissions, move failed, restore failed, cleanup failed)
+         (sgoinfre permissions, update failed, move failed, restore failed, cleanup failed)
 
 $delim_small
 
