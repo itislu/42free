@@ -223,7 +223,7 @@ get_latest_version_number()
     fi
 
     # Fetch the latest version from the git tags on GitHub
-    if ! latest_version=$($downloader $downloader_opts "https://api.github.com/repos/itislu/42free/tags"); then
+    if ! latest_version=$("$downloader" "$downloader_opts" "https://api.github.com/repos/itislu/42free/tags"); then
         if [[ "$1" != "silent" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
         fi
@@ -245,7 +245,7 @@ update()
         pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
         pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
         if prompt_user "$prompt_update"; then
-            bash <($downloader $downloader_opts "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update
+            bash <("$downloader" "$downloader_opts" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update
             return $?
         else
             pretty_print "Not updating."

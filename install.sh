@@ -51,7 +51,7 @@ fi
 
 # Download the script
 mkdir -p "$dest_dir"
-$downloader $downloader_opts "$dest_dir/$dest_file" "$script_url"
+"$downloader" "$downloader_opts" "$dest_dir/$dest_file" "$script_url"
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
     pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
