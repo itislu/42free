@@ -7,6 +7,15 @@ script_url="https://raw.githubusercontent.com/itislu/42free/main/42free.sh"
 dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
 
+# Check if curl or wget is available
+if command -v curl &>/dev/null; then
+    downloader="curl"
+    downloader_opts="-sSLo"
+elif command -v wget &>/dev/null; then
+    downloader="wget"
+    downloader_opts="-qO"
+fi
+
 # Exit codes
 success=0
 download_failed=1
@@ -27,13 +36,7 @@ pretty_print()
 }
 
 # Check if curl or wget is available
-if command -v curl &>/dev/null; then
-    downloader="curl"
-    downloader_opts="-sSLo"
-elif command -v wget &>/dev/null; then
-    downloader="wget"
-    downloader_opts="-qO"
-else
+if [ -z "$downloader" ]; then
     pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
     pretty_print "Please install one of them and try again."
     exit $download_failed

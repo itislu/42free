@@ -10,6 +10,15 @@ sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
+# Check if curl or wget is available
+if command -v curl &>/dev/null; then
+    downloader="curl"
+    downloader_opts="-sSL"
+elif command -v wget &>/dev/null; then
+    downloader="wget"
+    downloader_opts="-q"
+fi
+
 # Exit codes
 success=0
 input_error=1
@@ -204,13 +213,7 @@ get_timestamp()
 get_latest_version_number()
 {
     # Check if curl or wget is available
-    if command -v curl &>/dev/null; then
-        downloader="curl"
-        downloader_opts="-sSL"
-    elif command -v wget &>/dev/null; then
-        downloader="wget"
-        downloader_opts="-q"
-    else
+    if [ -z "$downloader" ]; then
         if [[ "$1" != "silent" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
             pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
