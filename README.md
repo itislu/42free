@@ -1,10 +1,11 @@
 <div align="center">
-  
+
 # 📁 42free 📁
 
 ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
 
 </div>
+<br>
 
 * [📌 Overview](#-overview)
 * [🛠️ Installation](#%EF%B8%8F-installation)
@@ -14,7 +15,11 @@
 * [🤝 Contributing](#-contributing)
 * [🐬 Fun fact](#-fun-fact)
 
+<br>
+
 ---
+
+<br>
 
 ## 📌 Overview
 
@@ -40,7 +45,11 @@
 **Storage limit aware.**
 - 42free will detect if moving more files to sgoinfre would go over the allowed storage limit and will warn you.
 
+<br>
+
 ---
+
+<br>
 
 ## 🛠️ Installation
 
@@ -54,7 +63,11 @@ This will download the `42free.sh` script into a hidden `.scripts` directory in 
 
 It will also add an alias `42free` to your shell's RC file (either `.bashrc` or `.zshrc`) so you can use it from any directory.
 
+<br>
+
 ---
+
+<br>
 
 ## 👩‍💻 Usage
 
@@ -77,7 +90,11 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 >
 > - To see the manual, run `42free -h`.
 
+<br>
+
 ---
+
+<br>
 
 ## 💡 How it works
 
@@ -87,7 +104,11 @@ The allowed space in sgoinfre is usually much higher than in your home directory
 
 Applications that need the moved files will just follow the symbolic link and access them from sgoinfre.
 
+<br>
+
 ---
+
+<br>
 
 ## 🌍 Confirmed to work for the following campuses
 
@@ -95,7 +116,11 @@ Applications that need the moved files will just follow the symbolic link and ac
 | --- | --- | --- |
 | 🇦🇹 42 Vienna | 5GB | 30GB |
 
+<br>
+
 ---
+
+<br>
 
 ## 🤝 Contributing
 
@@ -109,7 +134,11 @@ Applications that need the moved files will just follow the symbolic link and ac
 - If you want to report a bug, please open an issue or create a pull request with a possible fix!
   I'm super grateful for any and all contributions.
 
+<br>
+
 ---
+
+<br>
 
 ## 🐬 Fun fact
 
@@ -117,3 +146,5 @@ The English translation for the French word _goinfre_ (/ɡwɛ̃fʁ/ - pronounced
 
 Knowing that, goinfre might also be a reference to the character _Ford Prefect_ from _The Hitchhiker's Guide to the Galaxy_, who is the friend and savior of _Arthur_.
 He is known to be an excessive eater and drinker.
+
+<br>
