@@ -16,6 +16,11 @@ elif command -v wget &>/dev/null; then
     downloader_opts="-qO"
 fi
 
+# RC files
+BASH_RC="$HOME/.bashrc"
+ZSH_RC="$HOME/.zshrc"
+FISH_CONFIG="$HOME/.config/fish/config.fish"
+
 # Exit codes
 success=0
 download_failed=1
@@ -61,29 +66,30 @@ fi
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
 
-# Determine the shell and set the appropriate RC file
-if [[ "$SHELL" == *"bash"* ]]; then
-    RC_FILE="$HOME/.bashrc"
-elif [[ "$SHELL" == *"zsh"* ]]; then
-    RC_FILE="$HOME/.zshrc"
-elif [[ "$SHELL" == *"fish"* ]]; then
-    RC_FILE="$HOME/.config/fish/config.fish"
-else
-    pretty_print "${sty_bol}${sty_bri_yel}Unsupported shell. Please set an alias for your shell manually.${sty_res}"
-    exit $install_failed
-fi
-
-# Add an alias to the user's shell RC file if it doesn't exist
-if ! grep "42free=" "$RC_FILE" &>/dev/null; then
-    pretty_print "${sty_yel}42free alias not present.${sty_res}"
-    pretty_print "${sty_yel}Adding 42free alias in file '$RC_FILE'.${sty_res}"
-    echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
-    new_alias=true
-else
-    if [[ $1 != "update" ]]; then
-        pretty_print "${sty_yel}42free alias already present.${sty_res}"
+# Add an alias to all supported RC files if it doesn't exist yet
+for RC_FILE in "$BASH_RC" "$ZSH_RC" "$FISH_CONFIG"; do
+    case "$RC_FILE" in
+        "$BASH_RC")
+            SHELL_NAME="bash"
+            ;;
+        "$ZSH_RC")
+            SHELL_NAME="zsh"
+            ;;
+        "$FISH_CONFIG")
+            SHELL_NAME="fish"
+            ;;
+    esac
+    if ! grep "alias 42free=" "$RC_FILE" &>/dev/null; then
+        pretty_print "${sty_yel}Adding 42free alias to $SHELL_NAME.${sty_res}"
+        echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
+        new_alias=true
     fi
-    new_alias=false
+done
+
+# Check user's default shell
+if [[ "$SHELL" != *"bash"* && "$SHELL" != *"zsh"* && "$SHELL" == *"fish"* ]]; then
+    pretty_print "${sty_bol}${sty_bri_yel}Could not set the 42free alias for $(basename "$SHELL"). Please set it manually.${sty_res}"
+    exit $install_failed
 fi
 
 # Check if it's an update or a fresh install
@@ -100,8 +106,8 @@ if [[ $new_alias == true ]]; then
     if [ -x "$SHELL" ]; then
         exec $SHELL
     fi
-    # If exec failed, inform the user to open a new shell
-    pretty_print "Please open a new shell to make the 42free command available."
+    # If exec failed, inform the user to start a new shell
+    pretty_print "Please start a new shell to make the 42free command available."
 fi
 
 exit $success
