@@ -79,7 +79,7 @@ for RC_FILE in "$BASH_RC" "$ZSH_RC" "$FISH_CONFIG"; do
             SHELL_NAME="fish"
             ;;
     esac
-    if ! grep "alias 42free=" "$RC_FILE" &>/dev/null; then
+    if [ -f "$RC_FILE" ] && ! grep "alias 42free=" "$RC_FILE" &>/dev/null; then
         pretty_print "${sty_yel}Adding 42free alias to $SHELL_NAME.${sty_res}"
         echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
         new_alias=true
