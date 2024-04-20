@@ -13,10 +13,10 @@ sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
     downloader="curl"
-    downloader_opts="-sSL"
+    downloader_opts_stdout="-sSL"
 elif command -v wget &>/dev/null; then
     downloader="wget"
-    downloader_opts="-q"
+    downloader_opts_stdout="-qO-"
 fi
 
 # Exit codes
@@ -223,13 +223,15 @@ get_latest_version_number()
     fi
 
     # Fetch the latest version from the git tags on GitHub
-    if ! latest_version=$("$downloader" "$downloader_opts" "https://api.github.com/repos/itislu/42free/tags"); then
+    latest_version=$("$downloader" "$downloader_opts_stdout" "https://api.github.com/repos/itislu/42free/tags")
+    latest_version=$(echo "$latest_version" | grep -m 1 '"name":' | cut -d '"' -f 4) 2>/dev/null
+    if [ -z "$latest_version" ] ; then
         if [[ "$1" != "silent" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
         fi
         return $major_error
     fi
-    echo "$latest_version" | grep -m 1 '"name":' | cut -d '"' -f 4
+    echo "$latest_version"
     return 0
 }
 
@@ -245,7 +247,7 @@ update()
         pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
         pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
         if prompt_user "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update
+            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update
             return $?
         else
             pretty_print "Not updating."

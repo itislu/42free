@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Define the URL of the script on GitHub
-script_url="https://raw.githubusercontent.com/itislu/42free/main/42free.sh"
+# Define the URL of the latest release API endpoint
+api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Define the destination directory and filename
 dest_dir="$HOME/.scripts"
@@ -10,10 +10,12 @@ dest_file="42free.sh"
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
     downloader="curl"
-    downloader_opts="-sSLo"
+    downloader_opts_stdout="-sSL"
+    downloader_opts_file="-sSLo"
 elif command -v wget &>/dev/null; then
     downloader="wget"
-    downloader_opts="-qO"
+    downloader_opts_stdout="-qO-"
+    downloader_opts_file="-qO"
 fi
 
 # RC files
@@ -54,9 +56,12 @@ else
     pretty_print "${sty_yel}Downloading '$dest_file' into '$dest_dir'...${sty_res}"
 fi
 
+# Get the URL of the asset from the latest release
+script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_download_url" | cut -d '"' -f 4)
+
 # Download the script
 mkdir -p "$dest_dir"
-"$downloader" "$downloader_opts" "$dest_dir/$dest_file" "$script_url"
+"$downloader" "$downloader_opts_file" "$dest_dir/$dest_file" "$script_url"
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
     pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
