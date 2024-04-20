@@ -120,14 +120,14 @@ It is ${sty_bol}highly${sty_res} recommended to change the permissions so that o
 msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
 
 # Prompts
-prompt_update="Do you wish to update? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
-prompt_continue="Do you still wish to continue? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
-prompt_continue_with_rest="Do you wish to continue with the other arguments? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
-prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
-prompt_symlink="Do you wish to create a symbolic link to it? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
-prompt_replace="Do you wish to continue and replace any duplicate files? (${sty_bol}y${sty_res}/${sty_bol}n${sty_res})"
+prompt_update="Do you wish to update? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_continue="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_continue_with_rest="Do you wish to continue with the other arguments? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_symlink="Do you wish to create a symbolic link to it? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_replace="Do you wish to continue and replace any duplicate files? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
 
-# Automatically detects the size of the terminal window and preserves word boundaries at the edges
+# Automatically detect the size of the terminal window and preserve word boundaries at the edges
 pretty_print()
 {
     printf "%b" "$1" | fmt -sw $(tput cols)
@@ -167,17 +167,10 @@ prompt_user()
 
 prompt_restore()
 {
-    pretty_print "Do you wish to leave (${sty_bol}l${sty_res}) it like that or restore (${sty_bol}r${sty_res}) what was already moved to '$target_path' back to '$source_path'? (${sty_bol}l${sty_res}/${sty_bol}r${sty_res})"
-    while true; do
-        read -rp "> "
-        if [[ $REPLY =~ ^[Rr](estore)?$ ]]; then
-            return 0
-        elif [[ $REPLY =~ ^[Ll](eave)?$ ]]; then
-            return 1
-        else
-            pretty_print "Invalid option. Please enter ${sty_bol}l${sty_res} for 'leave' or ${sty_bol}r${sty_res} for 'restore'. (${sty_bol}l${sty_res}/${sty_bol}r${sty_res})"
-        fi
-    done
+    pretty_print "Do you wish to leave it like that? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+    pretty_print "- Selecting ${sty_bol}no${sty_res} will restore what was already moved to $target_name back to $source_name."
+    prompt_user
+    return $((! $?))
 }
 
 restore_after_error()
@@ -340,6 +333,7 @@ fi
 # Check which direction the script should move the directories or files
 if ! $reverse; then
     source_base="$HOME"
+    source_name="home"
     target_base="$sgoinfre"
     target_name="sgoinfre"
     max_size=30
@@ -347,6 +341,7 @@ if ! $reverse; then
     outcome="freed"
 else
     source_base="$sgoinfre"
+    source_name="sgoinfre"
     target_base="$HOME"
     target_name="home"
     max_size=5
