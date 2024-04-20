@@ -103,7 +103,7 @@ if [[ $1 == "update" ]]; then
 else
     pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
     pretty_print "You can now use the 42free command."
-    pretty_print "For help, run '${sty_bol}42free -h${sty_res}'."
+    pretty_print "To see the manual, run '${sty_bol}42free --help${sty_res}'."
 fi
 
 if [[ $new_alias == true ]]; then

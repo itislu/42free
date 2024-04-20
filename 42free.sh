@@ -369,6 +369,7 @@ for arg in "${args[@]}"; do
     # Print reminder to close all programs first in first iteration of default arguments
     if [ $args_index -eq 1 ] && $no_user_args; then
         pretty_print "$msg_close_programs"
+        pretty_print "To see the manual, run '${sty_bol}42free --help${sty_res}'."
         echo
     fi
 

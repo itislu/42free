@@ -96,7 +96,7 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 >
 > - Use the `-r` option to move any directories and files back to their original location.
 >
-> - To see the manual, run `42free -h`.
+> - To see the manual, run `42free --help`.
 
 <br>
 
