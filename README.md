@@ -53,11 +53,17 @@
 
 ## 🛠️ Installation
 
-To install 42free, you can use the following command:
+To install 42free, you can use one of the following commands:
 
-```bash
-bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
-```
+- With curl:
+  ```bash
+  bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
+  ```
+
+- With wget:
+  ```bash
+  bash <(wget -qO- https://raw.githubusercontent.com/itislu/42free/main/install.sh)
+  ```
 
 This will download the `42free.sh` script into a hidden `.scripts` directory in your home directory.
 
