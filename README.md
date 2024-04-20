@@ -83,20 +83,18 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 
 - Use 42free by running the `42free` command in the terminal.
 
-- If no arguments are given, 42free will prompt you with some suggestions.
-
 - You can also specify any amount of files or directories you want to free the space of.
 
 - The arguments can be given as absolute or relative paths.
 
-- Closing all programs first will help to avoid errors during the move.
-
 > [!TIP]
-> **You can pass options anywhere in your command to change the behavior of 42free:**
+> - **You can pass options anywhere in your command to change the behavior of 42free:**
 >
-> - Use the `-r` option to move any directories and files back to their original location.
+>   - Use the `-r` option to move any directories and files back to their original location.
 >
-> - To see the manual, run `42free --help`.
+>   - To see the manual, run `42free --help`.
+>
+> - **Closing all programs first will help to avoid errors during the move.**
 
 <br>
 
