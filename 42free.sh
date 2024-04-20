@@ -2,6 +2,19 @@
 
 current_version="0.0.2"
 
+default_args=(\
+"$HOME/.cache" \
+"$HOME/.config/Code/Cache" \
+"$HOME/.config/Code/CachedData" \
+"$HOME/.config/Code/User/workspaceStorage" \
+"$HOME/.var/app/com.discordapp.Discord" \
+"$HOME/.var/app/com.slack.Slack" \
+"$HOME/.var/app/com.brave.Browser/cache" \
+"$HOME/.var/app/com.google.Chrome/cache" \
+"$HOME/.var/app/com.opera.Opera/cache" \
+"$HOME/.var/app/org.mozilla.firefox/cache" \
+)
+
 # Standard variables
 stderr=""
 current_dir=$(pwd)
@@ -69,8 +82,9 @@ All programs will then access them through the symlink and they will accumulate 
 
 $delim_small
 
-${sty_und}Usage:${sty_res} ${sty_bol}42free target1${sty_res} [${sty_bol}target2${sty_res} ...]
-    The target paths can be absolute or relative to your current directory.
+${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [${sty_bol}target1 target2${sty_res} ...]
+    If no arguments are given, 42free will make some suggestions.
+    Target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
     Closing all programs first will help to avoid errors during the move.
 
@@ -119,9 +133,12 @@ It is ${sty_bol}highly${sty_res} recommended to change the permissions so that o
 
 msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
 
+msg_close_programs="${sty_bol}${sty_bri_yel}Close all programs first to avoid errors during the move.${sty_res}"
+
 # Prompts
 prompt_update="Do you wish to update? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_continue="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_continue="Do you wish to continue? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_continue_still="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
 prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
 prompt_symlink="Do you wish to create a symbolic link to it? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
@@ -168,7 +185,7 @@ prompt_user()
 prompt_restore()
 {
     pretty_print "Do you wish to leave it like that? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-    pretty_print "- Selecting ${sty_bol}no${sty_res} will restore what was already moved to $target_name back to $source_name."
+    pretty_print "- Selecting ${sty_bol}no${sty_res} will restore what was already moved to the $target_name directory back to the $source_name directory."
     prompt_user
     return $((! $?))
 }
@@ -306,8 +323,10 @@ done
 # Check if the script received any targets
 if [ -z "${args[*]}" ]; then
     update silent
-    pretty_print "$msg_manual"
-    exit $input_error
+    args=("${default_args[@]}")
+    no_user_args=true
+else
+    no_user_args=false
 fi
 
 # Check if the permissions of user's sgoinfre directory are rwx------
@@ -320,7 +339,7 @@ if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
             pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
             print_stderr
             syscmd_failed=true
-            if ! prompt_user "$prompt_continue"; then
+            if ! prompt_user "$prompt_continue_still"; then
                 exit $major_error
             fi
             pretty_print "$msg_sgoinfre_permissions_keep"
@@ -356,13 +375,21 @@ echo
 
 # Loop over all arguments
 args_index=0
+need_delim=false
 for arg in "${args[@]}"; do
     args_index=$((args_index + 1))
 
-    # Print a delimiter if not the first iteration
-    if [ $args_index -gt 1 ]; then
+    # Print reminder to close all programs first in first iteration of default arguments
+    if [ $args_index -eq 1 ] && $no_user_args; then
+        pretty_print "$msg_close_programs"
+        echo
+    fi
+
+    # Print delimiter
+    if $need_delim; then
         pretty_print "$delim_small"
     fi
+    need_delim=true
 
     # Check if argument is an absolute or relative path
     if [[ "$arg" = /* ]]; then
@@ -428,9 +455,11 @@ for arg in "${args[@]}"; do
                 print_skip_arg "$arg"
                 arg_skipped=true
             fi
-        else
+        elif ! $no_user_args; then
             pretty_print "$indicator_error '${sty_bri_red}$source_path${sty_res}' does not exist."
             bad_input=true
+        else
+            need_delim=false
         fi
         continue
     fi
@@ -440,27 +469,42 @@ for arg in "${args[@]}"; do
     real_arg_dirpath=$(realpath "$arg_dirpath")
     real_arg_path=$(realpath "$arg_path")
     if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } || \
-       { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }
-    then
-        pretty_print "$indicator_error '$source_subpath' is already in $target_name."
+       { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
+        pretty_print "$indicator_error '$source_subpath' is already in the $target_name directory."
         pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
         print_skip_arg "$arg"
         bad_input=true
         continue
     fi
 
-    # Check if the source file is a symbolic link
+    # If the source directory or file has already been moved to sgoinfre, skip it
     if [ -L "$source_path" ]; then
-        # If the source directory or file has already been moved to sgoinfre, skip it
         real_source_path=$(realpath "$source_path")
         if ! $reverse && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
-            pretty_print "'${sty_bol}${sty_bri_cya}$source_subpath${sty_res}' has already been moved to sgoinfre."
-            pretty_print "It is located at '$real_source_path'."
+            if ! $no_user_args; then
+                pretty_print "'${sty_bol}${sty_bri_cya}$source_subpath${sty_res}' has already been moved to sgoinfre."
+                pretty_print "It is located at '$real_source_path'."
+                print_skip_arg "$arg"
+            else
+                need_delim=false
+            fi
+            continue
+        fi
+    fi
+
+    # If no user arguments, ask user if they want to process the current argument
+    if $no_user_args && [ -e "$source_path" ]; then
+        pretty_print "This will move '${sty_bol}$source_path${sty_res}' to the $target_name directory."
+        if ! prompt_user "$prompt_continue"; then
             print_skip_arg "$arg"
             continue
         fi
+    fi
+
+    # Check if the source file is a symbolic link
+    if [ -L "$source_path" ]; then
         pretty_print "$indicator_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
-        if ! prompt_user "$prompt_continue"; then
+        if ! prompt_user "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -496,7 +540,7 @@ for arg in "${args[@]}"; do
     # Check if the target directory would go above its maximum recommended size
     if (( target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
         pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
-        if ! prompt_user "$prompt_continue"; then
+        if ! prompt_user "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
