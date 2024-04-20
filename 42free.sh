@@ -91,9 +91,8 @@ ${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [${sty_bol}target1 target2
 ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --reverse  Reverse the operation and move the directories or files
                    back to their original location in home.
-    -s, --suggest  Display some suggestions to move and exit.
-    -h, --help     Display this help message and exit.
     -u, --update   Check for a new version of 42free.
+    -h, --help     Display this help message and exit.
     -v, --version  Display version information and exit.
     --             Stop interpreting options.
 
@@ -113,13 +112,6 @@ $delim_small
 
 To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}.
 \n"
-
-msg_suggest="\
-${sty_bol}Some suggestions to move:${sty_res}
-   ~/.cache
-   ~/.var/app/*/cache
-
-Close all programs first to avoid errors during the move."
 
 msg_version="\
 ${sty_bol}42free v$current_version${sty_res}
@@ -276,11 +268,6 @@ while (( $# )); do
     case "$1" in
         -r|--reverse)
             reverse=true
-            ;;
-        -s|--suggest)
-            # Print some suggestions
-            pretty_print "$msg_suggest"
-            exit $success
             ;;
         -u|--update)
             update
