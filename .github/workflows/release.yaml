@@ -48,14 +48,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: ⏫ Update version number in script
+      - name: 🛠️ Append dev to version number in script
         run: |
-          version=${{ env.VERSION }}
-          major=$(echo $version | cut -d. -f1)
-          minor=$(echo $version | cut -d. -f2)
-          patch=$(echo $version | cut -d. -f3)
-          patch=$((patch + 1))
-          new_version="$major.$minor.$patch"
+          new_version="${{ env.VERSION }}+dev"
           sed -i "s/^current_version=.*/current_version=\"$new_version\"/" 42free.sh
           git add 42free.sh
           git commit -m "bot: Update version number to $new_version"
