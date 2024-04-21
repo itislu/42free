@@ -5,9 +5,6 @@ on:
     tags:
       - 'v*.*.*'
 
-env:
-  VERSION:
-
 permissions:
   contents: write
   actions: write
@@ -15,6 +12,10 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      VERSION:
+      PROCEED:
+
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
@@ -30,7 +31,18 @@ jobs:
       - name: Get version number
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
+      - name: Check tag version
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          new_tag=${{ env.VERSION }}
+          if [[ $(printf '%s\n' "$latest_tag" "$new_tag" | sort -rV | head -n1) == "$new_tag" ]]; then
+            echo "PROCEED=true" >> "$GITHUB_ENV"
+          else
+            echo "PROCEED=false" >> "$GITHUB_ENV"
+          fi
+
       - name: ⏫ Update version number in script
+        if: env.PROCEED == 'true'
         run: |
           sed -i "s/^current_version=.*/current_version=\"${{ env.VERSION }}\"/" 42free.sh
           git add 42free.sh
@@ -40,6 +52,7 @@ jobs:
           git push -f origin ${{ env.VERSION }}
 
       - name: 🚀 Release and upload asset
+        if: env.PROCEED == 'true'
         uses: softprops/action-gh-release@v2
         with:
           files: 42free.sh
@@ -49,6 +62,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🛠️ Append dev to version number in script
+        if: env.PROCEED == 'true'
         run: |
           new_version="${{ env.VERSION }}+dev"
           sed -i "s/^current_version=.*/current_version=\"$new_version\"/" 42free.sh
