@@ -16,7 +16,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout triggering tag
         uses: actions/checkout@v4
 
       - name: Setup Git
@@ -34,9 +34,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout main branch
-        run: |
-          git checkout main
-          git pull
+        uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Get the version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
