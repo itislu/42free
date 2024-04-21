@@ -21,8 +21,8 @@ jobs:
 
       - name: Setup Git
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Release and Upload Asset
         uses: softprops/action-gh-release@v2
