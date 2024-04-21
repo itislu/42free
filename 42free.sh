@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_version="0.0.2"
+current_version="v0.0.2"
 
 default_args=(\
 "$HOME/.cache" \
@@ -114,7 +114,7 @@ To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri
 \n"
 
 msg_version="\
-${sty_bol}42free v$current_version${sty_res}
+${sty_bol}42free $current_version${sty_res}
 A script made for 42 students to take advantage of symbolic links to free up storage.
 For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
 

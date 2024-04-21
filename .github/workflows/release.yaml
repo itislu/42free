@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'
 
+env:
+  VERSION:
+
 permissions:
   contents: write
   actions: write
@@ -16,6 +19,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
       - name: Release and Upload Asset
         uses: softprops/action-gh-release@v2
         with:
@@ -24,3 +32,24 @@ jobs:
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout main branch
+        run: |
+          git checkout main
+          git pull
+
+      - name: Get the version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
+      - name: Update version number in script
+        run: |
+          version=${{ env.VERSION }}
+          major=$(echo $version | cut -d. -f1)
+          minor=$(echo $version | cut -d. -f2)
+          patch=$(echo $version | cut -d. -f3)
+          patch=$((patch + 1))
+          new_version="$major.$minor.$patch"
+          sed -i "s/^current_version=.*/current_version=\"$new_version\"/" 42free.sh
+          git add 42free.sh
+          git commit -m "bot: Update version number to $new_version"
+          git push origin main
