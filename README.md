@@ -29,7 +29,7 @@
 
 **Easy to use.**
 - 42free is designed to be easy to use. You don't have to go to a certain directory or give full paths as arguments.
-  You can use it from any directory and you can pass multiple arguments at once. It will detect what you want to do.
+  You can use it from any directory and you can pass multiple arguments at once or none at all. It will detect what you want to do.
 
 **No data loss.**
 - You will not lose any data by running 42free, it only moves the data.
