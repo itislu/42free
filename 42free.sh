@@ -207,6 +207,43 @@ cleanup_empty_dirs()
     done
 }
 
+wait_for_jobs()
+{
+    local job_pids=("$@")
+    local job_pid
+    local exit_status=0
+    local finished
+
+    # Wait for each job to finish, checking every second
+    for (( i=0; i<100; i++ )); do
+        finished=true
+        for job_pid in "${job_pids[@]}"; do
+            if kill -0 "$job_pid" 2>/dev/null; then
+                finished=false
+                break
+            fi
+        done
+        if $finished; then
+            break
+        fi
+        # If any job is still running after 10 seconds, print a message
+        if [[ i -eq 10 ]]; then
+            echo "This can take a bit of time..."
+        fi
+        sleep 1
+    done
+
+    # Wait for all jobs to finish and check their exit status
+    for job_pid in "${job_pids[@]}"; do
+        wait "$job_pid" 2>/dev/null
+        job_exit_status=$?
+        if [[ $job_exit_status -ne 0 ]]; then
+            exit_status=$job_exit_status
+        fi
+    done
+    return $exit_status
+}
+
 get_timestamp()
 {
     date +%Y%m%d%H%M%S
@@ -561,22 +598,10 @@ for arg in "${args[@]}"; do
     # Start to move the directory or file in the background
     pretty_print "Moving '$source_basename' to '$target_dirpath'..."
     stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
-    rsync_pid=$!
-
-    # Wait for rsync to finish, checking every second
-    for (( i=0; i<100; i++ )); do
-        if ! kill -0 $rsync_pid 2>/dev/null; then
-            break
-        fi
-        # If rsync is still running after 10 seconds, print a message
-        if [[ i -eq 10 ]]; then
-            pretty_print "This can take a bit of time..."
-        fi
-        sleep 1
-    done
+    rsync_job=$!
 
     # Wait for rsync to finish
-    wait $rsync_pid 2>/dev/null
+    wait_for_jobs $rsync_job
     rsync_status=$?
 
     # Check the exit status of rsync
