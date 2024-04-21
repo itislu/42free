@@ -19,12 +19,12 @@ jobs:
       - name: Checkout triggering tag
         uses: actions/checkout@v4
 
-      - name: Setup Git
+      - name: Configure GitHub Actions bot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Release and Upload Asset
+      - name: 🚀 Release and upload asset
         uses: softprops/action-gh-release@v2
         with:
           files: 42free.sh
@@ -38,10 +38,10 @@ jobs:
         with:
           ref: main
 
-      - name: Get the version
+      - name: Get version number
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
-      - name: Update version number in script
+      - name: ⏫ Update version number in script
         run: |
           version=${{ env.VERSION }}
           major=$(echo $version | cut -d. -f1)
