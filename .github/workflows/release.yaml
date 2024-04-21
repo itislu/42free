@@ -16,13 +16,28 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout triggering tag
+      - name: Checkout main branch
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Configure GitHub Actions bot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Get version number
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
+      - name: ⏫ Update version number in script
+        run: |
+          sed -i "s/^current_version=.*/current_version=\"${{ env.VERSION }}\"/" 42free.sh
+          git add 42free.sh
+          git commit -m "bot: Update version number to ${{ env.VERSION }}" || exit 0
+          git push origin main
+          git tag -f ${{ env.VERSION }}
+          git push -f origin ${{ env.VERSION }}
 
       - name: 🚀 Release and upload asset
         uses: softprops/action-gh-release@v2
@@ -32,14 +47,6 @@ jobs:
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-
-      - name: Get version number
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
       - name: ⏫ Update version number in script
         run: |
