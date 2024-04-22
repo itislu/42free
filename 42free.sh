@@ -22,6 +22,8 @@ sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
+sgoinfre_max_size=30
+home_max_size=5
 
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
@@ -379,7 +381,7 @@ if ! $reverse; then
     source_name="home"
     target_base="$sgoinfre"
     target_name="sgoinfre"
-    max_size=30
+    target_max_size=$sgoinfre_max_size
     operation="moved"
     outcome="freed"
 else
@@ -387,7 +389,7 @@ else
     source_name="sgoinfre"
     target_base="$HOME"
     target_name="home"
-    max_size=5
+    target_max_size=$home_max_size
     operation="moved back"
     outcome="occupied"
 fi
@@ -573,12 +575,12 @@ for arg in "${args[@]}"; do
     # Get the size of any target that will be replaced
     existing_target_size_in_bytes="$(du -sb "$target_path" 2>/dev/null | cut -f1)"
 
-    # Convert max_size from GB to bytes
-    max_size_in_bytes=$((max_size * 1024 * 1024 * 1024))
+    # Convert target_max_size from GB to bytes
+    max_size_in_bytes=$(( target_max_size * 1024 * 1024 * 1024 ))
 
     # Check if the target directory would go above its maximum recommended size
-        pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
     if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
+        pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${target_max_size}GB${sty_res}."
         if ! prompt_user "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
