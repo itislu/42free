@@ -181,7 +181,7 @@ prompt_restore()
     pretty_print "Do you wish to leave it like that? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
     pretty_print "- Selecting ${sty_bol}no${sty_res} will restore what was already moved to the $target_name directory back to the $source_name directory."
     prompt_user
-    return $((! $?))
+    return $(( ! $? ))
 }
 
 restore_after_error()
@@ -380,7 +380,7 @@ while (( $# )); do
             shift
             while (( $# )); do
                 args+=("$1")
-                args_amount=$((args_amount + 1))
+                args_amount=$(( args_amount + 1 ))
                 shift
             done
             break
@@ -393,7 +393,7 @@ while (( $# )); do
         *)
             # Non-option argument
             args+=("$1")
-            args_amount=$((args_amount + 1))
+            args_amount=$(( args_amount + 1 ))
             ;;
     esac
     shift
@@ -457,7 +457,7 @@ args_index=0
 need_delim=false
 
 for arg in "${args[@]}"; do
-    args_index=$((args_index + 1))
+    args_index=$(( args_index + 1 ))
 
     # Print reminder to close all programs first in first iteration of default arguments
     if [ $args_index -eq 1 ] && $no_user_args; then
@@ -699,7 +699,7 @@ for arg in "${args[@]}"; do
 
             # Calculate and print how much space was already partially moved
             leftover_size_in_bytes=$(du -sb "$source_old" 2>/dev/null | cut -f1)
-            outcome_size_in_bytes=$((size_in_bytes - leftover_size_in_bytes))
+            outcome_size_in_bytes=$(( size_in_bytes - leftover_size_in_bytes ))
             outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_bytes)"
             pretty_print "${sty_bol}$outcome_size${sty_res} of ${sty_bol}$size${sty_res} $outcome."
 
