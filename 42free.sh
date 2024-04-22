@@ -546,10 +546,24 @@ for arg in "${args[@]}"; do
         fi
     fi
 
-    # Get the current size of the target directory
-    if [ -z "$target_dir_size_in_bytes" ]; then
-        pretty_print "Getting the current size of the $target_name directory..."
-        target_dir_size_in_bytes=$(du -sb "$target_base" 2>/dev/null | cut -f1)
+    # Get the current sizes of the source and target base directories
+    if [ -z "$target_base_size_in_bytes" ]; then
+        pretty_print "Getting the current sizes of the $source_name and $target_name directories..."
+
+        tmpfile_source_base_size="/tmp/42free~source_base_size"
+        tmpfile_target_base_size="/tmp/42free~target_base_size"
+
+        # Run parallel jobs and wait for both to finish
+        du -sb "$source_base" 2>/dev/null | cut -f1 > $tmpfile_source_base_size &
+        source_base_size_job=$!
+        du -sb "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
+        target_base_size_job=$!
+        wait_for_jobs $source_base_size_job $target_base_size_job
+
+        # Read the sizes from the temporary files
+        source_base_size_in_bytes=$(cat $tmpfile_source_base_size 2>/dev/null)
+        target_base_size_in_bytes=$(cat $tmpfile_target_base_size 2>/dev/null)
+        rm -f $tmpfile_source_base_size $tmpfile_target_base_size
     fi
 
     # Get the size of the directory or file to be moved
@@ -563,8 +577,8 @@ for arg in "${args[@]}"; do
     max_size_in_bytes=$((max_size * 1024 * 1024 * 1024))
 
     # Check if the target directory would go above its maximum recommended size
-    if (( target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
         pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${max_size}GB${sty_res}."
+    if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
         if ! prompt_user "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -658,7 +672,7 @@ for arg in "${args[@]}"; do
         fi
 
         # Force recalculation of the target directory size in next iteration
-        unset target_dir_size_in_bytes
+        unset target_base_size_in_bytes
         continue
     fi
     pretty_print "$indicator_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirpath${sty_res}'."
@@ -686,8 +700,9 @@ for arg in "${args[@]}"; do
         fi
     fi
 
-    # Update the size of the target directory
-    target_dir_size_in_bytes=$((target_dir_size_in_bytes + size_in_bytes - existing_target_size_in_bytes))
+    # Update the directory sizes
+    source_base_size_in_bytes=$(( source_base_size_in_bytes - size_in_bytes ))
+    target_base_size_in_bytes=$(( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes ))
 
     # Print result
     pretty_print "${sty_bol}$size${sty_res} $outcome."
