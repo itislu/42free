@@ -31,10 +31,12 @@ install_failed=2
 # Colors and styles
 sty_res="\e[0m"
 sty_bol="\e[1m"
+sty_und="\e[4m"
 sty_red="\e[31m"
 sty_yel="\e[33m"
 sty_bri_gre="\e[92m"
 sty_bri_yel="\e[93m"
+sty_bri_blu="\e[94m"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
@@ -100,6 +102,7 @@ fi
 # Check if it's an update or a fresh install
 if [[ $1 == "update" ]]; then
     pretty_print "${sty_bol}${sty_bri_gre}Update completed.${sty_res}"
+    pretty_print "To see the changelog, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}."
 else
     pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
     pretty_print "You can now use the 42free command."
