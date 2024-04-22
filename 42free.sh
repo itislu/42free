@@ -246,6 +246,59 @@ wait_for_jobs()
     return $exit_status
 }
 
+# Calculate a color based on the percentage of used space
+calculate_usage_color()
+{
+    local size=$1
+    local max_size=$2
+    local percentage
+    local color
+
+    # Calculate the percentage of used space
+    percentage=$(awk -v s="$size" -v ms="$max_size" 'BEGIN { printf "%.2f", s / ms * 100 }')
+
+    if (( $(echo "$percentage >= 100" | bc -l) )); then
+        color="${sty_red}"
+    elif (( $(echo "$percentage >= 90" | bc -l) )); then
+        color="${sty_bri_red}"
+    elif (( $(echo "$percentage >= 80" | bc -l) )); then
+        color="${sty_bri_yel}"
+    else
+        color="${sty_bri_gre}"
+    fi
+    echo "$color"
+}
+
+print_available_space()
+{
+    local source_base_size_in_bytes=$1
+    local target_base_size_in_bytes=$2
+    local source_base_size
+    local target_base_size
+    local home_size
+    local sgoinfre_size
+    local home_color
+    local sgoinfre_color
+
+    source_base_size=$(echo "$source_base_size_in_bytes/1024/1024/1024" | bc -l | xargs printf "%.2f")
+    target_base_size=$(echo "$target_base_size_in_bytes/1024/1024/1024" | bc -l | xargs printf "%.2f")
+
+    if ! $reverse; then
+        home_size=$source_base_size
+        sgoinfre_size=$target_base_size
+    else
+        home_size=$target_base_size
+        sgoinfre_size=$source_base_size
+    fi
+
+    home_color=$(calculate_usage_color "$home_size" "$home_max_size")
+    sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
+
+    pretty_print "${sty_bol}${sty_und}Available space:${sty_res}"
+    printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
+    printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
+}
+
 get_timestamp()
 {
     date +%Y%m%d%H%M%S
@@ -402,6 +455,7 @@ echo
 # Loop over all arguments
 args_index=0
 need_delim=false
+
 for arg in "${args[@]}"; do
     args_index=$((args_index + 1))
 
@@ -707,7 +761,14 @@ for arg in "${args[@]}"; do
     target_base_size_in_bytes=$(( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes ))
 
     # Print result
-    pretty_print "${sty_bol}$size${sty_res} $outcome."
+    if ! $reverse; then
+        outcome_color="${sty_bri_cya}"
+    else
+        outcome_color="${sty_bri_blu}"
+    fi
+    pretty_print "${sty_bol}${outcome_color}$size $outcome.${sty_res}"
+    print_available_space "$source_base_size_in_bytes" "$target_base_size_in_bytes"
+
 done
 
 if $syscmd_failed; then
