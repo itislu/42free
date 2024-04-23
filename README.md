@@ -25,6 +25,7 @@
 
 **Never run `ncdu` again.**
 - You only need to run 42free once for every file or directory you want to free the space of.
+  <br>
   From that point onwards, they will accumulate their space outside of your home directory.
 
 **Easy to use.**
@@ -33,10 +34,12 @@
 
 **No data loss.**
 - You will not lose any data by running 42free, it only moves the data.
+  <br>
   All programs that need the moved directories and files will continue to work normally.
 
 **You are in control.**
 - 42free will prompt you for confirmation if it encounters any unusual situation before doing anything.
+  <br>
   It will not overwrite files without asking you.
 
 **Reversable.**
@@ -157,6 +160,7 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/5).
 The English translation for the French word _goinfre_ (/ɡwɛ̃fʁ/ - pronounced 'gwah(n)-fruh') is "glutton" (definition of glutton: an excessively greedy eater).
 
 Knowing that, goinfre might also be a reference to the character _Ford Prefect_ from _The Hitchhiker's Guide to the Galaxy_, who is the friend and savior of _Arthur_.
+<br>
 He is known to be an excessive eater and drinker.
 
 <br>
