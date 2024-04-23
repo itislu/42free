@@ -122,6 +122,8 @@ Applications that need the moved files will just follow the symbolic link and ac
 | --- | --- | --- |
 | 🇦🇹 42 Vienna | 5GB | 30GB |
 
+Confirm **your** campus [here](https://github.com/itislu/42free/discussions/5).
+
 <br>
 
 ---
@@ -130,14 +132,18 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ## 🤝 Contributing
 
-- If this script worked for you and your peers, please let me (and others) know by posting in the [Discussions](https://github.com/itislu/42free/discussions) page.
-  All confirmed campuses will be added to the [table](https://github.com/itislu/42free/edit/main/README.md#confirmed-to-work-for-the-following-42-campuses) above.
+- If this script worked for you and your peers, please let me (and others) know by posting or reacting to already existing posts in the [💬 Discussions](https://github.com/itislu/42free/discussions) page.
 
-- If you have ideas how 42free could be improved, checkout the [Discussions](https://github.com/itislu/42free/discussions) page and feel free to post there! I will see it and respond.
+- If the storage layout on your campus is different, you can post in [here](https://github.com/itislu/42free/discussions/5). A template is already prepared for you 😊
+  <br>
+  All confirmed campuses will be added to the [🌍 table](https://github.com/itislu/42free?tab=readme-ov-file#-confirmed-to-work-for-the-following-campuses) above.
 
-- If the storage layout on your campus is different, please let me (and others) know by posting in, you guessed it, the [Discussions](https://github.com/itislu/42free/discussions) page.
+- If you have ideas how 42free could be improved, checkout the [💡 Ideas](https://github.com/itislu/42free/discussions/categories/ideas) section in the Discussions page and feel free to post there!
+  <br>
+  I will see it and respond.
 
-- If you want to report a bug, please open an issue or create a pull request with a possible fix!
+- If you want to report a bug, please open an [Issue](https://github.com/itislu/42free/issues) or create a [Pull Request](https://github.com/itislu/42free/pulls) with a possible fix!
+  <br>
   I'm super grateful for any and all contributions.
 
 <br>
