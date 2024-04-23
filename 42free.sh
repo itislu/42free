@@ -769,6 +769,7 @@ for arg in "${args[@]}"; do
     pretty_print "${sty_bol}${outcome_color}$size $outcome.${sty_res}"
     print_available_space "$source_base_size_in_bytes" "$target_base_size_in_bytes"
 
+# Process the next argument
 done
 
 if $syscmd_failed; then
