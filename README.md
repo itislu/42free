@@ -91,7 +91,7 @@ It will also add an alias `42free` to your shell's RC file (either `.bashrc` or 
 - The arguments can be given as absolute or relative paths.
 
 > [!TIP]
-> - **You can pass options anywhere in your command to change the behavior of 42free:**
+> - **You can pass options anywhere in your command to change the behavior of 42free.**
 >
 >   - Use the `-r` option to move any directories and files back to their original location.
 >
