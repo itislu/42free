@@ -18,12 +18,19 @@ default_args=(\
 # Standard variables
 stderr=""
 current_dir=$(pwd)
+script_dir="$HOME/.scripts"
+script_path="$script_dir/42free.sh"
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 sgoinfre_max_size=30
 home_max_size=5
+
+# RC files
+bash_rc="$HOME/.bashrc"
+zsh_rc="$HOME/.zshrc"
+fish_config="$HOME/.config/fish/config.fish"
 
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
@@ -50,6 +57,7 @@ sty_res="\e[0m"
 sty_bol="\e[1m"
 sty_und="\e[4m"
 sty_red="\e[31m"
+sty_yel="\e[33m"
 sty_bri_red="\e[91m"
 sty_bri_gre="\e[92m"
 sty_bri_yel="\e[93m"
@@ -91,12 +99,13 @@ ${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [${sty_bol}target1 target2
     Closing all programs first will help to avoid errors during the move.
 
 ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
-    -r, --reverse  Reverse the operation and move the directories or files
-                   back to their original location in home.
-    -u, --update   Check for a new version of 42free.
-    -h, --help     Display this help message and exit.
-    -v, --version  Display version information and exit.
-    --             Stop interpreting options.
+    -r, --reverse    Reverse the operation and move the directories or files
+                     back to their original location in home.
+    -u, --update     Check for a new version of 42free.
+    -h, --help       Display this help message and exit.
+    -v, --version    Display version information and exit.
+        --uninstall  Uninstall 42free.
+    --               Stop interpreting options.
 
 ${sty_und}Exit codes:${sty_res}
     0: Success
@@ -368,6 +377,44 @@ update()
     return $success
 }
 
+remove_alias()
+{
+    # Remove alias from all RC files
+    for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
+        case "$rc_file" in
+            "$bash_rc")
+                shell_name="bash"
+                ;;
+            "$zsh_rc")
+                shell_name="zsh"
+                ;;
+            "$fish_config")
+                shell_name="fish"
+                ;;
+        esac
+        if [ -f "$rc_file" ] && sed -i '/^alias 42free/d' "$rc_file" 2>/dev/null; then
+            pretty_print "${sty_yel}Alias removed from $shell_name.${sty_res}"
+        fi
+    done
+}
+
+uninstall()
+{
+    pretty_print "Uninstalling 42free..."
+    if stderr=$(rm -f "$script_path" 2>&1); then
+        pretty_print "${sty_yel}Script deleted.${sty_res}"
+        # Check if script_dir is empty and remove it
+        find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
+        remove_alias
+        pretty_print "$indicator_success 42free has been uninstalled."
+        exit $success
+    else
+        pretty_print "$indicator_error Cannot uninstall 42free."
+        print_stderr
+        exit $major_error
+    fi
+}
+
 # Process options
 args=()
 args_amount=0
@@ -380,6 +427,9 @@ while (( $# )); do
         -u|--update)
             update
             exit $?
+            ;;
+        --uninstall)
+            uninstall
             ;;
         -h|--help)
             # Print help message
