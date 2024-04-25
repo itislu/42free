@@ -92,13 +92,13 @@ All programs will then access them through the symlink and they will accumulate 
 
 $delim_small
 
-${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [${sty_bol}target1 target2${sty_res} ...]
+${sty_bol}${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [target1 target2 ...]
     If no arguments are given, 42free will make some suggestions.
     Target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
     Closing all programs first will help to avoid errors during the move.
 
-${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
+${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --reverse    Reverse the operation and move the directories or files
                      back to their original location in home.
     -u, --update     Check for a new version of 42free.
@@ -107,17 +107,16 @@ ${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
         --uninstall  Uninstall 42free.
     --               Stop interpreting options.
 
-${sty_und}Exit codes:${sty_res}
-    0: Success
-    1: Input error
-       An argument was invalid.
-         (no arguments, unknown option, invalid path, file does not exist)
-    2: Minor error
-       An argument was skipped.
-         (symbolic link, file conflict, no space left)
-    3: Major error
-       An operation failed.
-         (sgoinfre permissions, update failed, move failed, restore failed, cleanup failed)
+${sty_bol}${sty_und}Error codes:${sty_res}
+    1 - Input error
+        An argument was invalid.
+          (no arguments, unknown option, invalid path, file does not exist)
+    2 - Minor error
+        An argument was skipped.
+          (symbolic link, file conflict, no space left)
+    3 - Major error
+        An operation failed.
+          (sgoinfre permissions, update failed, move failed, restore failed, cleanup failed)
 
 $delim_small
 
@@ -344,7 +343,7 @@ get_latest_version_number()
     # Fetch the latest version from the git tags on GitHub
     latest_version=$("$downloader" "$downloader_opts_stdout" "https://api.github.com/repos/itislu/42free/tags")
     latest_version=$(echo "$latest_version" | grep -m 1 '"name":' | cut -d '"' -f 4) 2>/dev/null
-    if [ -z "$latest_version" ] ; then
+    if [ -z "$latest_version" ]; then
         if [[ "$1" != "silent" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
         fi
