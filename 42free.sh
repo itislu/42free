@@ -117,7 +117,7 @@ To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri
 
 msg_version="\
 ${sty_bol}42free $current_version${sty_res}
-A script made for 42 students to take advantage of symbolic links to free up storage.
+A script made for 42 students to take advantage of symbolic links to free up storage without data loss.
 For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
 
 msg_sgoinfre_permissions="\
