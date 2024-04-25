@@ -130,13 +130,13 @@ msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoin
 msg_close_programs="${sty_bol}${sty_bri_yel}Close all programs first to avoid errors during the move.${sty_res}"
 
 # Prompts
-prompt_update="Do you wish to update? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_continue="Do you wish to continue? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_continue_still="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_continue_with_rest="Do you wish to continue with the other arguments? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_symlink="Do you wish to create a symbolic link to it? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_replace="Do you wish to continue and replace any duplicate files? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_update="Do you wish to update? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_continue="Do you wish to continue? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_continue_still="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
+prompt_continue_with_rest="Do you wish to continue with the other arguments? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
+prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_symlink="Do you wish to create a symbolic link to it? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_replace="Do you wish to continue and replace any duplicate files? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
 
 # Automatically detect the size of the terminal window and preserve word boundaries at the edges
 pretty_print()
@@ -166,21 +166,37 @@ print_skip_arg()
 }
 
 # Prompt the user for confirmation
-prompt_user()
+# Default is 'no', for 'yes' needs y/Y/yes/Yes + Enter key
+prompt_with_enter()
 {
     pretty_print "$1"
     read -rp "> "
-    if [[ ! $REPLY =~ ^[Yy](es)?$ ]]; then
-        return 1
+    if [[ $REPLY =~ ^[Yy](es)?$ ]]; then
+        return 0
     fi
-    return 0
+    return 1
+}
+
+# Prompt the user for confirmation
+# Default is 'yes', only needs y/Y key
+prompt_single_key()
+{
+    pretty_print "$1"
+    read -n 1 -rp "> "
+    if [[ -n $REPLY ]]; then
+        echo
+    fi
+    if [[ $REPLY =~ ^([Yy]?)$|^$ ]]; then
+        return 0
+    fi
+    return 1
 }
 
 prompt_restore()
 {
-    pretty_print "Do you wish to leave it like that? [${sty_bol}y${sty_res}/${sty_bol}n${sty_res}]"
+    pretty_print "Do you wish to leave it like that? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
     pretty_print "- Selecting ${sty_bol}no${sty_res} will restore what was already moved to the $target_name directory back to the $source_name directory."
-    prompt_user
+    prompt_with_enter
     return $(( ! $? ))
 }
 
@@ -340,7 +356,7 @@ update()
         pretty_print "A new version of 42free is available."
         pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
         pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
-        if prompt_user "$prompt_update"; then
+        if prompt_single_key "$prompt_update"; then
             bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update && exit $?
             return $?
         else
@@ -411,14 +427,14 @@ fi
 # Check if the permissions of user's sgoinfre directory are rwx------
 if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
     pretty_print "$msg_sgoinfre_permissions"
-    if prompt_user "$prompt_change_permissions"; then
+    if prompt_single_key "$prompt_change_permissions"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
             pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
         else
             pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
             print_stderr
             syscmd_failed=true
-            if ! prompt_user "$prompt_continue_still"; then
+            if ! prompt_single_key "$prompt_continue_still"; then
                 exit $major_error
             fi
             pretty_print "$msg_sgoinfre_permissions_keep"
@@ -524,7 +540,7 @@ for arg in "${args[@]}"; do
         if ! $reverse && [ -e "$target_path" ]; then
             pretty_print "'${sty_bri_yel}$source_path${sty_res}' has already been moved to sgoinfre."
             pretty_print "It is located at '${sty_bri_gre}$target_path${sty_res}'."
-            if prompt_user "$prompt_symlink"; then
+            if prompt_single_key "$prompt_symlink"; then
                 if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
                     pretty_print "$indicator_success Symbolic link created."
                 else
@@ -576,7 +592,7 @@ for arg in "${args[@]}"; do
     # If no user arguments, ask user if they want to process the current argument
     if $no_user_args && [ -e "$source_path" ]; then
         pretty_print "This will move '${sty_bol}$source_path${sty_res}' to the $target_name directory."
-        if ! prompt_user "$prompt_continue"; then
+        if ! prompt_single_key "$prompt_continue"; then
             print_skip_arg "$arg"
             continue
         fi
@@ -585,7 +601,7 @@ for arg in "${args[@]}"; do
     # Check if the source file is a symbolic link
     if [ -L "$source_path" ]; then
         pretty_print "$indicator_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
-        if ! prompt_user "$prompt_continue_still"; then
+        if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -595,7 +611,7 @@ for arg in "${args[@]}"; do
     # Check if an existing directory or file would get replaced
     if [ -e "$target_path" ] && ! ($reverse && [ -L "$target_path" ]); then
         pretty_print "$indicator_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
-        if ! prompt_user "$prompt_replace"; then
+        if ! prompt_with_enter "$prompt_replace"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -635,7 +651,7 @@ for arg in "${args[@]}"; do
     # Check if the target directory would go above its maximum recommended size
     if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
         pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${target_max_size}GB${sty_res}."
-        if ! prompt_user "$prompt_continue_still"; then
+        if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -658,7 +674,7 @@ for arg in "${args[@]}"; do
         print_stderr
         syscmd_failed=true
         # If not last argument, ask user if they want to continue with the other arguments
-        if [ $args_index -lt $args_amount ] && ! prompt_user "$prompt_continue_with_rest"; then
+        if [ $args_index -lt $args_amount ] && ! prompt_with_enter "$prompt_continue_with_rest"; then
             pretty_print "Skipping the rest of the arguments."
             break
         fi
@@ -722,7 +738,7 @@ for arg in "${args[@]}"; do
         fi
 
         # If not last argument, ask user if they want to continue with the other arguments
-        if [ $args_index -lt $args_amount ] && ! prompt_user "$prompt_continue_with_rest"; then
+        if [ $args_index -lt $args_amount ] && ! prompt_with_enter "$prompt_continue_with_rest"; then
             pretty_print "Skipping the rest of the arguments."
             break
         fi
@@ -749,7 +765,7 @@ for arg in "${args[@]}"; do
                 print_stderr
             fi
             # If not last argument, ask user if they want to continue with the other arguments
-            if [ $args_index -lt $args_amount ] && ! prompt_user "$prompt_continue_with_rest"; then
+            if [ $args_index -lt $args_amount ] && ! prompt_with_enter "$prompt_continue_with_rest"; then
                 pretty_print "Skipping the rest of the arguments."
                 break
             fi
