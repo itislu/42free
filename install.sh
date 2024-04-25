@@ -19,9 +19,9 @@ elif command -v wget &>/dev/null; then
 fi
 
 # RC files
-BASH_RC="$HOME/.bashrc"
-ZSH_RC="$HOME/.zshrc"
-FISH_CONFIG="$HOME/.config/fish/config.fish"
+bash_rc="$HOME/.bashrc"
+zsh_rc="$HOME/.zshrc"
+fish_config="$HOME/.config/fish/config.fish"
 
 # Exit codes
 success=0
@@ -74,21 +74,21 @@ fi
 chmod +x "$dest_dir/$dest_file"
 
 # Add an alias to all supported RC files if it doesn't exist yet
-for RC_FILE in "$BASH_RC" "$ZSH_RC" "$FISH_CONFIG"; do
-    case "$RC_FILE" in
-        "$BASH_RC")
-            SHELL_NAME="bash"
+for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
+    case "$rc_file" in
+        "$bash_rc")
+            shell_name="bash"
             ;;
-        "$ZSH_RC")
-            SHELL_NAME="zsh"
+        "$zsh_rc")
+            shell_name="zsh"
             ;;
-        "$FISH_CONFIG")
-            SHELL_NAME="fish"
+        "$fish_config")
+            shell_name="fish"
             ;;
     esac
-    if [ -f "$RC_FILE" ] && ! grep "alias 42free=" "$RC_FILE" &>/dev/null; then
-        echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$RC_FILE"
-        pretty_print "${sty_yel}Added 42free alias to $SHELL_NAME.${sty_res}"
+    if [ -f "$rc_file" ] && ! grep "alias 42free=" "$rc_file" &>/dev/null; then
+        echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$rc_file"
+        pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
         new_alias=true
     fi
 done
