@@ -105,8 +105,8 @@ if [[ $1 == "update" ]]; then
     pretty_print "To see the changelog, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}."
 else
     pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
-    pretty_print "You can now use the 42free command."
-    pretty_print "To see the manual, run '${sty_bol}42free --help${sty_res}'."
+    pretty_print "You can now use the '${sty_bol}42free${sty_res}' command."
+    pretty_print "To see the manual, run '42free --help'."
 fi
 
 if [[ $new_alias == true ]]; then
