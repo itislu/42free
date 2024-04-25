@@ -399,18 +399,23 @@ remove_alias()
 
 uninstall()
 {
-    pretty_print "Uninstalling 42free..."
-    if stderr=$(rm -f "$script_path" 2>&1); then
-        pretty_print "${sty_yel}Script deleted.${sty_res}"
-        # Check if script_dir is empty and remove it
-        find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
-        remove_alias
-        pretty_print "$indicator_success 42free has been uninstalled."
-        exit $success
+    if prompt_with_enter "Do you wish to uninstall 42free? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"; then
+        pretty_print "Uninstalling 42free..."
+        if stderr=$(rm -f "$script_path" 2>&1); then
+            pretty_print "${sty_yel}Script deleted.${sty_res}"
+            # Check if script_dir is empty and remove it
+            find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
+            remove_alias
+            pretty_print "$indicator_success 42free has been uninstalled."
+            exit $success
+        else
+            pretty_print "$indicator_error Cannot uninstall 42free."
+            print_stderr
+            exit $major_error
+        fi
     else
-        pretty_print "$indicator_error Cannot uninstall 42free."
-        print_stderr
-        exit $major_error
+        pretty_print "Not uninstalling."
+        exit $success
     fi
 }
 
