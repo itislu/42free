@@ -382,8 +382,7 @@ update()
         pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
         pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
         if prompt_single_key "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update && exit $?
-            return $?
+            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update; exit $?
         else
             pretty_print "Not updating."
         fi
