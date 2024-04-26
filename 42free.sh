@@ -25,9 +25,17 @@ sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
-# Gets set at installation
-sgoinfre_max_size=
-home_max_size=
+# Max sizes in GB
+if [[ -n "$HOME_MAX_SIZE" ]] && [[ "$HOME_MAX_SIZE" =~ ^[0-9]+$ ]]; then
+    home_max_size=$HOME_MAX_SIZE
+else
+    home_max_size=0
+fi
+if [[ -n "$SGOINFRE_MAX_SIZE" ]] && [[ "$SGOINFRE_MAX_SIZE" =~ ^[0-9]+$ ]]; then
+    sgoinfre_max_size=$SGOINFRE_MAX_SIZE
+else
+    sgoinfre_max_size=0
+fi
 
 # RC files
 bash_rc="$HOME/.bashrc"

@@ -131,10 +131,6 @@ if [ $exit_status -ne 0 ]; then
     exit $download_failed
 fi
 
-# Set max_size variables in 42free.sh
-sed -i "s/^sgoinfre_max_size=/c\sgoinfre_max_size=$sgoinfre_max_size/" "$dest_dir/$dest_file"
-sed -i "s/^home_max_size=/c\home_max_size=$home_max_size/" "$dest_dir/$dest_file"
-
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
 
@@ -151,16 +147,30 @@ for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
             shell_name="fish"
             ;;
     esac
-    if [ -f "$rc_file" ] && ! grep "alias 42free=" "$rc_file" &>/dev/null; then
-        echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$rc_file"
-        pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
-        new_alias=true
+    if [ -f "$rc_file" ]; then
+        if ! grep "alias 42free=" "$rc_file" &>/dev/null; then
+            echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$rc_file"
+            pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
+            new_alias=true
+        fi
+        if ! grep "export HOME_MAX_SIZE=" "$rc_file" &>/dev/null; then
+            echo -e "\nexport HOME_MAX_SIZE=$home_max_size\n" >> "$rc_file"
+            pretty_print "${sty_yel}Added HOME_MAX_SIZE environment variable to $shell_name.${sty_res}"
+        fi
+        if ! grep "export SGOINFRE_MAX_SIZE=" "$rc_file" &>/dev/null; then
+            echo -e "\nexport SGOINFRE_MAX_SIZE=$sgoinfre_max_size\n" >> "$rc_file"
+            pretty_print "${sty_yel}Added SGOINFRE_MAX_SIZE environment variable to $shell_name.${sty_res}"
+        fi
     fi
 done
 
 # Check user's default shell
 if [[ "$SHELL" != *"bash"* && "$SHELL" != *"zsh"* && "$SHELL" == *"fish"* ]]; then
-    pretty_print "${sty_bol}${sty_bri_yel}Could not set the 42free alias for $(basename "$SHELL"). Please set it manually.${sty_res}"
+    pretty_print "${sty_bol}${sty_bri_yel}Could not set up 42free for $(basename "$SHELL"). Please do it manually.${sty_res}"
+    pretty_print "${sty_bol}${sty_bri_yel}You can paste the following lines into your shell's configuration file:"
+    pretty_print "${sty_bol}alias 42free='bash $dest_dir/$dest_file'${sty_res}"
+    pretty_print "${sty_bol}export HOME_MAX_SIZE=$home_max_size${sty_res}"
+    pretty_print "${sty_bol}export SGOINFRE_MAX_SIZE=$sgoinfre_max_size${sty_res}"
     exit $install_failed
 fi
 
