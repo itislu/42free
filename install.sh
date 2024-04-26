@@ -16,6 +16,11 @@ campus_dict=(
 dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
 
+# RC files
+bash_rc="$HOME/.bashrc"
+zsh_rc="$HOME/.zshrc"
+fish_config="$HOME/.config/fish/config.fish"
+
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
     downloader="curl"
@@ -26,11 +31,6 @@ elif command -v wget &>/dev/null; then
     downloader_opts_stdout="-qO-"
     downloader_opts_file="-qO"
 fi
-
-# RC files
-bash_rc="$HOME/.bashrc"
-zsh_rc="$HOME/.zshrc"
-fish_config="$HOME/.config/fish/config.fish"
 
 # Exit codes
 success=0

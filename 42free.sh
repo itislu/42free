@@ -25,6 +25,11 @@ sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
+# RC files
+bash_rc="$HOME/.bashrc"
+zsh_rc="$HOME/.zshrc"
+fish_config="$HOME/.config/fish/config.fish"
+
 # Max sizes in GB
 if [[ -n "$HOME_MAX_SIZE" ]] && [[ "$HOME_MAX_SIZE" =~ ^[0-9]+$ ]]; then
     home_max_size=$HOME_MAX_SIZE
@@ -36,11 +41,6 @@ if [[ -n "$SGOINFRE_MAX_SIZE" ]] && [[ "$SGOINFRE_MAX_SIZE" =~ ^[0-9]+$ ]]; then
 else
     sgoinfre_max_size=0
 fi
-
-# RC files
-bash_rc="$HOME/.bashrc"
-zsh_rc="$HOME/.zshrc"
-fish_config="$HOME/.config/fish/config.fish"
 
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
