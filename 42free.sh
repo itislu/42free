@@ -24,8 +24,10 @@ sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
-sgoinfre_max_size=30
-home_max_size=5
+
+# Gets set at installation
+sgoinfre_max_size=
+home_max_size=
 
 # RC files
 bash_rc="$HOME/.bashrc"
@@ -315,12 +317,19 @@ print_available_space()
         sgoinfre_size=$source_base_size
     fi
 
-    home_color=$(calculate_usage_color "$home_size" "$home_max_size")
-    sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
-
     pretty_print "${sty_bol}${sty_und}Space used:${sty_res}"
-    printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
-    printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
+    if [ "$home_max_size" -gt 0 ]; then
+        home_color=$(calculate_usage_color "$home_size" "$home_max_size")
+        printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
+    else
+        printf "${sty_bol}  %-10s %5.2fGB${sty_res}\n" "Home:" "$home_size"
+    fi
+    if [ "$sgoinfre_max_size" -gt 0 ]; then
+        sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
+        printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
+    else
+        printf "${sty_bol}  %-10s %5.2fGB${sty_res}\n" "Sgoinfre:" "$sgoinfre_size"
+    fi
 }
 
 get_timestamp()

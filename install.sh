@@ -3,6 +3,15 @@
 # Define the URL of the latest release API endpoint
 api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
+# Dictionary of supported campuses
+# Format: ["Campus Name"]="home_max_size sgoinfre_max_size"
+declare -A campus_dict
+campus_dict=(
+["42 Berlin"]="10 30"
+["42 Vienna"]="5 30"
+["Other"]="0 0"
+)
+
 # Define the destination directory and filename
 dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
@@ -51,6 +60,58 @@ if [ -z "$downloader" ]; then
     exit $download_failed
 fi
 
+# Sort campus names by keys
+mapfile -t campus_names_sorted < <(printf '%s\n' "${!campus_dict[@]}" | sort)
+
+# Create list of campuses in this format: n) Campus Name
+prompt_campuses=""
+i=1
+for campus_name in "${campus_names_sorted[@]}"; do
+    prompt_campuses+="${sty_bol}$(( i++ ))${sty_res}) $campus_name\n"
+done
+
+# Make campus names array 1-indexed
+campus_names_sorted=("" "${campus_names_sorted[@]}")
+
+# Prompt user to choose their campus
+while true; do
+    pretty_print "${sty_bol}Choose your campus:${sty_res}"
+    pretty_print "$prompt_campuses"
+    read -rp "> "
+    if [[ $REPLY =~ ^[0-9]+$ ]]; then
+        campus_name=${campus_names_sorted[$REPLY]}
+        if [[ -n "$campus_name" ]]; then
+            IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
+            break
+        fi
+    fi
+    pretty_print "${sty_bol}${sty_red}Invalid option. Please try again.${sty_res}"
+done
+
+# If max_size not known, prompt user to enter it
+if [[ $home_max_size -eq 0 ]]; then
+    while true; do
+        pretty_print "${sty_bol}Enter the maximum allowed size of your home directory in GB:${sty_res}"
+        read -rp "> "
+        if [[ $REPLY =~ ^[0-9]+$ ]]; then
+            home_max_size=$REPLY
+            break
+        fi
+        pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
+    done
+fi
+if [[ $sgoinfre_max_size -eq 0 ]]; then
+    while true; do
+        pretty_print "${sty_bol}Enter the maximum allowed size of your sgoinfre directory in GB:${sty_res}"
+        read -rp "> "
+        if [[ $REPLY =~ ^[0-9]+$ ]]; then
+            sgoinfre_max_size=$REPLY
+            break
+        fi
+        pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
+    done
+fi
+
 # Check if it's an update or a fresh install
 if [[ $1 == "update" ]]; then
     pretty_print "${sty_yel}Updating '$dest_file' in '$dest_dir'...${sty_res}"
@@ -69,6 +130,10 @@ if [ $exit_status -ne 0 ]; then
     pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
     exit $download_failed
 fi
+
+# Set max_size variables in 42free.sh
+sed -i "s/^sgoinfre_max_size=/c\sgoinfre_max_size=$sgoinfre_max_size/" "$dest_dir/$dest_file"
+sed -i "s/^home_max_size=/c\home_max_size=$home_max_size/" "$dest_dir/$dest_file"
 
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
