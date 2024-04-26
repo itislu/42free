@@ -457,9 +457,6 @@ while (( $# )); do
             update
             exit $?
             ;;
-        --uninstall)
-            uninstall
-            ;;
         -h|--help)
             # Print help message
             pretty_print "$msg_manual"
@@ -469,6 +466,9 @@ while (( $# )); do
             # Print version information
             pretty_print "$msg_version"
             exit $success
+            ;;
+        --uninstall)
+            uninstall
             ;;
         --)
             # End of options
