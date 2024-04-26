@@ -318,7 +318,7 @@ print_available_space()
     home_color=$(calculate_usage_color "$home_size" "$home_max_size")
     sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
 
-    pretty_print "${sty_bol}${sty_und}Available space:${sty_res}"
+    pretty_print "${sty_bol}${sty_und}Space used:${sty_res}"
     printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
     printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
 }
