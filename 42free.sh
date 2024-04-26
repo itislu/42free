@@ -393,9 +393,9 @@ update()
     return $success
 }
 
-remove_alias()
+# Remove everything added from installation in all RC files
+clean_rc_files()
 {
-    # Remove alias from all RC files
     for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
         case "$rc_file" in
             "$bash_rc")
@@ -408,8 +408,16 @@ remove_alias()
                 shell_name="fish"
                 ;;
         esac
-        if [ -f "$rc_file" ] && sed -i '/^alias 42free/d' "$rc_file" 2>/dev/null; then
-            pretty_print "${sty_yel}Alias removed from $shell_name.${sty_res}"
+        if [ -f "$rc_file" ]; then
+            if sed -i '/^alias 42free/d' "$rc_file" 2>/dev/null; then
+                pretty_print "${sty_yel}Alias removed from $shell_name.${sty_res}"
+            fi
+            if sed -i '/^export HOME_MAX_SIZE=/d' "$rc_file" 2>/dev/null; then
+                pretty_print "${sty_yel}HOME_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
+            fi
+            if sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$rc_file" 2>/dev/null; then
+                pretty_print "${sty_yel}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
+            fi
         fi
     done
 }
@@ -422,7 +430,7 @@ uninstall()
             pretty_print "${sty_yel}Script deleted.${sty_res}"
             # Check if script_dir is empty and remove it
             find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
-            remove_alias
+            clean_rc_files
             pretty_print "$indicator_success 42free has been uninstalled."
             exit $success
         else
