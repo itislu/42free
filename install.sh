@@ -61,6 +61,13 @@ pretty_print()
     printf "%b" "$1" | fmt -sw $(tput cols)
 }
 
+# Check if it's an update or a fresh install
+if [[ $1 == "update" ]]; then
+    pretty_print "${sty_yel}Updating 42free...${sty_res}"
+else
+    pretty_print "${sty_yel}Installing 42free...${sty_res}"
+fi
+
 # Check if curl or wget is available
 if [ -z "$downloader" ]; then
     pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
@@ -122,12 +129,7 @@ if [[ -z "$sgoinfre_max_size" ]]; then
     done
 fi
 
-# Check if it's an update or a fresh install
-if [[ $1 == "update" ]]; then
-    pretty_print "${sty_yel}Updating '$dest_file' in '$dest_dir'...${sty_res}"
-else
-    pretty_print "${sty_yel}Downloading '$dest_file' into '$dest_dir'...${sty_res}"
-fi
+pretty_print "${sty_yel}Downloading '$dest_file' into '$dest_dir'...${sty_res}"
 
 # Get the URL of the asset from the latest release
 script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_download_url" | cut -d '"' -f 4)
