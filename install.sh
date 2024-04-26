@@ -21,6 +21,14 @@ bash_rc="$HOME/.bashrc"
 zsh_rc="$HOME/.zshrc"
 fish_config="$HOME/.config/fish/config.fish"
 
+# Max sizes in GB
+if [[ -n "$HOME_MAX_SIZE" ]] && [[ "$HOME_MAX_SIZE" =~ ^[0-9]+$ ]]; then
+    home_max_size=$HOME_MAX_SIZE
+fi
+if [[ -n "$SGOINFRE_MAX_SIZE" ]] && [[ "$SGOINFRE_MAX_SIZE" =~ ^[0-9]+$ ]]; then
+    sgoinfre_max_size=$SGOINFRE_MAX_SIZE
+fi
+
 # Check if curl or wget is available
 if command -v curl &>/dev/null; then
     downloader="curl"
@@ -60,36 +68,38 @@ if [ -z "$downloader" ]; then
     exit $download_failed
 fi
 
-# Sort campus names by keys
-mapfile -t campus_names_sorted < <(printf '%s\n' "${!campus_dict[@]}" | sort)
+# Prompt user to choose their campus if max sizes are not known
+if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
+    # Sort campus names by keys
+    mapfile -t campus_names_sorted < <(printf '%s\n' "${!campus_dict[@]}" | sort)
 
-# Create list of campuses in this format: n) Campus Name
-prompt_campuses=""
-i=1
-for campus_name in "${campus_names_sorted[@]}"; do
-    prompt_campuses+="${sty_bol}$(( i++ ))${sty_res}) $campus_name\n"
-done
+    # Create list of campuses in this format: n) Campus Name
+    i=1
+    for campus_name in "${campus_names_sorted[@]}"; do
+        prompt_campuses+="${sty_bol}$(( i++ ))${sty_res}) $campus_name\n"
+    done
 
-# Make campus names array 1-indexed
-campus_names_sorted=("" "${campus_names_sorted[@]}")
+    # Make campus names array 1-indexed
+    campus_names_sorted=("" "${campus_names_sorted[@]}")
 
-# Prompt user to choose their campus
-while true; do
-    pretty_print "${sty_bol}Choose your campus:${sty_res}"
-    pretty_print "$prompt_campuses"
-    read -rp "> "
-    if [[ $REPLY =~ ^[0-9]+$ ]]; then
-        campus_name=${campus_names_sorted[$REPLY]}
-        if [[ -n "$campus_name" ]]; then
-            IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
-            break
+    # Prompt user
+    while true; do
+        pretty_print "${sty_bol}Choose your campus:${sty_res}"
+        pretty_print "$prompt_campuses"
+        read -rp "> "
+        if [[ $REPLY =~ ^[0-9]+$ ]]; then
+            campus_name=${campus_names_sorted[$REPLY]}
+            if [[ -n "$campus_name" ]]; then
+                IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
+                break
+            fi
         fi
-    fi
-    pretty_print "${sty_bol}${sty_red}Invalid option. Please try again.${sty_res}"
-done
+        pretty_print "${sty_bol}${sty_red}Invalid option. Please try again.${sty_res}"
+    done
+fi
 
-# If max_size not known, prompt user to enter it
-if [[ $home_max_size -eq 0 ]]; then
+# If max size still not known, prompt user to enter it
+if [[ -z "$home_max_size" ]]; then
     while true; do
         pretty_print "${sty_bol}Enter the maximum allowed size of your home directory in GB:${sty_res}"
         read -rp "> "
@@ -100,7 +110,7 @@ if [[ $home_max_size -eq 0 ]]; then
         pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
     done
 fi
-if [[ $sgoinfre_max_size -eq 0 ]]; then
+if [[ -z "$sgoinfre_max_size" ]]; then
     while true; do
         pretty_print "${sty_bol}Enter the maximum allowed size of your sgoinfre directory in GB:${sty_res}"
         read -rp "> "
