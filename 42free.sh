@@ -61,7 +61,7 @@ major_error=3
 bad_input=false
 arg_skipped=false
 syscmd_failed=false
-changed_shell_config=false
+changed_config=false
 printed_update_info=false
 
 # Colors and styles
@@ -184,7 +184,7 @@ print_one_stderr()
 
 ft_exit()
 {
-    if $changed_shell_config; then
+    if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
         if [ "$1" -eq 0 ] && [ -x "$SHELL" ]; then
             exec $SHELL
@@ -459,7 +459,7 @@ change_max_sizes()
 
         if $changed_max_size; then
             pretty_print "${sty_yel}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${sty_res}"
-            changed_shell_config=true
+            changed_config=true
         fi
     done
 }

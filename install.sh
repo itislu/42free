@@ -46,7 +46,7 @@ download_failed=1
 install_failed=2
 
 # Flags
-changed_shell_config=false
+changed_config=false
 
 # Colors and styles
 sty_res="\e[0m"
@@ -64,7 +64,7 @@ pretty_print()
 
 ft_exit()
 {
-    if $changed_shell_config; then
+    if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
         if [ "$1" -eq 0 ] && [ -x "$SHELL" ]; then
             exec $SHELL
@@ -73,6 +73,23 @@ ft_exit()
         pretty_print "Please start a new shell to make the 42free configs available."
     fi
     exit "$1"
+}
+
+add_to_config()
+{
+    local config_file=$1
+    local pattern=$2
+    local line=$3
+    local msg=$4
+
+    if ! grep "$pattern" "$config_file" &>/dev/null; then
+        if ! $changed_config; then
+            printf "\n" >> "$config_file"
+        fi
+        printf "%s\n" "$line" >> "$config_file"
+        pretty_print "${sty_yel}$msg${sty_res}"
+        changed_config=true
+    fi
 }
 
 # Check if it's an update or a fresh install
@@ -169,30 +186,12 @@ for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
             ;;
     esac
     if [ -f "$config_file" ]; then
-        if ! grep "alias 42free=" "$config_file" &>/dev/null; then
-            if ! $changed_shell_config; then
-                printf "\n" >> "$config_file"
-            fi
-            printf "alias 42free='bash %s'\n" "$dest_dir/$dest_file" >> "$config_file"
-            pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
-            changed_shell_config=true
-        fi
-        if ! grep "export HOME_MAX_SIZE=" "$config_file" &>/dev/null; then
-            if ! $changed_shell_config; then
-                printf "\n" >> "$config_file"
-            fi
-            printf "export HOME_MAX_SIZE=%s\n" "$home_max_size" >> "$config_file"
-            pretty_print "${sty_yel}Added HOME_MAX_SIZE environment variable to $shell_name.${sty_res}"
-            changed_shell_config=true
-        fi
-        if ! grep "export SGOINFRE_MAX_SIZE=" "$config_file" &>/dev/null; then
-            if ! $changed_shell_config; then
-                printf "\n" >> "$config_file"
-            fi
-            printf "export SGOINFRE_MAX_SIZE=%s\n" "$sgoinfre_max_size" >> "$config_file"
-            pretty_print "${sty_yel}Added SGOINFRE_MAX_SIZE environment variable to $shell_name.${sty_res}"
-            changed_shell_config=true
-        fi
+        msg="Added 42free alias to $shell_name."
+        add_to_config "$config_file" "alias 42free=" "alias 42free='bash $dest_dir/$dest_file'" "$msg"
+        msg="Added HOME_MAX_SIZE environment variable to $shell_name."
+        add_to_config "$config_file" "export HOME_MAX_SIZE=" "export HOME_MAX_SIZE=$home_max_size" "$msg"
+        msg="Added SGOINFRE_MAX_SIZE environment variable to $shell_name."
+        add_to_config "$config_file" "export SGOINFRE_MAX_SIZE=" "export SGOINFRE_MAX_SIZE=$sgoinfre_max_size" "$msg"
     fi
 done
 
