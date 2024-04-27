@@ -607,7 +607,7 @@ uninstall()
         pretty_print "Uninstalling 42free..."
         if stderr=$(rm -f "$script_path" 2>&1); then
             pretty_print "${sty_yel}Script deleted.${sty_res}"
-            # Check if script_dir is empty and remove it
+            # If script_dir is empty, remove it
             find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
             clean_config_files
             pretty_print "$indicator_success 42free has been uninstalled."
@@ -787,7 +787,7 @@ for arg in "${args[@]}"; do
         source_path="$source_base/$target_subpath"
         source_subpath="${source_path#"$source_base/"}"
     else
-        # If the result is neither in the source nor target base directory, skip the argument
+        # If the result is neither a path in the source nor target base directory, skip the argument
         pretty_print "$invalid_path_msg"
         print_skip_arg "$arg"
         bad_input=true
@@ -830,7 +830,7 @@ for arg in "${args[@]}"; do
     arg_dirpath=$(dirname "$arg_path")
     real_arg_dirpath=$(realpath "$arg_dirpath")
     real_arg_path=$(realpath "$arg_path")
-    if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } || \
+    if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
        { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
         pretty_print "$indicator_error '$source_subpath' is already in the $target_name directory."
         pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
