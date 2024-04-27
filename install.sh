@@ -118,29 +118,24 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
     done
 fi
 
-# If max size still not known, prompt user to enter it
-if [[ -z "$home_max_size" ]]; then
-    while true; do
-        pretty_print "${sty_bol}Enter the maximum allowed size of your home directory in GB:${sty_res}"
-        read -rp "> "
-        if [[ $REPLY =~ ^[0-9]+$ ]]; then
-            home_max_size=$REPLY
-            break
-        fi
-        pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
-    done
-fi
-if [[ -z "$sgoinfre_max_size" ]]; then
-    while true; do
-        pretty_print "${sty_bol}Enter the maximum allowed size of your sgoinfre directory in GB:${sty_res}"
-        read -rp "> "
-        if [[ $REPLY =~ ^[0-9]+$ ]]; then
-            sgoinfre_max_size=$REPLY
-            break
-        fi
-        pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
-    done
-fi
+# If a max size still not known, prompt user to enter it
+for dir in home sgoinfre; do
+    # Construct variable name
+    max_size_var_name="${dir}_max_size"
+
+    # If max size still not known, prompt user to enter it
+    if [[ -z "${!max_size_var_name}" ]]; then
+        while true; do
+            pretty_print "${sty_bol}Enter the maximum allowed size of your $dir directory in GB:${sty_res}"
+            read -rp "> "
+            if [[ $REPLY =~ ^[0-9]+$ ]]; then
+                declare "$max_size_var_name=$REPLY"
+                break
+            fi
+            pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
+        done
+    fi
+done
 
 pretty_print "${sty_yel}Downloading '$dest_file' into '$dest_dir'...${sty_res}"
 
