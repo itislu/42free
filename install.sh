@@ -45,6 +45,9 @@ success=0
 download_failed=1
 install_failed=2
 
+# Flags
+changed_shell_config=false
+
 # Colors and styles
 sty_res="\e[0m"
 sty_bol="\e[1m"
@@ -167,17 +170,26 @@ for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
     esac
     if [ -f "$config_file" ]; then
         if ! grep "alias 42free=" "$config_file" &>/dev/null; then
-            echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$config_file"
+            if ! $changed_shell_config; then
+                printf "\n" >> "$config_file"
+            fi
+            printf "alias 42free='bash %s'\n" "$dest_dir/$dest_file" >> "$config_file"
             pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
             changed_shell_config=true
         fi
         if ! grep "export HOME_MAX_SIZE=" "$config_file" &>/dev/null; then
-            echo -e "\nexport HOME_MAX_SIZE=$home_max_size\n" >> "$config_file"
+            if ! $changed_shell_config; then
+                printf "\n" >> "$config_file"
+            fi
+            printf "export HOME_MAX_SIZE=%s\n" "$home_max_size" >> "$config_file"
             pretty_print "${sty_yel}Added HOME_MAX_SIZE environment variable to $shell_name.${sty_res}"
             changed_shell_config=true
         fi
         if ! grep "export SGOINFRE_MAX_SIZE=" "$config_file" &>/dev/null; then
-            echo -e "\nexport SGOINFRE_MAX_SIZE=$sgoinfre_max_size\n" >> "$config_file"
+            if ! $changed_shell_config; then
+                printf "\n" >> "$config_file"
+            fi
+            printf "export SGOINFRE_MAX_SIZE=%s\n" "$sgoinfre_max_size" >> "$config_file"
             pretty_print "${sty_yel}Added SGOINFRE_MAX_SIZE environment variable to $shell_name.${sty_res}"
             changed_shell_config=true
         fi

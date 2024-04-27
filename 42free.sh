@@ -17,8 +17,6 @@ default_args=(\
 
 # Standard variables
 stderr=""
-changed_shell_config=false
-printed_update_info=false
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
@@ -63,6 +61,8 @@ major_error=3
 bad_input=false
 arg_skipped=false
 syscmd_failed=false
+changed_shell_config=false
+printed_update_info=false
 
 # Colors and styles
 sty_res="\e[0m"
