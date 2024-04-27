@@ -61,6 +61,19 @@ pretty_print()
     printf "%b" "$1" | fmt -sw $(tput cols)
 }
 
+ft_exit()
+{
+    if $changed_shell_config; then
+        # Start the default shell to make changes of the shell config available immediately
+        if [ "$1" -eq 0 ] && [ -x "$SHELL" ]; then
+            exec $SHELL
+        fi
+        # If exec failed, inform the user to start a new shell
+        pretty_print "Please start a new shell to make the 42free configs available."
+    fi
+    exit "$1"
+}
+
 # Check if it's an update or a fresh install
 if [[ $1 == "update" ]]; then
     pretty_print "${sty_yel}Updating 42free...${sty_res}"
@@ -163,15 +176,17 @@ for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
         if ! grep "alias 42free=" "$rc_file" &>/dev/null; then
             echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$rc_file"
             pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
-            new_alias=true
+            changed_shell_config=true
         fi
         if ! grep "export HOME_MAX_SIZE=" "$rc_file" &>/dev/null; then
             echo -e "\nexport HOME_MAX_SIZE=$home_max_size\n" >> "$rc_file"
             pretty_print "${sty_yel}Added HOME_MAX_SIZE environment variable to $shell_name.${sty_res}"
+            changed_shell_config=true
         fi
         if ! grep "export SGOINFRE_MAX_SIZE=" "$rc_file" &>/dev/null; then
             echo -e "\nexport SGOINFRE_MAX_SIZE=$sgoinfre_max_size\n" >> "$rc_file"
             pretty_print "${sty_yel}Added SGOINFRE_MAX_SIZE environment variable to $shell_name.${sty_res}"
+            changed_shell_config=true
         fi
     fi
 done
@@ -196,13 +211,4 @@ else
     pretty_print "To see the manual, run '42free --help'."
 fi
 
-if [[ $new_alias == true ]]; then
-    # Start the default shell to make the alias available immediately
-    if [ -x "$SHELL" ]; then
-        exec $SHELL
-    fi
-    # If exec failed, inform the user to start a new shell
-    pretty_print "Please start a new shell to make the 42free command available."
-fi
-
-exit $success
+ft_exit $success

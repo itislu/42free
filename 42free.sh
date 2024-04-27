@@ -17,6 +17,7 @@ default_args=(\
 
 # Standard variables
 stderr=""
+changed_shell_config=false
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
@@ -176,6 +177,19 @@ print_one_stderr()
     if [[ $(wc -l <<< "$stderr") -gt 1 ]]; then
         pretty_print "STDERR: ..."
     fi
+}
+
+ft_exit()
+{
+    if $changed_shell_config; then
+        # Start the default shell to make changes of the shell config available immediately
+        if [ "$1" -eq 0 ] && [ -x "$SHELL" ]; then
+            exec $SHELL
+        fi
+        # If exec failed, inform the user to start a new shell
+        pretty_print "Please start a new shell to make the changed 42free configs available."
+    fi
+    exit "$1"
 }
 
 print_skip_arg()
@@ -382,7 +396,7 @@ update()
         pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
         pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
         if prompt_single_key "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update; exit $?
+            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update; ft_exit $?
         else
             pretty_print "Not updating."
         fi
@@ -431,15 +445,15 @@ uninstall()
             find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
             clean_rc_files
             pretty_print "$indicator_success 42free has been uninstalled."
-            exit $success
+            ft_exit $success
         else
             pretty_print "$indicator_error Cannot uninstall 42free."
             print_stderr
-            exit $major_error
+            ft_exit $major_error
         fi
     else
         pretty_print "Not uninstalling."
-        exit $success
+        ft_exit $success
     fi
 }
 
@@ -454,17 +468,17 @@ while (( $# )); do
             ;;
         -u|--update)
             update
-            exit $?
+            ft_exit $?
             ;;
         -h|--help)
             # Print help message
             pretty_print "$msg_manual"
-            exit $success
+            ft_exit $success
             ;;
         -v|--version)
             # Print version information
             pretty_print "$msg_version"
-            exit $success
+            ft_exit $success
             ;;
         --uninstall)
             uninstall
@@ -482,7 +496,7 @@ while (( $# )); do
         -*)
             # Unknown option
             pretty_print "Unknown option: '$1'"
-            exit $input_error
+            ft_exit $input_error
             ;;
         *)
             # Non-option argument
@@ -513,7 +527,7 @@ if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
             print_stderr
             syscmd_failed=true
             if ! prompt_single_key "$prompt_continue_still"; then
-                exit $major_error
+                ft_exit $major_error
             fi
             pretty_print "$msg_sgoinfre_permissions_keep"
         fi
@@ -867,11 +881,11 @@ for arg in "${args[@]}"; do
 done
 
 if $syscmd_failed; then
-    exit $major_error
+    ft_exit $major_error
 elif $arg_skipped; then
-    exit $minor_error
+    ft_exit $minor_error
 elif $bad_input; then
-    exit $input_error
+    ft_exit $input_error
 else
-    exit $success
+    ft_exit $success
 fi
