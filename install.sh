@@ -16,9 +16,9 @@ campus_dict=(
 dest_dir="$HOME/.scripts"
 dest_file="42free.sh"
 
-# RC files
-bash_rc="$HOME/.bashrc"
-zsh_rc="$HOME/.zshrc"
+# Shell config files
+bash_config="$HOME/.bashrc"
+zsh_config="$HOME/.zshrc"
 fish_config="$HOME/.config/fish/config.fish"
 
 # Max sizes in GB
@@ -154,32 +154,32 @@ fi
 # Make the script executable
 chmod +x "$dest_dir/$dest_file"
 
-# Add an alias to all supported RC files if it doesn't exist yet
-for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
-    case "$rc_file" in
-        "$bash_rc")
+# Add an alias to all supported shell config files if it doesn't exist yet
+for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
+    case "$config_file" in
+        "$bash_config")
             shell_name="bash"
             ;;
-        "$zsh_rc")
+        "$zsh_config")
             shell_name="zsh"
             ;;
         "$fish_config")
             shell_name="fish"
             ;;
     esac
-    if [ -f "$rc_file" ]; then
-        if ! grep "alias 42free=" "$rc_file" &>/dev/null; then
-            echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$rc_file"
+    if [ -f "$config_file" ]; then
+        if ! grep "alias 42free=" "$config_file" &>/dev/null; then
+            echo -e "\nalias 42free='bash $dest_dir/$dest_file'\n" >> "$config_file"
             pretty_print "${sty_yel}Added 42free alias to $shell_name.${sty_res}"
             changed_shell_config=true
         fi
-        if ! grep "export HOME_MAX_SIZE=" "$rc_file" &>/dev/null; then
-            echo -e "\nexport HOME_MAX_SIZE=$home_max_size\n" >> "$rc_file"
+        if ! grep "export HOME_MAX_SIZE=" "$config_file" &>/dev/null; then
+            echo -e "\nexport HOME_MAX_SIZE=$home_max_size\n" >> "$config_file"
             pretty_print "${sty_yel}Added HOME_MAX_SIZE environment variable to $shell_name.${sty_res}"
             changed_shell_config=true
         fi
-        if ! grep "export SGOINFRE_MAX_SIZE=" "$rc_file" &>/dev/null; then
-            echo -e "\nexport SGOINFRE_MAX_SIZE=$sgoinfre_max_size\n" >> "$rc_file"
+        if ! grep "export SGOINFRE_MAX_SIZE=" "$config_file" &>/dev/null; then
+            echo -e "\nexport SGOINFRE_MAX_SIZE=$sgoinfre_max_size\n" >> "$config_file"
             pretty_print "${sty_yel}Added SGOINFRE_MAX_SIZE environment variable to $shell_name.${sty_res}"
             changed_shell_config=true
         fi

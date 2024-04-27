@@ -70,7 +70,7 @@ To install 42free, you can use one of the following commands:
 
 This will download the `42free.sh` script into a hidden `.scripts` directory in your home directory.
 
-It will also add an alias `42free` to your shell's RC file (either `.bashrc` or `.zshrc`) so you can use it from any directory.
+It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zshrc` and `config.fish`) so you can use it from any directory.
 
 <br>
 

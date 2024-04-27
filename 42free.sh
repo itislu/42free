@@ -26,9 +26,9 @@ sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
 
-# RC files
-bash_rc="$HOME/.bashrc"
-zsh_rc="$HOME/.zshrc"
+# Shell config files
+bash_config="$HOME/.bashrc"
+zsh_config="$HOME/.zshrc"
 fish_config="$HOME/.config/fish/config.fish"
 
 # Max sizes in GB
@@ -429,9 +429,9 @@ change_max_sizes()
             pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
         done
 
-        # Change MAX_SIZE in all RC files
-        for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
-            if sed -i "s/^export ${dir^^}_MAX_SIZE=/c\export ${dir^^}_MAX_SIZE=${!max_size_var_name}/" "$rc_file" 2>/dev/null; then
+        # Change MAX_SIZE in all shell config files
+        for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
+            if sed -i "s/^export ${dir^^}_MAX_SIZE=/c\export ${dir^^}_MAX_SIZE=${!max_size_var_name}/" "$config_file" 2>/dev/null; then
                 changed_max_size=true
             fi
         done
@@ -443,29 +443,29 @@ change_max_sizes()
     done
 }
 
-# Remove everything added from installation in all RC files
-clean_rc_files()
+# Remove everything added from installation in all shell config files
+clean_config_files()
 {
-    for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
-        case "$rc_file" in
-            "$bash_rc")
+    for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
+        case "$config_file" in
+            "$bash_config")
                 shell_name="bash"
                 ;;
-            "$zsh_rc")
+            "$zsh_config")
                 shell_name="zsh"
                 ;;
             "$fish_config")
                 shell_name="fish"
                 ;;
         esac
-        if [ -f "$rc_file" ]; then
-            if sed -i '/^alias 42free/d' "$rc_file" 2>/dev/null; then
+        if [ -f "$config_file" ]; then
+            if sed -i '/^alias 42free/d' "$config_file" 2>/dev/null; then
                 pretty_print "${sty_yel}Alias removed from $shell_name.${sty_res}"
             fi
-            if sed -i '/^export HOME_MAX_SIZE=/d' "$rc_file" 2>/dev/null; then
+            if sed -i '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null; then
                 pretty_print "${sty_yel}HOME_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
             fi
-            if sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$rc_file" 2>/dev/null; then
+            if sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null; then
                 pretty_print "${sty_yel}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
             fi
         fi
@@ -480,7 +480,7 @@ uninstall()
             pretty_print "${sty_yel}Script deleted.${sty_res}"
             # Check if script_dir is empty and remove it
             find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
-            clean_rc_files
+            clean_config_files
             pretty_print "$indicator_success 42free has been uninstalled."
             ft_exit $success
         else
