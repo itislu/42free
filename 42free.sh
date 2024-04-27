@@ -18,6 +18,7 @@ default_args=(\
 # Standard variables
 stderr=""
 changed_shell_config=false
+printed_update_info=false
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
@@ -386,6 +387,28 @@ get_latest_version_number()
     return 0
 }
 
+print_update_info()
+{
+    if [ -z "$latest_version" ]; then
+        latest_version=$(get_latest_version_number "silent")
+    fi
+
+    if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
+        # If reminder already printed before, don't print again
+        if [[ "$1" == "remind" ]] && $printed_update_info; then
+            return
+        fi
+        pretty_print "${sty_bol}${sty_und}${sty_bri_yel}A new version of 42free is available.${sty_res}"
+        pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
+        pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
+        pretty_print "To see the changelog, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}."
+        if [[ "$1" == "remind" ]]; then
+            pretty_print "Run '42free --update' to update.${sty_res}"
+        fi
+        printed_update_info=true
+    fi
+}
+
 update()
 {
     if ! latest_version=$(get_latest_version_number "$1"); then
@@ -393,10 +416,8 @@ update()
     fi
 
     # Compare the latest version with the current version number
-    if [[ "${latest_version#v}" != "${current_version#v}" ]]; then
-        pretty_print "A new version of 42free is available."
-        pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
-        pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
+    if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
+        print_update_info
         if prompt_single_key "$prompt_update"; then
             bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") update; ft_exit $?
         else
@@ -511,12 +532,12 @@ while (( $# )); do
             ft_exit $?
             ;;
         -h|--help)
-            # Print help message
+            print_update_info "remind"
             pretty_print "$msg_manual"
             ft_exit $success
             ;;
         -v|--version)
-            # Print version information
+            print_update_info "remind"
             pretty_print "$msg_version"
             ft_exit $success
             ;;
@@ -555,6 +576,8 @@ if [ -z "${args[*]}" ]; then
 else
     no_user_args=false
 fi
+
+print_update_info "remind"
 
 # Check if the permissions of user's sgoinfre directory are rwx------
 if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
