@@ -112,6 +112,8 @@ ${sty_bol}${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [target1 target2
 ${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --reverse    Reverse the operation and move the directories or files
                      back to their original location in home.
+    -m, --max-size   Change the warning sizes for the home and sgoinfre directories (in GB).
+                     Current sizes: HOME_MAX_SIZE=$home_max_size, SGOINFRE_MAX_SIZE=$sgoinfre_max_size
     -u, --update     Check for a new version of 42free.
     -h, --help       Display this help message and exit.
     -v, --version    Display version information and exit.
@@ -406,6 +408,41 @@ update()
     return $success
 }
 
+change_max_sizes()
+{
+    local changed_max_size
+
+    for dir in home sgoinfre; do
+        changed_max_size=false
+
+        # Construct variable name
+        max_size_var_name="${dir}_max_size"
+
+        # Prompt user for the maximum allowed size of the directory
+        while true; do
+            pretty_print "${sty_bol}Enter the maximum allowed size of your $dir directory in GB:${sty_res}"
+            read -rp "> "
+            if [[ $REPLY =~ ^[0-9]+$ ]]; then
+                declare "$max_size_var_name=$REPLY"
+                break
+            fi
+            pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
+        done
+
+        # Change MAX_SIZE in all RC files
+        for rc_file in "$bash_rc" "$zsh_rc" "$fish_config"; do
+            if sed -i "s/^export ${dir^^}_MAX_SIZE=/c\export ${dir^^}_MAX_SIZE=${!max_size_var_name}/" "$rc_file" 2>/dev/null; then
+                changed_max_size=true
+            fi
+        done
+
+        if $changed_max_size; then
+            pretty_print "${sty_yel}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${sty_res}"
+            changed_shell_config=true
+        fi
+    done
+}
+
 # Remove everything added from installation in all RC files
 clean_rc_files()
 {
@@ -465,6 +502,9 @@ while (( $# )); do
     case "$1" in
         -r|--reverse)
             reverse=true
+            ;;
+        -m|--max-size)
+            change_max_sizes
             ;;
         -u|--update)
             update
