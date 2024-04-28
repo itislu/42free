@@ -235,18 +235,28 @@ prompt_restore()
     return $(( ! $? ))
 }
 
-restore_after_error()
+move_files()
 {
-    local restore_from=$1
-    local restore_to=$2
+    local source_path=$1
+    local target_dirpath=$2
+    local operation=$3
 
-    stderr=$(rsync -a --remove-source-files "$restore_from" "$restore_to/" 2>&1); ret=$?
-    cleanup_empty_dirs "$restore_from"
-    if [ $ret -ne 0 ]; then
-        return 1
-    else
-        return 0
+    # Move the files in a background job
+    pretty_print "${operation^} '$(basename "$source_path")' to '$target_dirpath'..."
+    stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
+    rsync_job=$!
+
+    # Wait for rsync to finish
+    wait_for_jobs "$operation" $rsync_job
+    rsync_status=$?
+
+    cleanup_empty_dirs "$source_path"
+
+    # Check the exit status of rsync
+    if [[ $rsync_status -ne 0 ]]; then
+        syscmd_failed=true
     fi
+    return $rsync_status
 }
 
 cleanup_empty_dirs()
@@ -697,7 +707,8 @@ if ! $reverse; then
     target_base="$sgoinfre"
     target_name="sgoinfre"
     target_max_size=$sgoinfre_max_size
-    operation="moved"
+    operation="moving"
+    operation_success="moved"
     outcome="freed"
 else
     source_base="$sgoinfre"
@@ -705,7 +716,8 @@ else
     target_base="$HOME"
     target_name="home"
     target_max_size=$home_max_size
-    operation="moved back"
+    operation="restoring"
+    operation_success="restored"
     outcome="occupied"
 fi
 
@@ -897,7 +909,7 @@ for arg in "${args[@]}"; do
 
     # Check if the target directory would go above its maximum recommended size
     if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
-        pretty_print "$indicator_warning Moving '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${target_max_size}GB${sty_res}."
+        pretty_print "$indicator_warning ${operation^} '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${target_max_size}GB${sty_res}."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -915,7 +927,7 @@ for arg in "${args[@]}"; do
         fi
     fi
 
-    # Create the same directory structure as in the source
+    # Create the same directory structure as in source
     if ! stderr=$(mkdir -p "$target_dirpath" 2>&1); then
         pretty_print "$indicator_error Cannot create the directory structure for '$target_path'."
         print_stderr
@@ -928,22 +940,10 @@ for arg in "${args[@]}"; do
         continue
     fi
 
-    # Start to move the directory or file in the background
-    pretty_print "Moving '$source_basename' to '$target_dirpath'..."
-    stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
-    rsync_job=$!
-
-    # Wait for rsync to finish
-    wait_for_jobs $rsync_job
-    rsync_status=$?
-
-    # Check the exit status of rsync
-    if [[ $rsync_status -ne 0 ]]; then
+    # Move the files
+    if ! move_files "$source_path" "$target_dirpath" "$operation"; then
         pretty_print "$indicator_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
         print_one_stderr
-        syscmd_failed=true
-
-        cleanup_empty_dirs "$source_path"
         if [ -d "$source_path" ]; then
             # Rename the directory with the files that could not be moved
             source_old="$source_path~42free-old_$(get_timestamp)~"
@@ -968,14 +968,14 @@ for arg in "${args[@]}"; do
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
             if prompt_restore; then
-                pretty_print "Restoring '$source_basename' to '$source_dirpath'..."
                 rm -f "$link" 2>/dev/null;
                 mv -T "$source_old" "$source_path" 2>/dev/null
-                if restore_after_error "$target_path" "$source_dirpath"; then
-                    pretty_print "'${sty_bol}$source_basename${sty_res}' has been restored to '${sty_bol}$source_dirpath${sty_res}'."
-                else
+                if ! move_files "$target_path" "$source_dirpath" "restoring"; then
                     pretty_print "$indicator_error Could not fully restore '$source_basename' to '$source_dirpath'."
+                    print_one_stderr
                     pretty_print "The rest of the partial copy is left in '${sty_bol}$target_path${sty_res}'."
+                else
+                    pretty_print "'${sty_bol}$source_basename${sty_res}' has been restored to '${sty_bol}$source_dirpath${sty_res}'."
                 fi
             else
                 pretty_print "Try to close all programs and move the rest from '${sty_bol}$source_old${sty_res}' manually."
@@ -994,8 +994,7 @@ for arg in "${args[@]}"; do
         unset target_base_size_in_bytes
         continue
     fi
-    pretty_print "$indicator_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation to '${sty_bri_gre}$target_dirpath${sty_res}'."
-    cleanup_empty_dirs "$source_path"
+    pretty_print "$indicator_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation_success to '${sty_bri_gre}$target_dirpath${sty_res}'."
 
     if ! $reverse; then
         # Create the symbolic link
