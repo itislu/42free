@@ -115,7 +115,7 @@ ${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the argu
                      back to their original location in home.
     -m, --max-size   Change the warning sizes for the home and sgoinfre directories (in GB).
                      Current sizes: HOME_MAX_SIZE=$home_max_size, SGOINFRE_MAX_SIZE=$sgoinfre_max_size
-    -u, --update     Check for a new version of 42free.
+    -u, --update     Update to the newest version of 42free.
     -h, --help       Display this help message and exit.
     -v, --version    Display version information and exit.
         --uninstall  Uninstall 42free.
@@ -526,7 +526,7 @@ update()
     # Compare the latest version with the current version number
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
-        if prompt_single_key "$prompt_update"; then
+        if [[ "$1" == "no_prompt" ]] || prompt_single_key "$prompt_update"; then
             bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") "update"; ft_exit $?
         else
             pretty_print "Not updating."
@@ -637,7 +637,7 @@ while (( $# )); do
             ft_exit $success
             ;;
         -u|--update)
-            update
+            update "no_prompt"
             ft_exit $?
             ;;
         -h|--help)
