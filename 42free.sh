@@ -467,7 +467,7 @@ get_latest_version_number()
 {
     # Check if curl or wget is available
     if [ -z "$downloader" ]; then
-        if [[ "$1" != "silent" ]]; then
+        if [[ "$1" != "quiet" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
             pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
             pretty_print "Please install one of them and try again."
@@ -479,7 +479,7 @@ get_latest_version_number()
     latest_version=$("$downloader" "$downloader_opts_stdout" "https://api.github.com/repos/itislu/42free/tags")
     latest_version=$(echo "$latest_version" | grep -m 1 '"name":' | cut -d '"' -f 4) 2>/dev/null
     if [ -z "$latest_version" ]; then
-        if [[ "$1" != "silent" ]]; then
+        if [[ "$1" != "quiet" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
         fi
         return $major_error
@@ -495,7 +495,7 @@ print_update_info()
     local bottom_border="└────────────────────────────────────────────┘"
 
     if [ -z "$latest_version" ]; then
-        latest_version=$(get_latest_version_number "silent")
+        latest_version=$(get_latest_version_number "quiet")
     fi
 
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
@@ -531,7 +531,7 @@ update()
         else
             pretty_print "Not updating."
         fi
-    elif [[ "$1" != "silent" ]]; then
+    elif [[ "$1" != "quiet" ]]; then
         pretty_print "You are already using the latest version of 42free."
     fi
     return $success
@@ -679,7 +679,7 @@ done
 
 # Check if the script received any targets
 if [ -z "${args[*]}" ]; then
-    update silent
+    update quiet
     args=("${default_args[@]}")
     no_user_args=true
 else
