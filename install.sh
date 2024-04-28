@@ -145,7 +145,7 @@ for dir in home sgoinfre; do
     # If a max size still 0 or not known, prompt user to enter it
     if [[ -z "${!max_size_var_name}" ]] || [[ "${!max_size_var_name}" -eq 0 ]]; then
         while true; do
-            pretty_print "${sty_bol}Enter the maximum allowed size of your $dir directory in GB:${sty_res}"
+            pretty_print "Enter the maximum allowed size of your ${sty_bol}$dir${sty_res} directory in GB:"
             read -rp "> "
             if [[ $REPLY =~ ^[0-9]+$ ]]; then
                 declare "$max_size_var_name=$REPLY"

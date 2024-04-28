@@ -549,7 +549,7 @@ change_max_sizes()
 
         # Prompt user for the maximum allowed size of the directory
         while true; do
-            pretty_print "${sty_bol}Enter the maximum allowed size of your $dir directory in GB:${sty_res}"
+            pretty_print "Enter the maximum allowed size of your ${sty_bol}$dir${sty_res} directory in GB:"
             read -rp "> "
             if [[ $REPLY =~ ^[0-9]+$ ]]; then
                 declare "$max_size_var_name=$REPLY"
