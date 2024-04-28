@@ -634,6 +634,7 @@ while (( $# )); do
             ;;
         -m|--max-size)
             change_max_sizes
+            ft_exit $success
             ;;
         -u|--update)
             update
