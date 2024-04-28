@@ -260,33 +260,124 @@ cleanup_empty_dirs()
     done
 }
 
-wait_for_jobs()
+clear_prev_line()
+{
+    printf "\e[1K\e[1A\n"
+}
+
+show_cursor()
+{
+    tput cnorm
+    clear_prev_line
+    exit 130
+}
+
+any_job_running()
 {
     local job_pids=("$@")
-    local job_pid
-    local exit_status=0
-    local finished
 
-    # Wait for each job to finish, checking every second
-    for (( i=0; i<100; i++ )); do
-        finished=true
-        for job_pid in "${job_pids[@]}"; do
-            if kill -0 "$job_pid" 2>/dev/null; then
-                finished=false
+    for job_pid in "${job_pids[@]}"; do
+        if kill -0 "$job_pid" 2>/dev/null; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+wait_for_jobs()
+{
+    if [[ "$1" == "moving" ]]; then
+        local pacing=0.1
+        local frames=(
+            '  📁          📁'
+            '  📂          📁'
+            '  📂📄        📁'
+            '  📂 📄       📁'
+            '  📁  📄      📁'
+            '  📁   📄     📁'
+            '  📁    📄    📁'
+            '  📁     📄   📁'
+            '  📁      📄  📁'
+            '  📁       📄 📂'
+            '  📁        📄📂'
+            '  📁          📂'
+            '  📁          📁'
+            )
+        shift
+    elif [[ "$1" == "restoring" ]]; then
+        local pacing=0.1
+        local frames=(
+            '  📁          📁'
+            '  📁          📂'
+            '  📁        📄📂'
+            '  📁       📄 📂'
+            '  📁      📄  📁'
+            '  📁     📄   📁'
+            '  📁    📄    📁'
+            '  📁   📄     📁'
+            '  📁  📄      📁'
+            '  📂 📄       📁'
+            '  📂📄        📁'
+            '  📂          📁'
+            '  📁          📁'
+            )
+        shift
+    elif [[ "$1" == "searching" ]]; then
+        local pacing=0.5
+        local frames=(
+            '  🔎📁📁📁📁📁📁'
+            '  📄🔎📁📁📁📁📁'
+            '  📄📄🔎📁📁📁📁'
+            '  📄📄📄🔎📁📁📁'
+            '  📄📄📄📄🔎📁📁'
+            '  📄📄📄📄📄🔎📁'
+            '  📄📄📄📄📄📄🔎'
+            '  📄📄📄📄📄📄🔍'
+            '  📄📄📄📄📄🔍📁'
+            '  📄📄📄📄🔍📁📁'
+            '  📄📄📄🔍📁📁📁'
+            '  📄📄🔍📁📁📁📁'
+            '  📄🔍📁📁📁📁📁'
+            '  🔍📁📁📁📁📁📁'
+            )
+        shift
+    else
+        local pacing=0.25
+        local frames=(
+            '  | '
+            '  / '
+            '  - '
+            '  \ '
+            )
+    fi
+
+    local job_pids=("$@")
+    local exit_status=0
+
+    # Trap SIGINT to enable cursor again and clear line
+    trap show_cursor SIGINT
+
+    # Hide cursor
+    tput civis
+    # Print frames while jobs are running
+    while any_job_running "${job_pids[@]}"; do
+        for frame in "${frames[@]}"; do
+            if ! any_job_running "${job_pids[@]}"; then
                 break
             fi
+            printf "\r%s" "$frame"
+            sleep "$pacing"
         done
-        if $finished; then
-            break
-        fi
-        # If any job is still running after 10 seconds, print a message
-        if [[ i -eq 10 ]]; then
-            echo "This can take a bit of time..."
-        fi
-        sleep 1
     done
+      # Clear line on completion
+    printf "\r\e[K"
+    # Show cursor
+    tput cnorm
 
-    # Wait for all jobs to finish and check their exit status
+    # Reset signal trap
+    trap - SIGINT
+
+    # Collect exit status
     for job_pid in "${job_pids[@]}"; do
         wait "$job_pid" 2>/dev/null
         job_exit_status=$?
@@ -785,7 +876,7 @@ for arg in "${args[@]}"; do
         source_base_size_job=$!
         du -sb "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
         target_base_size_job=$!
-        wait_for_jobs $source_base_size_job $target_base_size_job
+        wait_for_jobs "searching" $source_base_size_job $target_base_size_job
 
         # Read the sizes from the temporary files
         source_base_size_in_bytes=$(cat $tmpfile_source_base_size 2>/dev/null)
@@ -794,6 +885,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Get the size of the directory or file to be moved
+    pretty_print "Getting the size of $source_basename..."
     size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
     size_in_bytes=$(du -sb "$source_path" 2>/dev/null | cut -f1)
 
