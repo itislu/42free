@@ -51,15 +51,46 @@ jobs:
           git tag -f ${{ env.VERSION }}
           git push -f origin ${{ env.VERSION }}
 
+      - name: 📝 Generate changelog from commit messages
+        if  : ${{ env.PROCEED }} == 'true'
+        uses: ardalanamini/auto-changelog@v4
+        id  : changelog
+        with:
+          github-token            : ${{ github.token }}
+          commit-types            : |
+            feat: New Features
+            fix: Bug Fixes
+            build: Build System & Dependencies
+            perf: Performance Improvements
+            doc: Documentation
+            test: Tests
+            refactor: Refactors
+            chore: Chores
+            style: Code Style
+            ci: CI
+            cd: CD
+            revert: Reverts
+            bot: Bots
+          default-commit-type     : Other Changes
+          release-name            : ${{ env.VERSION }}
+          release-name-prefix     : ""
+          mention-authors         : true
+          mention-new-contributors: true
+          include-compare-link    : true
+          include-pr-links        : true
+          include-commit-links    : true
+          semver                  : true
+          use-github-autolink     : true
+
       - name: 🚀 Release and upload asset
         if: env.PROCEED == 'true'
         uses: softprops/action-gh-release@v2
-        with:
-          files: 42free.sh
-          generate_release_notes: true
-          make_latest: true
-        env:
+        env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body      : ${{ steps.changelog.outputs.changelog }}
+          prerelease: ${{ steps.changelog.outputs.prerelease }}
+          files     : 42free.sh
 
       - name: 🛠️ Append dev to version number in script
         if: env.PROCEED == 'true'
