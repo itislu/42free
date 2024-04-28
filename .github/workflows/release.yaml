@@ -46,7 +46,7 @@ jobs:
         run : |
           sed -i "s/^current_version=.*/current_version=\"${{ env.VERSION }}\"/" 42free.sh
           git add 42free.sh
-          git commit -m "bot: Update version number to ${{ env.VERSION }}" || exit 0
+          git commit -m "bot: Update version number to ${{ env.VERSION }} [ignore]" || exit 0
           git push origin main
           git tag -f ${{ env.VERSION }}
           git push -f origin ${{ env.VERSION }}
@@ -98,5 +98,5 @@ jobs:
           new_version="${{ env.VERSION }}+dev"
           sed -i "s/^current_version=.*/current_version=\"$new_version\"/" 42free.sh
           git add 42free.sh
-          git commit -m "bot: Update version number to $new_version"
+          git commit -m "bot: Update version number to $new_version [ignore]"
           git push origin main
