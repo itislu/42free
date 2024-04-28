@@ -589,7 +589,7 @@ clean_config_files()
         esac
         if [ -f "$config_file" ]; then
             if sed -i '/^alias 42free/d' "$config_file" 2>/dev/null; then
-                pretty_print "${sty_yel}Alias removed from $shell_name.${sty_res}"
+                pretty_print "${sty_yel}42free alias removed from $shell_name.${sty_res}"
             fi
             if sed -i '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null; then
                 pretty_print "${sty_yel}HOME_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
