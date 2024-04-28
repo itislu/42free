@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_version="v1.3.0+dev"
+current_version="v1.3.1"
 
 default_args=(\
 "$HOME/.cache" \
