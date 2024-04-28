@@ -7,8 +7,8 @@ api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 # Format: ["Campus Name"]="home_max_size sgoinfre_max_size"
 declare -A campus_dict
 campus_dict=(
-["42 Berlin"]="10 30"
 ["42 Vienna"]="5 30"
+["42 Berlin"]="5 30"
 ["Other"]="0 0"
 )
 
