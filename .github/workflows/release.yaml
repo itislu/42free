@@ -7,12 +7,12 @@ on:
 
 permissions:
   contents: write
-  actions: write
+  actions : write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
+    env    :
       VERSION:
       PROCEED:
 
@@ -20,19 +20,19 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref        : main
           fetch-depth: 0
 
       - name: Configure GitHub Actions bot
-        run: |
+        run : |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Get version number
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+        run : echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
       - name: Check tag version
-        run: |
+        run : |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           new_tag=${{ env.VERSION }}
           if [[ $(printf '%s\n' "$latest_tag" "$new_tag" | sort -rV | head -n1) == "$new_tag" ]]; then
@@ -42,8 +42,8 @@ jobs:
           fi
 
       - name: ⏫ Update version number in script
-        if: env.PROCEED == 'true'
-        run: |
+        if  : env.PROCEED == 'true'
+        run : |
           sed -i "s/^current_version=.*/current_version=\"${{ env.VERSION }}\"/" 42free.sh
           git add 42free.sh
           git commit -m "bot: Update version number to ${{ env.VERSION }}" || exit 0
@@ -83,18 +83,18 @@ jobs:
           use-github-autolink     : true
 
       - name: 🚀 Release and upload asset
-        if: env.PROCEED == 'true'
+        if  : env.PROCEED == 'true'
         uses: softprops/action-gh-release@v2
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body      : ${{ steps.changelog.outputs.changelog }}
-          prerelease: ${{ steps.changelog.outputs.prerelease }}
-          files     : 42free.sh
+          body        : ${{ steps.changelog.outputs.changelog }}
+          prerelease  : ${{ steps.changelog.outputs.prerelease }}
+          files       : 42free.sh
 
       - name: 🛠️ Append dev to version number in script
-        if: env.PROCEED == 'true'
-        run: |
+        if  : env.PROCEED == 'true'
+        run : |
           new_version="${{ env.VERSION }}+dev"
           sed -i "s/^current_version=.*/current_version=\"$new_version\"/" 42free.sh
           git add 42free.sh
