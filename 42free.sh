@@ -113,7 +113,8 @@ ${sty_bol}${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [target1 target2
 ${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
     -r, --restore    Move the directories and files back to their original
                      location in home.
-    -m, --max-size   Change the warning sizes for the home and sgoinfre directories (in GB).
+    -m, --max-size   Change the warning sizes for the home and sgoinfre
+                     directories (in GB).
                      Current sizes: HOME_MAX_SIZE=$home_max_size, SGOINFRE_MAX_SIZE=$sgoinfre_max_size
     -u, --update     Check for a new version of 42free.
     -h, --help       Display this help message and exit.
