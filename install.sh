@@ -106,8 +106,9 @@ if [ -z "$downloader" ]; then
     exit $download_failed
 fi
 
-# Prompt user to choose their campus if max sizes are not known
-if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
+# Prompt user to choose their campus if max sizes are 0 or not known
+if { [[ -z "$home_max_size" ]] || [[ "$home_max_size" -eq 0 ]]; } &&
+   { [[ -z "$sgoinfre_max_size" ]] || [[ "$sgoinfre_max_size" -eq 0 ]]; }; then
     # Sort campus names by keys
     mapfile -t campus_names_sorted < <(printf '%s\n' "${!campus_dict[@]}" | sort)
 
@@ -141,8 +142,8 @@ for dir in home sgoinfre; do
     # Construct variable name
     max_size_var_name="${dir}_max_size"
 
-    # If max size still not known, prompt user to enter it
-    if [[ -z "${!max_size_var_name}" ]]; then
+    # If a max size still 0 or not known, prompt user to enter it
+    if [[ -z "${!max_size_var_name}" ]] || [[ "${!max_size_var_name}" -eq 0 ]]; then
         while true; do
             pretty_print "${sty_bol}Enter the maximum allowed size of your $dir directory in GB:${sty_res}"
             read -rp "> "
