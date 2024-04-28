@@ -122,19 +122,37 @@ if { [[ -z "$home_max_size" ]] || [[ "$home_max_size" -eq 0 ]]; } &&
     campus_names_sorted=("" "${campus_names_sorted[@]}")
 
     # Prompt user
+    # Allow case-insensitive matching
+    shopt -s nocasematch
     while true; do
         pretty_print "${sty_bol}Choose your campus:${sty_res}"
         pretty_print "$prompt_campuses"
         read -rp "> "
-        if [[ $REPLY =~ ^[0-9]+$ ]]; then
+        valid_choice=false
+
+        # Check if input is a valid number of the list
+        if [[ $REPLY =~ ^[0-9]+$ ]] && [[ -n ${campus_names_sorted[$REPLY]} ]]; then
             campus_name=${campus_names_sorted[$REPLY]}
-            if [[ -n "$campus_name" ]]; then
-                IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
-                break
-            fi
+            valid_choice=true
+        elif [ -n "$REPLY" ]; then
+            # Check if input is a campus name
+            for campus_name in "${campus_names_sorted[@]}"; do
+                name_part="${campus_name#[0-9]* }"
+                if [[ "$campus_name" == "$REPLY" ]] || [[ "$name_part" == "$REPLY" ]]; then
+                    valid_choice=true
+                    break
+                fi
+            done
         fi
-        pretty_print "${sty_bol}${sty_red}Invalid option. Please try again.${sty_res}"
+
+        # If valid choice, set max size variables
+        if $valid_choice; then
+            IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
+            break
+        fi
+        pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a valid number or your campus name.${sty_res}"
     done
+    shopt -u nocasematch
 fi
 
 # If a max size still not known, prompt user to enter it
