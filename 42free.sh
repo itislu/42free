@@ -560,7 +560,7 @@ change_max_sizes()
 
         # Change MAX_SIZE in all shell config files
         for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
-            if sed -i "s/^export ${dir^^}_MAX_SIZE=/c\export ${dir^^}_MAX_SIZE=${!max_size_var_name}/" "$config_file" 2>/dev/null; then
+            if sed -i "/^export ${dir^^}_MAX_SIZE=/c\export ${dir^^}_MAX_SIZE=${!max_size_var_name}" "$config_file" 2>/dev/null; then
                 changed_max_size=true
             fi
         done
