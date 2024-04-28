@@ -506,7 +506,7 @@ print_update_info()
         fi
         pretty_print "$top_border"
         pretty_print "$side_border ${sty_bol}${sty_und}${sty_bri_yel}A new version of 42free is available.${sty_res}      $side_border"
-        pretty_print "$side_border Current version: ${sty_bol}${current_version#v}${sty_res}                 $side_border"
+        pretty_print "$side_border Current version: ${sty_bol}${current_version#v}${sty_res}                     $side_border"
         pretty_print "$side_border Latest version: ${sty_bol}${latest_version#v}${sty_res}                      $side_border"
         pretty_print "$side_border To see the changelog, visit                $side_border"
         pretty_print "$side_border ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}. $side_border"
