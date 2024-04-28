@@ -490,6 +490,10 @@ get_latest_version_number()
 
 print_update_info()
 {
+    local top_border="┌────────────────────────────────────────────┐"
+    local side_border="│"
+    local bottom_border="└────────────────────────────────────────────┘"
+
     if [ -z "$latest_version" ]; then
         latest_version=$(get_latest_version_number "silent")
     fi
@@ -499,13 +503,16 @@ print_update_info()
         if [[ "$1" == "remind" ]] && $printed_update_info; then
             return
         fi
-        pretty_print "${sty_bol}${sty_und}${sty_bri_yel}A new version of 42free is available.${sty_res}"
-        pretty_print "Current version: ${sty_bol}${current_version#v}${sty_res}"
-        pretty_print "Latest version: ${sty_bol}${latest_version#v}${sty_res}"
-        pretty_print "To see the changelog, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}."
+        pretty_print "$top_border"
+        pretty_print "$side_border ${sty_bol}${sty_und}${sty_bri_yel}A new version of 42free is available.${sty_res}      $side_border"
+        pretty_print "$side_border Current version: ${sty_bol}${current_version#v}${sty_res}                 $side_border"
+        pretty_print "$side_border Latest version: ${sty_bol}${latest_version#v}${sty_res}                      $side_border"
+        pretty_print "$side_border To see the changelog, visit                $side_border"
+        pretty_print "$side_border ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}. $side_border"
         if [[ "$1" == "remind" ]]; then
-            pretty_print "Run '42free --update' to update.${sty_res}"
+            pretty_print "$side_border Run '42free --update' to update.${sty_res}           $side_border"
         fi
+        pretty_print "$bottom_border"
         printed_update_info=true
     fi
 }
