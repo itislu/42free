@@ -111,8 +111,8 @@ ${sty_bol}${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [target1 target2
     Closing all programs first will help to avoid errors during the move.
 
 ${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
-    -r, --reverse    Reverse the operation and move the directories or files
-                     back to their original location in home.
+    -r, --restore    Move the directories and files back to their original
+                     location in home.
     -m, --max-size   Change the warning sizes for the home and sgoinfre directories (in GB).
                      Current sizes: HOME_MAX_SIZE=$home_max_size, SGOINFRE_MAX_SIZE=$sgoinfre_max_size
     -u, --update     Check for a new version of 42free.
@@ -435,7 +435,7 @@ print_available_space()
     source_base_size=$(echo "$source_base_size_in_bytes/1024/1024/1024" | bc -l | xargs printf "%.2f")
     target_base_size=$(echo "$target_base_size_in_bytes/1024/1024/1024" | bc -l | xargs printf "%.2f")
 
-    if ! $reverse; then
+    if ! $restore; then
         home_size=$source_base_size
         sgoinfre_size=$target_base_size
     else
@@ -626,11 +626,11 @@ uninstall()
 # Process options
 args=()
 args_amount=0
-reverse=false
+restore=false
 while (( $# )); do
     case "$1" in
-        -r|--reverse)
-            reverse=true
+        -r|--restore)
+            restore=true
             ;;
         -m|--max-size)
             change_max_sizes
@@ -689,7 +689,7 @@ fi
 print_update_info "remind"
 
 # Check if the permissions of user's sgoinfre directory are rwx------
-if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
+if ! $restore && [ "$sgoinfre_permissions" != "drwx------" ]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_single_key "$prompt_change_permissions"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
@@ -709,7 +709,7 @@ if ! $reverse && [ "$sgoinfre_permissions" != "drwx------" ]; then
 fi
 
 # Check which direction the script should move the directories or files
-if ! $reverse; then
+if ! $restore; then
     source_base="$HOME"
     source_name="home"
     target_base="$sgoinfre"
@@ -770,7 +770,7 @@ for arg in "${args[@]}"; do
         sgoinfre="$sgoinfre_root"
     fi
     # Update variables with updated sgoinfre path
-    if ! $reverse; then
+    if ! $restore; then
         target_base="$sgoinfre"
     else
         source_base="$sgoinfre"
@@ -803,7 +803,7 @@ for arg in "${args[@]}"; do
     # Check if the source directory or file exists
     if [ ! -e "$source_path" ]; then
         # Check if the source directory or file has already been moved to sgoinfre and is missing a symbolic link
-        if ! $reverse && [ -e "$target_path" ]; then
+        if ! $restore && [ -e "$target_path" ]; then
             pretty_print "'${sty_bri_yel}$source_path${sty_res}' has already been moved to sgoinfre."
             pretty_print "It is located at '${sty_bri_gre}$target_path${sty_res}'."
             if prompt_single_key "$prompt_symlink"; then
@@ -843,7 +843,7 @@ for arg in "${args[@]}"; do
     # If the source directory or file has already been moved to sgoinfre, skip it
     if [ -L "$source_path" ]; then
         real_source_path=$(realpath "$source_path")
-        if ! $reverse && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
+        if ! $restore && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
             if ! $no_user_args; then
                 pretty_print "'${sty_bol}${sty_bri_cya}$source_subpath${sty_res}' has already been moved to sgoinfre."
                 pretty_print "It is located at '$real_source_path'."
@@ -875,7 +875,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Check if an existing directory or file would get replaced
-    if [ -e "$target_path" ] && ! ($reverse && [ -L "$target_path" ]); then
+    if [ -e "$target_path" ] && ! ($restore && [ -L "$target_path" ]); then
         pretty_print "$indicator_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
         if ! prompt_with_enter "$prompt_replace"; then
             print_skip_arg "$arg"
@@ -926,7 +926,7 @@ for arg in "${args[@]}"; do
     fi
 
     # When moving files back to home, first remove the symbolic link
-    if $reverse; then
+    if $restore; then
         if [ -L "$target_path" ]; then
             rm -f "$target_path" 2>/dev/null
         fi
@@ -1004,7 +1004,7 @@ for arg in "${args[@]}"; do
     fi
     pretty_print "$indicator_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation_success to '${sty_bri_gre}$target_dirpath${sty_res}'."
 
-    if ! $reverse; then
+    if ! $restore; then
         # Create the symbolic link
         if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
             pretty_print "Symbolic link left behind."
@@ -1031,7 +1031,7 @@ for arg in "${args[@]}"; do
     target_base_size_in_bytes=$(( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes ))
 
     # Print result
-    if ! $reverse; then
+    if ! $restore; then
         outcome_color="${sty_bri_cya}"
     else
         outcome_color="${sty_bri_blu}"
