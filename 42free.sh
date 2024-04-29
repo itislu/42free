@@ -2,16 +2,16 @@
 
 current_version="v1.4.1+dev"
 
-default_args=(\
-"$HOME/.cache" \
-"$HOME/.config/Code/Cache" \
-"$HOME/.config/Code/CachedData" \
-"$HOME/.config/Code/User/workspaceStorage" \
-"$HOME/.var/app/com.discordapp.Discord" \
-"$HOME/.var/app/com.slack.Slack" \
-"$HOME/.var/app/com.brave.Browser/cache" \
-"$HOME/.var/app/com.google.Chrome/cache" \
-"$HOME/.var/app/com.opera.Opera/cache" \
+default_args=(
+"$HOME/.cache"
+"$HOME/.config/Code/Cache"
+"$HOME/.config/Code/CachedData"
+"$HOME/.config/Code/User/workspaceStorage"
+"$HOME/.var/app/com.discordapp.Discord"
+"$HOME/.var/app/com.slack.Slack"
+"$HOME/.var/app/com.brave.Browser/cache"
+"$HOME/.var/app/com.google.Chrome/cache"
+"$HOME/.var/app/com.opera.Opera/cache"
 )
 
 # Standard variables
