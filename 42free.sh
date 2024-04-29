@@ -906,7 +906,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Get the size of the directory or file to be moved
-    pretty_print "Getting the size of $source_basename..."
+    pretty_print "Getting the size of '$source_basename'..."
     size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
     size_in_bytes=$(du -sb "$source_path" 2>/dev/null | cut -f1)
 
