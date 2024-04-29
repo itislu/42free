@@ -229,8 +229,9 @@ if [[ $1 == "update" ]]; then
     pretty_print "${sty_bol}${sty_bri_gre}Update completed.${sty_res}"
 else
     pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
-    pretty_print "You can now use the '${sty_bol}42free${sty_res}' command."
+    pretty_print "You can now use the 42free command in your terminal."
     pretty_print "To see the manual, run '42free --help'."
+    pretty_print "To just start, run '${sty_bol}42free${sty_res}'."
 fi
 
 ft_exit $success
