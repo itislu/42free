@@ -7,6 +7,18 @@
 </div>
 <br>
 
+### Quick Install
+
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
+```
+
+<br>
+
+---
+
+<br>
+
 * [📌 Overview](#-overview)
 * [🛠️ Installation](#%EF%B8%8F-installation)
 * [👩‍💻 Usage](#-usage)
@@ -92,7 +104,7 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 
 > [!TIP]
 > - **Closing all programs first will help to avoid errors during the move.**
-> 
+>
 > - **You can pass options anywhere in your command to change the behavior of 42free.**
 >
 > | Option | Description |
