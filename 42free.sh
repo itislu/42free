@@ -687,9 +687,8 @@ if [[ -z "${args[*]}" ]]; then
     no_user_args=true
 else
     no_user_args=false
+    print_update_info "remind"
 fi
-
-print_update_info "remind"
 
 # Check if sgoinfre exists
 if [[ ! -d "$sgoinfre" ]]; then
