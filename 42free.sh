@@ -23,7 +23,7 @@ script_path="$script_dir/42free.sh"
 sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
 sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
 sgoinfre="$sgoinfre_root"
-sgoinfre_permissions=$(stat -c "%A" "$sgoinfre")
+sgoinfre_permissions=$(stat -c "%A" "$sgoinfre" 2>/dev/null)
 
 # Shell config files
 bash_config="$HOME/.bashrc"
@@ -690,6 +690,16 @@ else
 fi
 
 print_update_info "remind"
+
+# Check if sgoinfre exists
+if [[ ! -d "$sgoinfre" ]]; then
+    pretty_print "$indicator_error${sty_bol} There does not seem to be a sgoinfre directory available on your campus.${sty_res}"
+    pretty_print "If you are sure there is one, please open an issue on GitHub and mention the following things:"
+    pretty_print "  - The campus you are on."
+    pretty_print "  - The path to your sgoinfre directory."
+    pretty_print "${sty_und}${sty_bri_blu}https://github.com/itislu/42free/issues${sty_res}"
+    ft_exit $major_error
+fi
 
 # Check if the permissions of user's sgoinfre directory are rwx------
 if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
