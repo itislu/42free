@@ -759,6 +759,19 @@ for arg in "${args[@]}"; do
         pretty_print "$msg_close_programs"
         pretty_print "To see the manual, run '${sty_bol}42free --help${sty_res}'."
         echo
+
+        # Print all default arguments and prompt user if they agree to all of them
+        pretty_print "${sty_bol}The following directories will be moved to $target_name:${sty_res}"
+        for default_arg in "${default_args[@]}"; do
+            pretty_print "  - $default_arg"
+        done
+        echo
+        if prompt_single_key "Do you agree with all of those? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"; then
+            # This is a temporary solution.
+            # The no_user_args variable is for not displaying errors for paths that do not actually exist.
+            # In order to do it properly, all the default arguments would need to go through all the error checking first before they get printed out.
+            no_user_args=false
+        fi
     fi
 
     # Print delimiter
