@@ -66,7 +66,7 @@ ft_exit()
 {
     if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
-        if [ "$1" -eq 0 ] && [ -x "$SHELL" ]; then
+        if [[ "$1" -eq 0 ]] && [[ -x "$SHELL" ]]; then
             exec $SHELL
         fi
         # If exec failed, inform the user to start a new shell
@@ -100,7 +100,7 @@ else
 fi
 
 # Check if curl or wget is available
-if [ -z "$downloader" ]; then
+if [[ -z "$downloader" ]]; then
     pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
     pretty_print "Please install one of them and try again."
     exit $download_failed
@@ -134,7 +134,7 @@ if { [[ -z "$home_max_size" ]] || [[ "$home_max_size" -eq 0 ]]; } &&
         if [[ $REPLY =~ ^[0-9]+$ ]] && [[ -n ${campus_names_sorted[$REPLY]} ]]; then
             campus_name=${campus_names_sorted[$REPLY]}
             valid_choice=true
-        elif [ -n "$REPLY" ]; then
+        elif [[ -n "$REPLY" ]]; then
             # Check if input is a campus name
             for campus_name in "${campus_names_sorted[@]}"; do
                 name_part="${campus_name#[0-9]* }"
@@ -183,7 +183,7 @@ script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_
 mkdir -p "$dest_dir"
 "$downloader" "$downloader_opts_file" "$dest_dir/$dest_file" "$script_url"
 exit_status=$?
-if [ $exit_status -ne 0 ]; then
+if [[ $exit_status -ne 0 ]]; then
     pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
     exit $download_failed
 fi
@@ -204,7 +204,7 @@ for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
             shell_name="fish"
             ;;
     esac
-    if [ -f "$config_file" ]; then
+    if [[ -f "$config_file" ]]; then
         msg="Added 42free alias to $shell_name."
         add_to_config "$config_file" "alias 42free=" "alias 42free='bash $dest_dir/$dest_file'" "$msg"
         msg="Added HOME_MAX_SIZE environment variable to $shell_name."

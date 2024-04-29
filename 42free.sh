@@ -177,7 +177,7 @@ print_stderr()
 print_one_stderr()
 {
     line=$(head -n 1 <<< "$stderr")
-    if [ -n "$line" ]; then
+    if [[ -n "$line" ]]; then
         pretty_print "STDERR: $line"
     fi
     if [[ $(wc -l <<< "$stderr") -gt 1 ]]; then
@@ -189,7 +189,7 @@ ft_exit()
 {
     if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
-        if [ "$1" -eq 0 ] && [ -x "$SHELL" ]; then
+        if [[ "$1" -eq 0 ]] && [[ -x "$SHELL" ]]; then
             exec $SHELL
         fi
         # If exec failed, inform the user to start a new shell
@@ -267,7 +267,7 @@ cleanup_empty_dirs()
     local dir=$1
 
     find "$dir" -type d -empty -delete 2>/dev/null
-    while [ "$dir" != "$HOME" ] && [ "$dir" != "$sgoinfre" ]; do
+    while [[ "$dir" != "$HOME" ]] && [[ "$dir" != "$sgoinfre" ]]; do
         rmdir "$dir" 2>/dev/null
         dir=$(dirname "$dir")
     done
@@ -447,13 +447,13 @@ print_available_space()
     fi
 
     pretty_print "${sty_bol}${sty_und}Space used:${sty_res}"
-    if [ "$home_max_size" -gt 0 ]; then
+    if [[ "$home_max_size" -gt 0 ]]; then
         home_color=$(calculate_usage_color "$home_size" "$home_max_size")
         printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
     else
         printf "${sty_bol}  %-10s %5.2fGB${sty_res}\n" "Home:" "$home_size"
     fi
-    if [ "$sgoinfre_max_size" -gt 0 ]; then
+    if [[ "$sgoinfre_max_size" -gt 0 ]]; then
         sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
         printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
     else
@@ -469,7 +469,7 @@ get_timestamp()
 get_latest_version_number()
 {
     # Check if curl or wget is available
-    if [ -z "$downloader" ]; then
+    if [[ -z "$downloader" ]]; then
         if [[ "$1" != "quiet" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
             pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
@@ -481,7 +481,7 @@ get_latest_version_number()
     # Fetch the latest version from the git tags on GitHub
     latest_version=$("$downloader" "$downloader_opts_stdout" "https://api.github.com/repos/itislu/42free/tags")
     latest_version=$(echo "$latest_version" | grep -m 1 '"name":' | cut -d '"' -f 4) 2>/dev/null
-    if [ -z "$latest_version" ]; then
+    if [[ -z "$latest_version" ]]; then
         if [[ "$1" != "quiet" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
         fi
@@ -497,7 +497,7 @@ print_update_info()
     local side_border="│"
     local bottom_border="└────────────────────────────────────────────┘"
 
-    if [ -z "$latest_version" ]; then
+    if [[ -z "$latest_version" ]]; then
         latest_version=$(get_latest_version_number "quiet")
     fi
 
@@ -590,7 +590,7 @@ clean_config_files()
                 shell_name="fish"
                 ;;
         esac
-        if [ -f "$config_file" ]; then
+        if [[ -f "$config_file" ]]; then
             if sed -i '/^alias 42free/d' "$config_file" 2>/dev/null; then
                 pretty_print "${sty_yel}42free alias removed from $shell_name.${sty_res}"
             fi
@@ -681,7 +681,7 @@ while (( $# )); do
 done
 
 # Check if the script received any targets
-if [ -z "${args[*]}" ]; then
+if [[ -z "${args[*]}" ]]; then
     update "quiet"
     args=("${default_args[@]}")
     no_user_args=true
@@ -692,7 +692,7 @@ fi
 print_update_info "remind"
 
 # Check if the permissions of user's sgoinfre directory are rwx------
-if ! $restore && [ "$sgoinfre_permissions" != "drwx------" ]; then
+if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_single_key "$prompt_change_permissions"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
@@ -745,7 +745,7 @@ for arg in "${args[@]}"; do
     args_index=$(( args_index + 1 ))
 
     # Print reminder to close all programs first in first iteration of default arguments
-    if [ $args_index -eq 1 ] && $no_user_args; then
+    if [[ $args_index -eq 1 ]] && $no_user_args; then
         pretty_print "$msg_close_programs"
         pretty_print "To see the manual, run '${sty_bol}42free --help${sty_res}'."
         echo
@@ -804,9 +804,9 @@ for arg in "${args[@]}"; do
     target_dirpath=$(dirname "$target_path")
 
     # Check if the source directory or file exists
-    if [ ! -e "$source_path" ]; then
+    if [[ ! -e "$source_path" ]]; then
         # Check if the source directory or file has already been moved to sgoinfre and is missing a symbolic link
-        if ! $restore && [ -e "$target_path" ]; then
+        if ! $restore && [[ -e "$target_path" ]]; then
             pretty_print "'${sty_bri_yel}$source_path${sty_res}' has already been moved to sgoinfre."
             pretty_print "It is located at '${sty_bri_gre}$target_path${sty_res}'."
             if prompt_single_key "$prompt_symlink"; then
@@ -844,7 +844,7 @@ for arg in "${args[@]}"; do
     fi
 
     # If the source directory or file has already been moved to sgoinfre, skip it
-    if [ -L "$source_path" ]; then
+    if [[ -L "$source_path" ]]; then
         real_source_path=$(realpath "$source_path")
         if ! $restore && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
             if ! $no_user_args; then
@@ -859,7 +859,7 @@ for arg in "${args[@]}"; do
     fi
 
     # If no user arguments, ask user if they want to process the current argument
-    if $no_user_args && [ -e "$source_path" ]; then
+    if $no_user_args && [[ -e "$source_path" ]]; then
         pretty_print "This will move '${sty_bol}$source_path${sty_res}' to the $target_name directory."
         if ! prompt_single_key "$prompt_continue"; then
             print_skip_arg "$arg"
@@ -868,7 +868,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Check if the source file is a symbolic link
-    if [ -L "$source_path" ]; then
+    if [[ -L "$source_path" ]]; then
         pretty_print "$indicator_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
@@ -878,7 +878,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Check if an existing directory or file would get replaced
-    if [ -e "$target_path" ] && ! ($restore && [ -L "$target_path" ]); then
+    if [[ -e "$target_path" ]] && ! ($restore && [[ -L "$target_path" ]]); then
         pretty_print "$indicator_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
         if ! prompt_with_enter "$prompt_replace"; then
             print_skip_arg "$arg"
@@ -888,7 +888,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Get the current sizes of the source and target base directories
-    if [ -z "$target_base_size_in_bytes" ]; then
+    if [[ -z "$target_base_size_in_bytes" ]]; then
         pretty_print "Getting the current sizes of the $source_name and $target_name directories..."
 
         tmpfile_source_base_size="/tmp/42free~source_base_size"
@@ -930,10 +930,10 @@ for arg in "${args[@]}"; do
 
     # When moving files back to home, first remove the symbolic link
     if $restore; then
-        if [ -L "$target_path" ]; then
+        if [[ -L "$target_path" ]]; then
             rm -f "$target_path" 2>/dev/null
         fi
-        if [ -L "$target_path~42free_tmp~" ]; then
+        if [[ -L "$target_path~42free_tmp~" ]]; then
             rm -f "$target_path~42free_tmp~" 2>/dev/null
         fi
     fi
@@ -944,7 +944,7 @@ for arg in "${args[@]}"; do
         print_stderr
         syscmd_failed=true
         # If not last argument, ask user if they want to continue with the other arguments
-        if [ $args_index -lt $args_amount ] && ! prompt_with_enter "$prompt_continue_with_rest"; then
+        if [[ $args_index -lt $args_amount ]] && ! prompt_with_enter "$prompt_continue_with_rest"; then
             pretty_print "Skipping the rest of the arguments."
             break
         fi
@@ -955,7 +955,7 @@ for arg in "${args[@]}"; do
     if ! move_files "$source_path" "$target_dirpath" "$operation"; then
         pretty_print "$indicator_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
         print_one_stderr
-        if [ -d "$source_path" ]; then
+        if [[ -d "$source_path" ]]; then
             # Rename the directory with the files that could not be moved
             source_old="$source_path~42free-old_$(get_timestamp)~"
             if mv -T "$source_path" "$source_old" 2>/dev/null; then
@@ -996,7 +996,7 @@ for arg in "${args[@]}"; do
         fi
 
         # If not last argument, ask user if they want to continue with the other arguments
-        if [ $args_index -lt $args_amount ] && ! prompt_with_enter "$prompt_continue_with_rest"; then
+        if [[ $args_index -lt $args_amount ]] && ! prompt_with_enter "$prompt_continue_with_rest"; then
             pretty_print "Skipping the rest of the arguments."
             break
         fi
@@ -1022,7 +1022,7 @@ for arg in "${args[@]}"; do
                 print_stderr
             fi
             # If not last argument, ask user if they want to continue with the other arguments
-            if [ $args_index -lt $args_amount ] && ! prompt_with_enter "$prompt_continue_with_rest"; then
+            if [[ $args_index -lt $args_amount ]] && ! prompt_with_enter "$prompt_continue_with_rest"; then
                 pretty_print "Skipping the rest of the arguments."
                 break
             fi
