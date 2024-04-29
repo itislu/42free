@@ -212,7 +212,7 @@ prompt_with_enter()
 {
     pretty_print "$1"
     read -rp "> "
-    if [[ $REPLY =~ ^[Yy](es)?$ ]]; then
+    if [[ $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
         return 0
     fi
     return 1
