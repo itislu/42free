@@ -177,7 +177,9 @@ print_stderr()
 print_one_stderr()
 {
     line=$(head -n 1 <<< "$stderr")
-    pretty_print "STDERR: $line"
+    if [ -n "$line" ]; then
+        pretty_print "STDERR: $line"
+    fi
     if [[ $(wc -l <<< "$stderr") -gt 1 ]]; then
         pretty_print "STDERR: ..."
     fi
