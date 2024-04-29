@@ -12,7 +12,6 @@ default_args=(\
 "$HOME/.var/app/com.brave.Browser/cache" \
 "$HOME/.var/app/com.google.Chrome/cache" \
 "$HOME/.var/app/com.opera.Opera/cache" \
-"$HOME/.var/app/org.mozilla.firefox/cache" \
 )
 
 # Standard variables
