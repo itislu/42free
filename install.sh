@@ -66,7 +66,7 @@ ft_exit()
 {
     if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
-        if [[ "$1" -eq 0 ]] && [[ -x "$SHELL" ]]; then
+        if [[ $1 -eq 0 ]] && [[ -x "$SHELL" ]]; then
             exec $SHELL
         fi
         # If exec failed, inform the user to start a new shell
@@ -107,8 +107,8 @@ if [[ -z "$downloader" ]]; then
 fi
 
 # Prompt user to choose their campus if max sizes are 0 or not known
-if { [[ -z "$home_max_size" ]] || [[ "$home_max_size" -eq 0 ]]; } &&
-   { [[ -z "$sgoinfre_max_size" ]] || [[ "$sgoinfre_max_size" -eq 0 ]]; }; then
+if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
+   { [[ -z "$sgoinfre_max_size" ]] || [[ $sgoinfre_max_size -eq 0 ]]; }; then
     # Sort campus names by keys
     mapfile -t campus_names_sorted < <(printf '%s\n' "${!campus_dict[@]}" | sort)
 
@@ -161,7 +161,7 @@ for dir in home sgoinfre; do
     max_size_var_name="${dir}_max_size"
 
     # If a max size still 0 or not known, prompt user to enter it
-    if [[ -z "${!max_size_var_name}" ]] || [[ "${!max_size_var_name}" -eq 0 ]]; then
+    if [[ -z "${!max_size_var_name}" ]] || [[ ${!max_size_var_name} -eq 0 ]]; then
         while true; do
             pretty_print "Enter the maximum allowed size of your ${sty_bol}$dir${sty_res} directory in GB:"
             read -rp "> "

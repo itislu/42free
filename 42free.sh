@@ -189,7 +189,7 @@ ft_exit()
 {
     if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
-        if [[ "$1" -eq 0 ]] && [[ -x "$SHELL" ]]; then
+        if [[ $1 -eq 0 ]] && [[ -x "$SHELL" ]]; then
             exec $SHELL
         fi
         # If exec failed, inform the user to start a new shell
@@ -447,13 +447,13 @@ print_available_space()
     fi
 
     pretty_print "${sty_bol}${sty_und}Space used:${sty_res}"
-    if [[ "$home_max_size" -gt 0 ]]; then
+    if [[ $home_max_size -gt 0 ]]; then
         home_color=$(calculate_usage_color "$home_size" "$home_max_size")
         printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
     else
         printf "${sty_bol}  %-10s %5.2fGB${sty_res}\n" "Home:" "$home_size"
     fi
-    if [[ "$sgoinfre_max_size" -gt 0 ]]; then
+    if [[ $sgoinfre_max_size -gt 0 ]]; then
         sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
         printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
     else
