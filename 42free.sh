@@ -758,7 +758,7 @@ for arg in "${args[@]}"; do
     need_delim=true
 
     # Check if argument is an absolute or relative path
-    if [[ "$arg" = /* ]]; then
+    if [[ "$arg" == /* ]]; then
         arg_path="$arg"
         invalid_path_msg="$indicator_error Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
     else
@@ -767,7 +767,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Make sure all defined mount points of sgoinfre work with the script
-    if [[ "$arg_path" = $sgoinfre_alt/* ]]; then
+    if [[ "$arg_path" == $sgoinfre_alt/* ]]; then
         sgoinfre="$sgoinfre_alt"
     else
         sgoinfre="$sgoinfre_root"
@@ -780,12 +780,12 @@ for arg in "${args[@]}"; do
     fi
 
     # Construct the source and target paths
-    if [[ "$arg_path" = $source_base/* ]]; then
+    if [[ "$arg_path" == $source_base/* ]]; then
         source_path="$arg_path"
         source_subpath="${source_path#"$source_base/"}"
         target_path="$target_base/$source_subpath"
         target_subpath="${target_path#"$target_base/"}"
-    elif [[ "$arg_path" = $target_base/* ]]; then
+    elif [[ "$arg_path" == $target_base/* ]]; then
         target_path="$arg_path"
         target_subpath="${target_path#"$target_base/"}"
         source_path="$source_base/$target_subpath"
@@ -834,8 +834,8 @@ for arg in "${args[@]}"; do
     arg_dirpath=$(dirname "$arg_path")
     real_arg_dirpath=$(realpath "$arg_dirpath")
     real_arg_path=$(realpath "$arg_path")
-    if { [[ "$arg_path" = $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
-       { [[ "$arg_path" = $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
+    if { [[ "$arg_path" == $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
+       { [[ "$arg_path" == $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
         pretty_print "$indicator_error '$source_subpath' is already in the $target_name directory."
         pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
         print_skip_arg "$arg"
