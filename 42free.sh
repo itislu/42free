@@ -152,8 +152,11 @@ msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoin
 
 msg_close_programs="${sty_bol}${sty_bri_yel}Close all programs first to avoid errors during the move.${sty_res}"
 
+msg_manual_reminder="To see the manual, run '${sty_bol}42free --help${sty_res}'."
+
 # Prompts
 prompt_update="Do you wish to update? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
+prompt_agree_all="Do you agree with all of those? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
 prompt_continue="Do you wish to continue? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
 prompt_continue_still="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
@@ -767,7 +770,7 @@ for arg in "${args[@]}"; do
     # Print reminder to close all programs first in first iteration of default arguments
     if [[ $args_index -eq 1 ]] && $no_user_args; then
         pretty_print "$msg_close_programs"
-        pretty_print "To see the manual, run '${sty_bol}42free --help${sty_res}'."
+        pretty_print "$msg_manual_reminder"
         echo
 
         # Print all default arguments and prompt user if they agree to all of them
@@ -776,7 +779,7 @@ for arg in "${args[@]}"; do
             pretty_print "  - $default_arg"
         done
         echo
-        if prompt_single_key "Do you agree with all of those? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"; then
+        if prompt_single_key "$prompt_agree_all"; then
             # This is a temporary solution.
             # The no_user_args variable is for not displaying errors for paths that do not actually exist.
             # In order to do it properly, all the default arguments would need to go through all the error checking first before they get printed out.
