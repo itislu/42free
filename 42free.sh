@@ -604,13 +604,16 @@ clean_config_files()
                 ;;
         esac
         if [[ -f "$config_file" ]]; then
-            if sed -i '/^alias 42free/d' "$config_file" 2>/dev/null; then
+            if grep -q "alias 42free=" "$config_file" 2>/dev/null; then
+                sed -i '/^alias 42free/d' "$config_file" 2>/dev/null
                 pretty_print "${sty_yel}42free alias removed from $shell_name.${sty_res}"
             fi
-            if sed -i '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null; then
+            if grep -q "^export HOME_MAX_SIZE=" "$config_file" 2>/dev/null; then
+                sed -i '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null
                 pretty_print "${sty_yel}HOME_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
             fi
-            if sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null; then
+            if grep -q "^export SGOINFRE_MAX_SIZE=" "$config_file" 2>/dev/null; then
+                sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null
                 pretty_print "${sty_yel}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
             fi
         fi
