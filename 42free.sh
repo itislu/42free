@@ -238,6 +238,16 @@ prompt_restore()
     return $(( ! $? ))
 }
 
+# Convert the base path of the default arguments
+convert_default_args()
+{
+    local replacement_base=$1
+
+    for i in "${!default_args[@]}"; do
+        default_args[i]="${default_args[i]/$HOME/$replacement_base}"
+    done
+}
+
 move_files()
 {
     local source_path=$1
@@ -739,6 +749,7 @@ else
     operation="restoring"
     operation_success="restored"
     outcome="occupied"
+    convert_default_args "$sgoinfre"
 fi
 
 # Print header
