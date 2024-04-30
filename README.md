@@ -166,6 +166,8 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 - If you want to report a bug, please open an [Issue](https://github.com/itislu/42free/issues) or create a [Pull Request](https://github.com/itislu/42free/pulls) with a possible fix!
   <br>
   I'm super grateful for any and all contributions.
+  <br>
+  If your changes get merged, you will also be mentioned as a contributor in the [release notes](https://github.com/itislu/42free/releases)!
 
 <br>
 
