@@ -233,14 +233,6 @@ prompt_single_key()
     return 1
 }
 
-prompt_restore()
-{
-    pretty_print "Do you wish to leave it like that? [${bold}y${reset}/${bold}N${reset}]"
-    pretty_print "- Selecting ${bold}no${reset} will restore what was already moved to the $target_name directory back to the $source_name directory."
-    prompt_with_enter
-    return $(( ! $? ))
-}
-
 # Convert the base path of the default arguments
 convert_default_args()
 {
@@ -1017,7 +1009,7 @@ for arg in "${args[@]}"; do
             pretty_print "${bold}$outcome_size${reset} of ${bold}$size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
-            if prompt_restore; then
+            if prompt_with_enter "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory? [${bold}y${reset}/${bold}N${reset}]"; then
                 rm -f "$link" 2>/dev/null;
                 mv -T "$source_old" "$source_path" 2>/dev/null
                 if ! move_files "$target_path" "$source_dirpath" "restoring"; then
