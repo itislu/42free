@@ -77,13 +77,13 @@ bright_blue="\e[94m"
 bright_cyan="\e[96m"
 
 header="
-               ${bold}${bright_yellow}📁  42free  📁${reset}"
+                ${bold}${bright_yellow}📁  42free  📁${reset}"
 tagline="\
-           ${bold}${bright_yellow}Never run \`ncdu\` again${reset}"
+            ${bold}${bright_yellow}Never run \`ncdu\` again${reset}"
 delim_small="\
-      --------------------------------"
+       --------------------------------"
 delim_big="\
-    ${underlined}                                    ${reset}"
+     ${underlined}                                    ${reset}"
 
 # Indicators
 indicator_error="${bold}${red}ERROR:${reset}"
