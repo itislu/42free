@@ -64,31 +64,31 @@ syscmd_failed=false
 changed_config=false
 printed_update_info=false
 
-# Colors and styles
-sty_res="\e[0m"
-sty_bol="\e[1m"
-sty_und="\e[4m"
-sty_red="\e[31m"
-sty_yel="\e[33m"
-sty_bri_red="\e[91m"
-sty_bri_gre="\e[92m"
-sty_bri_yel="\e[93m"
-sty_bri_blu="\e[94m"
-sty_bri_cya="\e[96m"
+# Text formatting
+reset="\e[0m"
+bold="\e[1m"
+underlined="\e[4m"
+red="\e[31m"
+yellow="\e[33m"
+bright_red="\e[91m"
+bright_green="\e[92m"
+bright_yellow="\e[93m"
+bright_blue="\e[94m"
+bright_cyan="\e[96m"
 
 header="
-               ${sty_bol}${sty_bri_yel}📁  42free  📁${sty_res}"
+               ${bold}${bright_yellow}📁  42free  📁${reset}"
 tagline="\
-           ${sty_bol}${sty_bri_yel}Never run \`ncdu\` again${sty_res}"
+           ${bold}${bright_yellow}Never run \`ncdu\` again${reset}"
 delim_small="\
       --------------------------------"
 delim_big="\
-    ${sty_und}                                    ${sty_res}"
+    ${underlined}                                    ${reset}"
 
 # Indicators
-indicator_error="${sty_bol}${sty_red}ERROR:${sty_res}"
-indicator_warning="${sty_bol}${sty_bri_yel}WARNING:${sty_res}"
-indicator_success="${sty_bol}${sty_bri_gre}SUCCESS:${sty_res}"
+indicator_error="${bold}${red}ERROR:${reset}"
+indicator_warning="${bold}${bright_yellow}WARNING:${reset}"
+indicator_success="${bold}${bright_green}SUCCESS:${reset}"
 
 # Messages
 msg_manual="\
@@ -104,13 +104,13 @@ All programs will then access them through the symlink and they will accumulate 
 
 $delim_small
 
-${sty_bol}${sty_und}Usage:${sty_res} ${sty_bol}42free${sty_res} [target1 target2 ...]
+${bold}${underlined}Usage:${reset} ${bold}42free${reset} [target1 target2 ...]
     If no arguments are given, 42free will make some suggestions.
     Target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
     Closing all programs first will help to avoid errors during the move.
 
-${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the arguments.
+${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
     -r, --restore    Move the directories and files back to their original
                      location in home.
     -m, --max-size   Change the warning sizes for the home and sgoinfre
@@ -122,7 +122,7 @@ ${sty_bol}${sty_und}Options:${sty_res} You can pass options anywhere in the argu
         --uninstall  Uninstall 42free.
     --               Stop interpreting options.
 
-${sty_bol}${sty_und}Error codes:${sty_res}
+${bold}${underlined}Error codes:${reset}
     1 - Input error
         An argument was invalid.
           (no arguments, unknown option, invalid path, file does not exist)
@@ -135,34 +135,34 @@ ${sty_bol}${sty_und}Error codes:${sty_res}
 
 $delim_small
 
-To contribute, report bugs or share improvement ideas, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}.
+To contribute, report bugs or share improvement ideas, visit ${underlined}${bright_blue}https://github.com/itislu/42free${reset}.
 \n"
 
 msg_version="\
-${sty_bol}42free $current_version${sty_res}
+${bold}42free $current_version${reset}
 A script made for 42 students to take advantage of symbolic links to free up storage without data loss.
-For more information, visit ${sty_und}${sty_bri_blu}https://github.com/itislu/42free${sty_res}."
+For more information, visit ${underlined}${bright_blue}https://github.com/itislu/42free${reset}."
 
 msg_sgoinfre_permissions="\
-$indicator_warning The permissions of your personal sgoinfre directory are not set to '${sty_bol}rwx------${sty_res}'.
-They are currently set to '${sty_bol}$sgoinfre_permissions${sty_res}'.
-It is ${sty_bol}highly${sty_res} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
+$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'.
+They are currently set to '${bold}$sgoinfre_permissions${reset}'.
+It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
 
 msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
 
-msg_close_programs="${sty_bol}${sty_bri_yel}Close all programs first to avoid errors during the move.${sty_res}"
+msg_close_programs="${bold}${bright_yellow}Close all programs first to avoid errors during the move.${reset}"
 
-msg_manual_reminder="To see the manual, run '${sty_bol}42free --help${sty_res}'."
+msg_manual_reminder="To see the manual, run '${bold}42free --help${reset}'."
 
 # Prompts
-prompt_update="Do you wish to update? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_agree_all="Do you agree with all of those? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_continue="Do you wish to continue? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_continue_still="Do you still wish to continue? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
-prompt_continue_with_rest="Do you wish to continue with the other arguments? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
-prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${sty_bol}rwx------${sty_res}'? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_symlink="Do you wish to create a symbolic link to it? [${sty_bol}Y${sty_res}/${sty_bol}n${sty_res}]"
-prompt_replace="Do you wish to continue and replace any duplicate files? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
+prompt_update="Do you wish to update? [${bold}Y${reset}/${bold}n${reset}]"
+prompt_agree_all="Do you agree with all of those? [${bold}Y${reset}/${bold}n${reset}]"
+prompt_continue="Do you wish to continue? [${bold}Y${reset}/${bold}n${reset}]"
+prompt_continue_still="Do you still wish to continue? [${bold}y${reset}/${bold}N${reset}]"
+prompt_continue_with_rest="Do you wish to continue with the other arguments? [${bold}y${reset}/${bold}N${reset}]"
+prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'? [${bold}Y${reset}/${bold}n${reset}]"
+prompt_symlink="Do you wish to create a symbolic link to it? [${bold}Y${reset}/${bold}n${reset}]"
+prompt_replace="Do you wish to continue and replace any duplicate files? [${bold}y${reset}/${bold}N${reset}]"
 
 # Automatically detect the size of the terminal window and preserve word boundaries at the edges
 pretty_print()
@@ -235,8 +235,8 @@ prompt_single_key()
 
 prompt_restore()
 {
-    pretty_print "Do you wish to leave it like that? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"
-    pretty_print "- Selecting ${sty_bol}no${sty_res} will restore what was already moved to the $target_name directory back to the $source_name directory."
+    pretty_print "Do you wish to leave it like that? [${bold}y${reset}/${bold}N${reset}]"
+    pretty_print "- Selecting ${bold}no${reset} will restore what was already moved to the $target_name directory back to the $source_name directory."
     prompt_with_enter
     return $(( ! $? ))
 }
@@ -426,13 +426,13 @@ calculate_usage_color()
     percentage=$(awk -v s="$size" -v ms="$max_size" 'BEGIN { printf "%.2f", s / ms * 100 }')
 
     if (( $(echo "$percentage >= 100" | bc -l) )); then
-        color="${sty_red}"
+        color="${red}"
     elif (( $(echo "$percentage >= 90" | bc -l) )); then
-        color="${sty_bri_red}"
+        color="${bright_red}"
     elif (( $(echo "$percentage >= 80" | bc -l) )); then
-        color="${sty_bri_yel}"
+        color="${bright_yellow}"
     else
-        color="${sty_bri_gre}"
+        color="${bright_green}"
     fi
     echo "$color"
 }
@@ -459,18 +459,18 @@ print_available_space()
         sgoinfre_size=$source_base_size
     fi
 
-    pretty_print "${sty_bol}${sty_und}Space used:${sty_res}"
+    pretty_print "${bold}${underlined}Space used:${reset}"
     if [[ $home_max_size -gt 0 ]]; then
         home_color=$(calculate_usage_color "$home_size" "$home_max_size")
-        printf "${sty_bol}  %-10s ${home_color}%5.2f${sty_res}${sty_bol}/%dGB${sty_res}\n" "Home:" "$home_size" "$home_max_size"
+        printf "${bold}  %-10s ${home_color}%5.2f${reset}${bold}/%dGB${reset}\n" "Home:" "$home_size" "$home_max_size"
     else
-        printf "${sty_bol}  %-10s %5.2fGB${sty_res}\n" "Home:" "$home_size"
+        printf "${bold}  %-10s %5.2fGB${reset}\n" "Home:" "$home_size"
     fi
     if [[ $sgoinfre_max_size -gt 0 ]]; then
         sgoinfre_color=$(calculate_usage_color "$sgoinfre_size" "$sgoinfre_max_size")
-        printf "${sty_bol}  %-10s ${sgoinfre_color}%5.2f${sty_res}${sty_bol}/%dGB\n${sty_res}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
+        printf "${bold}  %-10s ${sgoinfre_color}%5.2f${reset}${bold}/%dGB\n${reset}" "Sgoinfre:" "$sgoinfre_size" "$sgoinfre_max_size"
     else
-        printf "${sty_bol}  %-10s %5.2fGB${sty_res}\n" "Sgoinfre:" "$sgoinfre_size"
+        printf "${bold}  %-10s %5.2fGB${reset}\n" "Sgoinfre:" "$sgoinfre_size"
     fi
 }
 
@@ -485,7 +485,7 @@ get_latest_version_number()
     if [[ -z "$downloader" ]]; then
         if [[ "$1" != "quiet" ]]; then
             pretty_print "$indicator_error Cannot check for updates."
-            pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
+            pretty_print "Neither ${bold}${red}curl${reset} nor ${bold}${red}wget${reset} was found."
             pretty_print "Please install one of them and try again."
         fi
         return $major_error
@@ -520,13 +520,13 @@ print_update_info()
             return
         fi
         pretty_print "$top_border"
-        pretty_print "$side_border ${sty_bol}${sty_und}${sty_bri_yel}A new version of 42free is available.${sty_res}      $side_border"
-        pretty_print "$side_border Current version: ${sty_bol}${current_version#v}${sty_res}                     $side_border"
-        pretty_print "$side_border Latest version: ${sty_bol}${latest_version#v}${sty_res}                      $side_border"
+        pretty_print "$side_border ${bold}${underlined}${bright_yellow}A new version of 42free is available.${reset}      $side_border"
+        pretty_print "$side_border Current version: ${bold}${current_version#v}${reset}                     $side_border"
+        pretty_print "$side_border Latest version: ${bold}${latest_version#v}${reset}                      $side_border"
         pretty_print "$side_border To see the changelog, visit                $side_border"
-        pretty_print "$side_border ${sty_und}${sty_bri_blu}https://github.com/itislu/42free/releases${sty_res}. $side_border"
+        pretty_print "$side_border ${underlined}${bright_blue}https://github.com/itislu/42free/releases${reset}. $side_border"
         if [[ "$1" == "remind" ]]; then
-            pretty_print "$side_border Run '42free --update' to update.${sty_res}           $side_border"
+            pretty_print "$side_border Run '42free --update' to update.${reset}           $side_border"
         fi
         pretty_print "$bottom_border"
         printed_update_info=true
@@ -565,13 +565,13 @@ change_max_sizes()
 
         # Prompt user for the maximum allowed size of the directory
         while true; do
-            pretty_print "Enter the maximum allowed size of your ${sty_bol}$dir${sty_res} directory in GB:"
+            pretty_print "Enter the maximum allowed size of your ${bold}$dir${reset} directory in GB:"
             read -rp "> "
             if [[ $REPLY =~ ^[0-9]+$ ]]; then
                 declare "$max_size_var_name=$REPLY"
                 break
             fi
-            pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
+            pretty_print "${bold}${red}Invalid input. Please enter a number.${reset}"
         done
 
         # Change MAX_SIZE in all shell config files
@@ -582,7 +582,7 @@ change_max_sizes()
         done
 
         if $changed_max_size; then
-            pretty_print "${sty_yel}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${sty_res}"
+            pretty_print "${yellow}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${reset}"
             changed_config=true
         fi
     done
@@ -606,15 +606,15 @@ clean_config_files()
         if [[ -f "$config_file" ]]; then
             if grep -q "alias 42free=" "$config_file" 2>/dev/null; then
                 sed -i '/^alias 42free=/d' "$config_file" 2>/dev/null
-                pretty_print "${sty_yel}42free alias removed from $shell_name.${sty_res}"
+                pretty_print "${yellow}42free alias removed from $shell_name.${reset}"
             fi
             if grep -q "^export HOME_MAX_SIZE=" "$config_file" 2>/dev/null; then
                 sed -i '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null
-                pretty_print "${sty_yel}HOME_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
+                pretty_print "${yellow}HOME_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE_MAX_SIZE=" "$config_file" 2>/dev/null; then
                 sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null
-                pretty_print "${sty_yel}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${sty_res}"
+                pretty_print "${yellow}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
         fi
     done
@@ -622,10 +622,10 @@ clean_config_files()
 
 uninstall()
 {
-    if prompt_with_enter "Do you wish to uninstall 42free? [${sty_bol}y${sty_res}/${sty_bol}N${sty_res}]"; then
+    if prompt_with_enter "Do you wish to uninstall 42free? [${bold}y${reset}/${bold}N${reset}]"; then
         pretty_print "Uninstalling 42free..."
         if stderr=$(rm -f "$script_path" 2>&1); then
-            pretty_print "${sty_yel}Script deleted.${sty_res}"
+            pretty_print "${yellow}Script deleted.${reset}"
             # If script_dir is empty, remove it
             find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
             clean_config_files
@@ -708,11 +708,11 @@ fi
 
 # Check if sgoinfre exists
 if [[ ! -d "$sgoinfre" ]]; then
-    pretty_print "$indicator_error${sty_bol} There does not seem to be a sgoinfre directory available on your campus.${sty_res}"
+    pretty_print "$indicator_error${bold} There does not seem to be a sgoinfre directory available on your campus.${reset}"
     pretty_print "If you are sure there is one, please open an issue on GitHub and mention the following things:"
     pretty_print "  - The campus you are on."
     pretty_print "  - The path to your sgoinfre directory."
-    pretty_print "${sty_und}${sty_bri_blu}https://github.com/itislu/42free/issues${sty_res}"
+    pretty_print "${underlined}${bright_blue}https://github.com/itislu/42free/issues${reset}"
     ft_exit $major_error
 fi
 
@@ -721,7 +721,7 @@ if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_single_key "$prompt_change_permissions"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
-            pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${sty_bol}rwx------${sty_res}'."
+            pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${bold}rwx------${reset}'."
         else
             pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
             print_stderr
@@ -777,7 +777,7 @@ for arg in "${args[@]}"; do
         echo
 
         # Print all default arguments and prompt user if they agree to all of them
-        pretty_print "${sty_bol}The following directories will be moved to $target_name:${sty_res}"
+        pretty_print "${bold}The following directories will be moved to $target_name:${reset}"
         for default_arg in "${default_args[@]}"; do
             pretty_print "  - $default_arg"
         done
@@ -799,10 +799,10 @@ for arg in "${args[@]}"; do
     # Check if argument is an absolute or relative path
     if [[ "$arg" == /* ]]; then
         arg_path="$arg"
-        invalid_path_msg="$indicator_error Absolute paths have to lead to a path in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
+        invalid_path_msg="$indicator_error Absolute paths have to lead to a path in your ${bold}home${reset} or ${bold}sgoinfre${reset} directory."
     else
         arg_path="$current_dir/$arg"
-        invalid_path_msg="$indicator_error The current directory is not in your ${sty_bol}home${sty_res} or ${sty_bol}sgoinfre${sty_res} directory."
+        invalid_path_msg="$indicator_error The current directory is not in your ${bold}home${reset} or ${bold}sgoinfre${reset} directory."
     fi
 
     # Make sure all defined mount points of sgoinfre work with the script
@@ -846,8 +846,8 @@ for arg in "${args[@]}"; do
     if [[ ! -e "$source_path" ]]; then
         # Check if the source directory or file has already been moved to sgoinfre and is missing a symbolic link
         if ! $restore && [[ -e "$target_path" ]]; then
-            pretty_print "'${sty_bri_yel}$source_path${sty_res}' has already been moved to sgoinfre."
-            pretty_print "It is located at '${sty_bri_gre}$target_path${sty_res}'."
+            pretty_print "'${bright_yellow}$source_path${reset}' has already been moved to sgoinfre."
+            pretty_print "It is located at '${bright_green}$target_path${reset}'."
             if prompt_single_key "$prompt_symlink"; then
                 if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
                     pretty_print "$indicator_success Symbolic link created."
@@ -861,7 +861,7 @@ for arg in "${args[@]}"; do
                 arg_skipped=true
             fi
         elif ! $no_user_args; then
-            pretty_print "$indicator_error '${sty_bri_red}$source_path${sty_res}' does not exist."
+            pretty_print "$indicator_error '${bright_red}$source_path${reset}' does not exist."
             bad_input=true
         else
             need_delim=false
@@ -876,7 +876,7 @@ for arg in "${args[@]}"; do
     if { [[ "$arg_path" == $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
        { [[ "$arg_path" == $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
         pretty_print "$indicator_error '$source_subpath' is already in the $target_name directory."
-        pretty_print "Real path: '${sty_bol}$real_arg_path${sty_res}'."
+        pretty_print "Real path: '${bold}$real_arg_path${reset}'."
         print_skip_arg "$arg"
         bad_input=true
         continue
@@ -887,7 +887,7 @@ for arg in "${args[@]}"; do
         real_source_path=$(realpath "$source_path")
         if ! $restore && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
             if ! $no_user_args; then
-                pretty_print "'${sty_bol}${sty_bri_cya}$source_subpath${sty_res}' has already been moved to sgoinfre."
+                pretty_print "'${bold}${bright_cyan}$source_subpath${reset}' has already been moved to sgoinfre."
                 pretty_print "It is located at '$real_source_path'."
                 print_skip_arg "$arg"
             else
@@ -899,7 +899,7 @@ for arg in "${args[@]}"; do
 
     # If no user arguments, ask user if they want to process the current argument
     if $no_user_args && [[ -e "$source_path" ]]; then
-        pretty_print "This will move '${sty_bol}$source_path${sty_res}' to the $target_name directory."
+        pretty_print "This will move '${bold}$source_path${reset}' to the $target_name directory."
         if ! prompt_single_key "$prompt_continue"; then
             print_skip_arg "$arg"
             continue
@@ -908,7 +908,7 @@ for arg in "${args[@]}"; do
 
     # Check if the source file is a symbolic link
     if [[ -L "$source_path" ]]; then
-        pretty_print "$indicator_warning '${sty_bol}${sty_bri_cya}$source_path${sty_res}' is a symbolic link."
+        pretty_print "$indicator_warning '${bold}${bright_cyan}$source_path${reset}' is a symbolic link."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -918,7 +918,7 @@ for arg in "${args[@]}"; do
 
     # Check if an existing directory or file would get replaced
     if [[ -e "$target_path" ]] && ! ($restore && [[ -L "$target_path" ]]); then
-        pretty_print "$indicator_warning '${sty_bol}$source_subpath${sty_res}' already exists in the $target_name directory."
+        pretty_print "$indicator_warning '${bold}$source_subpath${reset}' already exists in the $target_name directory."
         if ! prompt_with_enter "$prompt_replace"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -959,7 +959,7 @@ for arg in "${args[@]}"; do
 
     # Check if the target directory would go above its maximum recommended size
     if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
-        pretty_print "$indicator_warning ${operation^} '${sty_bol}$source_subpath${sty_res}' would cause the ${sty_bol}$target_name${sty_res} directory to go above ${sty_bol}${target_max_size}GB${sty_res}."
+        pretty_print "$indicator_warning ${operation^} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
@@ -992,14 +992,14 @@ for arg in "${args[@]}"; do
 
     # Move the files
     if ! move_files "$source_path" "$target_dirpath" "$operation"; then
-        pretty_print "$indicator_error Could not fully move '${sty_bol}$source_basename${sty_res}' to '${sty_bol}$target_dirpath${sty_res}'."
+        pretty_print "$indicator_error Could not fully move '${bold}$source_basename${reset}' to '${bold}$target_dirpath${reset}'."
         print_one_stderr
         if [[ -d "$source_path" ]]; then
             # Rename the directory with the files that could not be moved
             source_old="$source_path~42free-old_$(get_timestamp)~"
             if mv -T "$source_path" "$source_old" 2>/dev/null; then
                 link="$source_path"
-                link_create_msg="Symbolic link created and the files that could not be moved are left in '${sty_bol}$source_old${sty_res}'."
+                link_create_msg="Symbolic link created and the files that could not be moved are left in '${bold}$source_old${reset}'."
             else
                 source_old="$source_path"
                 link="$source_path~42free_tmp~"
@@ -1014,7 +1014,7 @@ for arg in "${args[@]}"; do
             leftover_size_in_bytes=$(du -sb "$source_old" 2>/dev/null | cut -f1)
             outcome_size_in_bytes=$(( size_in_bytes - leftover_size_in_bytes ))
             outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_bytes)"
-            pretty_print "${sty_bol}$outcome_size${sty_res} of ${sty_bol}$size${sty_res} $outcome."
+            pretty_print "${bold}$outcome_size${reset} of ${bold}$size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
             if prompt_restore; then
@@ -1023,12 +1023,12 @@ for arg in "${args[@]}"; do
                 if ! move_files "$target_path" "$source_dirpath" "restoring"; then
                     pretty_print "$indicator_error Could not fully restore '$source_basename' to '$source_dirpath'."
                     print_one_stderr
-                    pretty_print "The rest of the partial copy is left in '${sty_bol}$target_path${sty_res}'."
+                    pretty_print "The rest of the partial copy is left in '${bold}$target_path${reset}'."
                 else
-                    pretty_print "'${sty_bol}$source_basename${sty_res}' has been restored to '${sty_bol}$source_dirpath${sty_res}'."
+                    pretty_print "'${bold}$source_basename${reset}' has been restored to '${bold}$source_dirpath${reset}'."
                 fi
             else
-                pretty_print "Try to close all programs and move the rest from '${sty_bol}$source_old${sty_res}' manually."
+                pretty_print "Try to close all programs and move the rest from '${bold}$source_old${reset}' manually."
             fi
         else
             pretty_print "Try to close all programs and try again."
@@ -1044,7 +1044,7 @@ for arg in "${args[@]}"; do
         unset target_base_size_in_bytes
         continue
     fi
-    pretty_print "$indicator_success '${sty_bri_yel}$source_basename${sty_res}' successfully $operation_success to '${sty_bri_gre}$target_dirpath${sty_res}'."
+    pretty_print "$indicator_success '${bright_yellow}$source_basename${reset}' successfully $operation_success to '${bright_green}$target_dirpath${reset}'."
 
     if ! $restore; then
         # Create the symbolic link
@@ -1074,11 +1074,11 @@ for arg in "${args[@]}"; do
 
     # Print result
     if ! $restore; then
-        outcome_color="${sty_bri_cya}"
+        outcome_color="${bright_cyan}"
     else
-        outcome_color="${sty_bri_blu}"
+        outcome_color="${bright_blue}"
     fi
-    pretty_print "${sty_bol}${outcome_color}$size $outcome.${sty_res}"
+    pretty_print "${bold}${outcome_color}$size $outcome.${reset}"
     print_available_space "$source_base_size_in_bytes" "$target_base_size_in_bytes"
 
 # Process the next argument

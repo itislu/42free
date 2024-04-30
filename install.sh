@@ -49,13 +49,13 @@ install_failed=2
 # Flags
 changed_config=false
 
-# Colors and styles
-sty_res="\e[0m"
-sty_bol="\e[1m"
-sty_red="\e[31m"
-sty_yel="\e[33m"
-sty_bri_gre="\e[92m"
-sty_bri_yel="\e[93m"
+# Text formatting
+reset="\e[0m"
+bold="\e[1m"
+red="\e[31m"
+yellow="\e[33m"
+bright_green="\e[92m"
+bright_yellow="\e[93m"
 
 # Automatically detects the size of the terminal window and preserves word boundaries at the edges
 pretty_print()
@@ -88,21 +88,21 @@ add_to_config()
             printf "\n" >> "$config_file"
         fi
         printf "%s\n" "$line" >> "$config_file"
-        pretty_print "${sty_yel}$msg${sty_res}"
+        pretty_print "${yellow}$msg${reset}"
         changed_config=true
     fi
 }
 
 # Check if it's an update or a fresh install
 if [[ $1 == "update" ]]; then
-    pretty_print "${sty_yel}Updating 42free...${sty_res}"
+    pretty_print "${yellow}Updating 42free...${reset}"
 else
-    pretty_print "${sty_yel}Installing 42free...${sty_res}"
+    pretty_print "${yellow}Installing 42free...${reset}"
 fi
 
 # Check if curl or wget is available
 if [[ -z "$downloader" ]]; then
-    pretty_print "Neither ${sty_bol}${sty_red}curl${sty_res} nor ${sty_bol}${sty_red}wget${sty_res} was found."
+    pretty_print "Neither ${bold}${red}curl${reset} nor ${bold}${red}wget${reset} was found."
     pretty_print "Please install one of them and try again."
     exit $download_failed
 fi
@@ -116,7 +116,7 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
     # Create list of campuses in this format: n) Campus Name
     i=1
     for campus_name in "${campus_names_sorted[@]}"; do
-        prompt_campuses+="${sty_bol}$(( i++ ))${sty_res}) $campus_name\n"
+        prompt_campuses+="${bold}$(( i++ ))${reset}) $campus_name\n"
     done
 
     # Make campus names array 1-indexed
@@ -126,7 +126,7 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
     # Allow case-insensitive matching
     shopt -s nocasematch
     while true; do
-        pretty_print "${sty_bol}Choose your campus:${sty_res}"
+        pretty_print "${bold}Choose your campus:${reset}"
         pretty_print "$prompt_campuses"
         read -rp "> "
         valid_choice=false
@@ -151,7 +151,7 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
             IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
             break
         fi
-        pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a valid number or your campus name.${sty_res}"
+        pretty_print "${bold}${red}Invalid input. Please enter a valid number or your campus name.${reset}"
     done
     shopt -u nocasematch
 fi
@@ -164,18 +164,18 @@ for dir in home sgoinfre; do
     # If a max size still 0 or not known, prompt user to enter it
     if [[ -z "${!max_size_var_name}" ]] || [[ ${!max_size_var_name} -eq 0 ]]; then
         while true; do
-            pretty_print "Enter the maximum allowed size of your ${sty_bol}$dir${sty_res} directory in GB:"
+            pretty_print "Enter the maximum allowed size of your ${bold}$dir${reset} directory in GB:"
             read -rp "> "
             if [[ $REPLY =~ ^[0-9]+$ ]]; then
                 declare "$max_size_var_name=$REPLY"
                 break
             fi
-            pretty_print "${sty_bol}${sty_red}Invalid input. Please enter a number.${sty_res}"
+            pretty_print "${bold}${red}Invalid input. Please enter a number.${reset}"
         done
     fi
 done
 
-pretty_print "${sty_yel}Downloading '$dest_file' into '$dest_dir'...${sty_res}"
+pretty_print "${yellow}Downloading '$dest_file' into '$dest_dir'...${reset}"
 
 # Get the URL of the asset from the latest release
 script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_download_url" | cut -d '"' -f 4)
@@ -185,7 +185,7 @@ mkdir -p "$dest_dir"
 "$downloader" "$downloader_opts_file" "$dest_dir/$dest_file" "$script_url"
 exit_status=$?
 if [[ $exit_status -ne 0 ]]; then
-    pretty_print "${sty_bol}${sty_red}Failed to download file with $downloader.${sty_res}"
+    pretty_print "${bold}${red}Failed to download file with $downloader.${reset}"
     exit $download_failed
 fi
 
@@ -217,22 +217,22 @@ done
 
 # Check user's default shell
 if [[ "$SHELL" != *"bash"* && "$SHELL" != *"zsh"* && "$SHELL" == *"fish"* ]]; then
-    pretty_print "${sty_bol}${sty_bri_yel}Could not set up 42free for $(basename "$SHELL"). Please do it manually.${sty_res}"
-    pretty_print "${sty_bol}${sty_bri_yel}You can paste the following lines into your shell's configuration file:"
-    pretty_print "${sty_bol}alias 42free='bash $dest_dir/$dest_file'${sty_res}"
-    pretty_print "${sty_bol}export HOME_MAX_SIZE=$home_max_size${sty_res}"
-    pretty_print "${sty_bol}export SGOINFRE_MAX_SIZE=$sgoinfre_max_size${sty_res}"
+    pretty_print "${bold}${bright_yellow}Could not set up 42free for $(basename "$SHELL"). Please do it manually.${reset}"
+    pretty_print "${bold}${bright_yellow}You can paste the following lines into your shell's configuration file:"
+    pretty_print "${bold}alias 42free='bash $dest_dir/$dest_file'${reset}"
+    pretty_print "${bold}export HOME_MAX_SIZE=$home_max_size${reset}"
+    pretty_print "${bold}export SGOINFRE_MAX_SIZE=$sgoinfre_max_size${reset}"
     exit $install_failed
 fi
 
 # Check if it's an update or a fresh install
 if [[ $1 == "update" ]]; then
-    pretty_print "${sty_bol}${sty_bri_gre}Update completed.${sty_res}"
+    pretty_print "${bold}${bright_green}Update completed.${reset}"
 else
-    pretty_print "${sty_bol}${sty_bri_gre}Installation completed.${sty_res}"
+    pretty_print "${bold}${bright_green}Installation completed.${reset}"
     pretty_print "You can now use the 42free command in your terminal."
     pretty_print "To see the manual, run '42free --help'."
-    pretty_print "To just start, run '${sty_bol}42free${sty_res}'."
+    pretty_print "To just start, run '${bold}42free${reset}'."
 fi
 
 ft_exit $success
