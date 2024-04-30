@@ -64,6 +64,7 @@ jobs:
             build: Build System & Dependencies
             perf: Performance Improvements
             doc: Documentation
+            docs: Documentation
             test: Tests
             refactor: Refactors
             chore: Chores
