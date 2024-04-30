@@ -59,6 +59,7 @@ jobs:
           github-token            : ${{ github.token }}
           commit-types            : |
             feat: New Features
+            improve: Improvements
             fix: Bug Fixes
             build: Build System & Dependencies
             perf: Performance Improvements
