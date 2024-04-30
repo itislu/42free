@@ -167,7 +167,38 @@ prompt_replace="Do you wish to continue and replace any duplicate files? [${bold
 # Automatically detect the size of the terminal window and preserve word boundaries at the edges
 pretty_print()
 {
-    printf "%b" "$1" | fmt -sw $(tput cols)
+    local columns
+
+    # Get terminal width
+    columns=$(tput cols)
+
+    # Decrease by one to ensure it does not wrap around just before the actual end
+    (( columns-- ))
+
+    # Use sed script to filter out ANSI escape sequences from affecting the line length
+    local better_fmt="
+    :0
+    # insert break after ${columns} visible characters (skipping ANSI sequences)
+    s/^((\\x1B\\[[ -?]*[@-~])*[^\\x1B]){$columns}(\\x1B\\[[ -?]*[@-~]|[[:blank:]])*/\\0\\n/
+    Tx
+    # if break was inserted mid-word, move it to preceding opportunity
+    s/^(((\\x1B\\[[ -?]*[@-~])*.)+([[:blank:]]|[^[:blank:]]-))(.*)\\n/\\1\\n\\5/m
+    :1
+    # trim trailing blanks, moving embedded ANSI sequences onto continuation line
+    s/[[:blank:]]+((\\x1B\\[[ -?]*[@-~])*)\\n/\\n\\1/
+    t1
+    P
+    :2
+    # scrub ANSI sequences from leading indentation
+    s/^([[:blank:]]*)(\\x1B\\[[ -?]*[@-~])+/\\1/
+    t2
+    s/^([[:blank:]]*).*\\n/\\1/m
+    t0
+    :x
+    p"
+
+    # Use printf to handle escape sequences, pipe into sed with the dynamic script
+    printf "%b\n" "$1" | sed -En "$better_fmt"
 }
 
 print_stderr()
