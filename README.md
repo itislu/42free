@@ -143,7 +143,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 | 🇦🇹 42 Vienna | 5GB | 30GB |
 | 🇩🇪 42 Berlin | 5GB | 30GB |
 
-Confirm **your** campus [here](https://github.com/itislu/42free/discussions/5).
+Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
 <br>
 
