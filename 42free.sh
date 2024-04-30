@@ -172,8 +172,12 @@ pretty_print()
     # Get terminal width
     terminal_width=$(tput cols)
 
-    # Decrease by one to ensure it does not wrap around just before the actual end
-    (( terminal_width-- ))
+    # Limit terminal width to 80 characters
+    if (( terminal_width > 80 )); then
+        terminal_width=80
+    fi
+    # Decrease by 5 to ensure it does not wrap around just before the actual end
+    (( terminal_width -= 5 ))
 
     # Use sed script to filter out ANSI escape sequences from affecting the line length
     local better_fmt="
