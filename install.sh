@@ -4,6 +4,7 @@
 api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Dictionary of supported campuses
+# Add new campuses to end of list before "Other" (will be printed alphanumerically sorted anyway)
 # Format: ["Campus Name"]="home_max_size sgoinfre_max_size"
 declare -A campus_dict
 campus_dict=(
