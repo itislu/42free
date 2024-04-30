@@ -167,19 +167,19 @@ prompt_replace="Do you wish to continue and replace any duplicate files? [${bold
 # Automatically detect the size of the terminal window and preserve word boundaries at the edges
 pretty_print()
 {
-    local columns
+    local terminal_width
 
     # Get terminal width
-    columns=$(tput cols)
+    terminal_width=$(tput cols)
 
     # Decrease by one to ensure it does not wrap around just before the actual end
-    (( columns-- ))
+    (( terminal_width-- ))
 
     # Use sed script to filter out ANSI escape sequences from affecting the line length
     local better_fmt="
     :0
-    # insert break after ${columns} visible characters (skipping ANSI sequences)
-    s/^((\\x1B\\[[ -?]*[@-~])*[^\\x1B]){$columns}(\\x1B\\[[ -?]*[@-~]|[[:blank:]])*/\\0\\n/
+    # insert break after terminal_width visible characters (skipping ANSI sequences)
+    s/^((\\x1B\\[[ -?]*[@-~])*[^\\x1B]){$terminal_width}(\\x1B\\[[ -?]*[@-~]|[[:blank:]])*/\\0\\n/
     Tx
     # if break was inserted mid-word, move it to preceding opportunity
     s/^(((\\x1B\\[[ -?]*[@-~])*.)+([[:blank:]]|[^[:blank:]]-))(.*)\\n/\\1\\n\\5/m
