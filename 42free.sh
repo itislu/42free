@@ -135,7 +135,8 @@ ${bold}${underlined}Error codes:${reset}
 
 $delim_small
 
-To contribute, report bugs or share improvement ideas, visit ${underlined}${bright_blue}https://github.com/itislu/42free${reset}.
+To contribute, report bugs or share improvement ideas, visit
+${underlined}${bright_blue}https://github.com/itislu/42free${reset}.
 \n"
 
 msg_version="\
