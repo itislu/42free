@@ -159,7 +159,7 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
   <br>
   All confirmed campuses will be added to the [🌍 table](https://github.com/itislu/42free?tab=readme-ov-file#-confirmed-to-work-for-the-following-campuses) above.
 
-- If you have ideas how 42free could be improved, checkout the [💡 Ideas](https://github.com/itislu/42free/discussions/categories/ideas) section in the Discussions page and feel free to post there!
+- If you have ideas how 42free could be improved, checkout the [💡 Feedback & Ideas](https://github.com/itislu/42free/discussions/categories/feedback-ideas) section in the Discussions page and feel free to post there!
   <br>
   I will see it and respond.
 
