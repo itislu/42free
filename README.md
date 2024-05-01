@@ -7,6 +7,9 @@
 </div>
 <br>
 
+> [!NOTE]
+> **42free currently only supports GNU/Linux.**
+
 ### Quick Install
 
 ```bash
@@ -67,6 +70,9 @@ bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh
 <br>
 
 ## 🛠️ Installation
+
+> [!NOTE]
+> **42free currently only supports GNU/Linux.**
 
 To install 42free, you can use one of the following commands:
 
