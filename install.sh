@@ -269,9 +269,9 @@ for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
     if [[ -f "$config_file" ]]; then
         msg="Added 42free alias to $shell_name."
         add_to_config "$config_file" "alias 42free=" "alias 42free='bash $dest_dir/$dest_file'" "$msg"
-        msg="Added HOME_MAX_SIZE environment variable to $shell_name."
+        msg="Added HOME_MAX_SIZE environment variable set to $home_max_size to $shell_name."
         add_to_config "$config_file" "export HOME_MAX_SIZE=" "export HOME_MAX_SIZE=$home_max_size" "$msg"
-        msg="Added SGOINFRE_MAX_SIZE environment variable to $shell_name."
+        msg="Added SGOINFRE_MAX_SIZE environment variable set to $sgoinfre_max_size to $shell_name."
         add_to_config "$config_file" "export SGOINFRE_MAX_SIZE=" "export SGOINFRE_MAX_SIZE=$sgoinfre_max_size" "$msg"
     fi
 done
