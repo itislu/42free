@@ -180,13 +180,13 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
 - If the storage layout on your campus is different, you can post in [here](https://github.com/itislu/42free/discussions/5). A template is already prepared for you 😊
   <br>
-  All confirmed campuses will be added to the [🌍 table](https://github.com/itislu/42free?tab=readme-ov-file#-confirmed-to-work-for-the-following-campuses) above.
+  All confirmed campuses will be added to the 🌍 table above.
 
 - If you have ideas how 42free could be improved, checkout the [💡 Feedback & Ideas](https://github.com/itislu/42free/discussions/categories/feedback-ideas) section in the Discussions page and feel free to post there!
   <br>
   I will see it and respond.
 
-- If you want to report a bug, please open an [Issue](https://github.com/itislu/42free/issues) or create a [Pull Request](https://github.com/itislu/42free/pulls) with a possible fix!
+- If you want to report a bug, please open an Issue or create a Pull Request with a possible fix!
   <br>
   I'm super grateful for any and all contributions.
   <br>
