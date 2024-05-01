@@ -10,7 +10,7 @@
 > [!NOTE]
 > **42free currently only supports GNU/Linux.**
 
-### Quick Install
+### 🚀 Quick Install
 
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
