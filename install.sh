@@ -173,6 +173,9 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
         prompt_campuses+="${bold}$(( i++ ))${reset}) $campus_name\n"
     done
 
+    # Remove last newline
+    prompt_campuses="${prompt_campuses%\\n}"
+
     # Make campus names array 1-indexed
     campus_names_sorted=("" "${campus_names_sorted[@]}")
 
