@@ -122,7 +122,9 @@ ${bold}${underlined}Options:${reset} You can pass options anywhere in the argume
                      location in home.
     -m, --max-size   Change the warning sizes for the home and sgoinfre
                      directories (in GB).
-                     Current sizes: HOME_MAX_SIZE=$home_max_size, SGOINFRE_MAX_SIZE=$sgoinfre_max_size
+                     Current sizes:
+                       HOME_MAX_SIZE=$home_max_size
+                       SGOINFRE_MAX_SIZE=$sgoinfre_max_size
     -u, --update     Check for a new version of 42free.
     -h, --help       Display this help message and exit.
     -v, --version    Display version information and exit.
