@@ -22,6 +22,8 @@ bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh
 
 <br>
 
+## 🧭 Contents
+
 * [📌 Overview](#-overview)
 * [🛠️ Installation](#%EF%B8%8F-installation)
 * [👩‍💻 Usage](#-usage)
