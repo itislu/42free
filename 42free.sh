@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_version="v1.5.4+dev"
+current_version="v1.5.5"
 
 # Check OS
 os_name=$(uname -s)
