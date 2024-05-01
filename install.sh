@@ -10,14 +10,13 @@ fi
 # Define the URL of the latest release API endpoint
 api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
-# Dictionary of supported campuses
+# Array of supported campuses
 # Add new campuses to end of list before "Other" (will be printed alphanumerically sorted anyway)
-# Format: ["Campus Name"]="home_max_size sgoinfre_max_size"
-declare -A campus_dict
-campus_dict=(
-["42 Vienna"]="5 30"
-["42 Berlin"]="5 30"
-["Other"]="0 0"
+# Format: "Campus Name;home_max_size;sgoinfre_max_size"
+campuses=(
+"42 Vienna;5;30"
+"42 Berlin;5;30"
+"Other;0;0"
 )
 
 # Define the destination directory and filename
@@ -164,20 +163,26 @@ fi
 # Prompt user to choose their campus if max sizes are 0 or not known
 if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
    { [[ -z "$sgoinfre_max_size" ]] || [[ $sgoinfre_max_size -eq 0 ]]; }; then
-    # Sort campus names by keys
-    mapfile -t campus_names_sorted < <(printf '%s\n' "${!campus_dict[@]}" | sort)
+
+    # Sort the campuses array alphanumerically
+    IFS=$'\n' campuses_sorted=( $(sort <<< "${campuses[*]}") )
+
+    # Iterate through the sorted campuses array and split the strings at the semicolon into separate arrays
+    for campus in "${campuses_sorted[@]}"; do
+        IFS=';' read -r campus_name home_max_size sgoinfre_max_size <<< "$campus"
+        campus_names+=("$campus_name")
+        home_max_sizes+=("$home_max_size")
+        sgoinfre_max_sizes+=("$sgoinfre_max_size")
+    done
 
     # Create list of campuses in this format: n) Campus Name
     i=1
-    for campus_name in "${campus_names_sorted[@]}"; do
+    for campus_name in "${campus_names[@]}"; do
         prompt_campuses+="${bold}$(( i++ ))${reset}) $campus_name\n"
     done
 
     # Remove last newline
     prompt_campuses="${prompt_campuses%\\n}"
-
-    # Make campus names array 1-indexed
-    campus_names_sorted=("" "${campus_names_sorted[@]}")
 
     # Prompt user
     # Allow case-insensitive matching
@@ -186,26 +191,25 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
         pretty_print "${bold}Choose your campus:${reset}"
         pretty_print "$prompt_campuses"
         read -rp "> "
-        valid_choice=false
 
         # Check if input is a valid number of the list
-        if [[ $REPLY =~ ^[0-9]+$ ]] && [[ -n ${campus_names_sorted[$REPLY]} ]]; then
-            campus_name=${campus_names_sorted[$REPLY]}
-            valid_choice=true
+        if [[ $REPLY =~ ^[0-9]+$ ]] && [[ $REPLY -ge 1 ]] && [[ $REPLY -le ${#campus_names[@]} ]]; then
+            # Zero-index the choice
+            campus_choice=$(( REPLY - 1 ))
+        # Check if input is a campus name or the non-numeric part of it
         elif [[ -n "$REPLY" ]]; then
-            # Check if input is a campus name
-            for campus_name in "${campus_names_sorted[@]}"; do
-                name_part="${campus_name#[0-9]* }"
-                if [[ "$campus_name" == "$REPLY" ]] || [[ "$name_part" == "$REPLY" ]]; then
-                    valid_choice=true
+            for i in "${!campus_names[@]}"; do
+                if [[ "$REPLY" == "${campus_names[$i]}" ]] || [[ "$REPLY" == "${campus_names[$i]#[0-9]* }" ]]; then
+                    campus_choice=$i
                     break
                 fi
             done
         fi
 
         # If valid choice, set max size variables
-        if $valid_choice; then
-            IFS=' ' read -r home_max_size sgoinfre_max_size <<< "${campus_dict[$campus_name]}"
+        if [[ -n "$campus_choice" ]]; then
+            home_max_size=${home_max_sizes[$campus_choice]}
+            sgoinfre_max_size=${sgoinfre_max_sizes[$campus_choice]}
             break
         fi
         pretty_print "${bold}${red}Invalid input. Please enter a valid number or your campus name.${reset}"
