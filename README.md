@@ -4,11 +4,9 @@
 
 ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
 
-</div>
-<br>
+#### ✋ 42free currently only supports GNU/Linux.
 
-> [!NOTE]
-> **42free currently only supports GNU/Linux.**
+<br>
 
 ### 🚀 Quick Install
 
@@ -18,15 +16,13 @@ bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh
 
 <br>
 
-<div align="center">
-    <p>
-        <a href="https://github.com/itislu/42free/releases">
-            <img 
-                alt="GitHub Downloads (all assets, all releases)" 
-                src="https://img.shields.io/github/downloads/itislu/42free/total?style=for-the-badge&logo=GNOME%20Terminal&logoColor=%23241f31&logoSize=auto&label=downloads&labelColor=%23f8d765&color=%23241f31"
-            >
-        </a>
-    </p>
+<a href="https://github.com/itislu/42free/releases">
+    <img
+        alt="GitHub Downloads (all assets, all releases)"
+        src="https://img.shields.io/github/downloads/itislu/42free/total?style=for-the-badge&logo=GNOME%20Terminal&logoColor=%23241f31&logoSize=auto&label=downloads&labelColor=%23f8d765&color=%23241f31"
+    >
+</a>
+
 </div>
 
 <br>
