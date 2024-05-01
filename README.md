@@ -25,11 +25,17 @@ bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh
 ## 🧭 Contents
 
 * [📌 Overview](#-overview)
+
 * [🛠️ Installation](#%EF%B8%8F-installation)
+
 * [👩‍💻 Usage](#-usage)
+
 * [💡 How it works](#-how-it-works)
+
 * [🌍 Confirmed to work for the following campuses](#-confirmed-to-work-for-the-following-campuses)
+
 * [🤝 Contributing](#-contributing)
+
 * [🐬 Fun fact](#-fun-fact)
 
 <br>
