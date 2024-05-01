@@ -165,7 +165,7 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
    { [[ -z "$sgoinfre_max_size" ]] || [[ $sgoinfre_max_size -eq 0 ]]; }; then
 
     # Sort the campuses array alphanumerically
-    IFS=$'\n' campuses_sorted=( $(sort <<< "${campuses[*]}") )
+    IFS=$'\n' campuses_sorted=( $(sort -f <<< "${campuses[*]}") )
 
     # Iterate through the sorted campuses array and split the strings at the semicolon into separate arrays
     for campus in "${campuses_sorted[@]}"; do
