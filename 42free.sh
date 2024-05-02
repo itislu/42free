@@ -929,7 +929,7 @@ for arg in "${args[@]}"; do
     real_arg_path=$(realpath "$arg_path")
     if { [[ "$arg_path" == $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
        { [[ "$arg_path" == $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
-        pretty_print "$indicator_error '$source_subpath' is already in the $target_name directory."
+        pretty_print "$indicator_error '${bright_blue}$source_subpath${reset}' is already in the $target_name directory."
         pretty_print "Real path: '${bold}$real_arg_path${reset}'."
         print_skip_arg "$arg"
         bad_input=true
