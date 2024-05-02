@@ -11,14 +11,20 @@ fi
 
 default_args=(
 "$HOME/.cache"
-"$HOME/.config/Code/Cache"
-"$HOME/.config/Code/CachedData"
-"$HOME/.config/Code/User/workspaceStorage"
 "$HOME/.var/app/com.discordapp.Discord"
 "$HOME/.var/app/com.slack.Slack"
+"$HOME/.config/Code/Cache"
+"$HOME/.config/Code/CachedData"
+"$HOME/.config/Code/CachedExtensionVSIXs"
+"$HOME/.config/Code/Crashpad"
+"$HOME/.config/Code/User/workspaceStorage"
+"$HOME/.config/Code/Service Worker"
 "$HOME/.var/app/com.brave.Browser/cache"
+"$HOME/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/Default/Service Worker"
 "$HOME/.var/app/com.google.Chrome/cache"
+"$HOME/.var/app/com.google.Chrome/config/google-chrome/Default/Service Worker"
 "$HOME/.var/app/com.opera.Opera/cache"
+"$HOME/.var/app/com.opera.Opera/config/opera/Default/Service Worker"
 )
 
 # Standard variables
