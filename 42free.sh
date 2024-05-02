@@ -10,21 +10,21 @@ if [[ "$os_name" != "Linux" ]]; then
 fi
 
 default_args=(
-"$HOME/.cache"
-"$HOME/.var/app/com.discordapp.Discord"
-"$HOME/.var/app/com.slack.Slack"
-"$HOME/.config/Code/Cache"
-"$HOME/.config/Code/CachedData"
-"$HOME/.config/Code/CachedExtensionVSIXs"
-"$HOME/.config/Code/Crashpad"
-"$HOME/.config/Code/User/workspaceStorage"
-"$HOME/.config/Code/Service Worker"
-"$HOME/.var/app/com.brave.Browser/cache"
-"$HOME/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/Default/Service Worker"
-"$HOME/.var/app/com.google.Chrome/cache"
-"$HOME/.var/app/com.google.Chrome/config/google-chrome/Default/Service Worker"
-"$HOME/.var/app/com.opera.Opera/cache"
-"$HOME/.var/app/com.opera.Opera/config/opera/Default/Service Worker"
+    "$HOME/.cache"
+    "$HOME/.var/app/com.discordapp.Discord"
+    "$HOME/.var/app/com.slack.Slack"
+    "$HOME/.config/Code/Cache"
+    "$HOME/.config/Code/CachedData"
+    "$HOME/.config/Code/CachedExtensionVSIXs"
+    "$HOME/.config/Code/Crashpad"
+    "$HOME/.config/Code/User/workspaceStorage"
+    "$HOME/.config/Code/Service Worker"
+    "$HOME/.var/app/com.brave.Browser/cache"
+    "$HOME/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/Default/Service Worker"
+    "$HOME/.var/app/com.google.Chrome/cache"
+    "$HOME/.var/app/com.google.Chrome/config/google-chrome/Default/Service Worker"
+    "$HOME/.var/app/com.opera.Opera/cache"
+    "$HOME/.var/app/com.opera.Opera/config/opera/Default/Service Worker"
 )
 
 # Standard variables
@@ -382,7 +382,7 @@ wait_for_jobs()
             '  📁        📄📂'
             '  📁          📂'
             '  📁          📁'
-            )
+        )
         shift
     elif [[ "$1" == "restoring" ]]; then
         local pacing=0.1
@@ -400,7 +400,7 @@ wait_for_jobs()
             '  📂📄        📁'
             '  📂          📁'
             '  📁          📁'
-            )
+        )
         shift
     elif [[ "$1" == "searching" ]]; then
         local pacing=0.5
@@ -419,7 +419,7 @@ wait_for_jobs()
             '  📄📄🔍📁📁📁📁'
             '  📄🔍📁📁📁📁📁'
             '  🔍📁📁📁📁📁📁'
-            )
+        )
         shift
     else
         local pacing=0.25
@@ -428,7 +428,7 @@ wait_for_jobs()
             '  / '
             '  - '
             '  \ '
-            )
+        )
     fi
 
     local job_pids=("$@")

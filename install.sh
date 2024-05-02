@@ -14,9 +14,9 @@ api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 # Add new campuses to end of list before "Other" (will be printed alphanumerically sorted anyway)
 # Format: "Campus Name;home_max_size;sgoinfre_max_size"
 campuses=(
-"42 Vienna;5;30"
-"42 Berlin;5;30"
-"Other;0;0"
+    "42 Vienna;5;30"
+    "42 Berlin;5;30"
+    "Other;0;0"
 )
 
 # Define the destination directory and filename
