@@ -800,6 +800,9 @@ if $no_user_args; then
     args=("${default_args[@]}")
 fi
 
+# Store the amount of arguments
+args_amount=${#args[@]}
+
 # Print header
 pretty_print "$header"
 pretty_print "$delim_big"
@@ -875,6 +878,11 @@ for arg in "${args[@]}"; do
         bad_input=true
         continue
     fi
+
+    # Print progress out of total amount of arguments
+    pretty_print "${bold}${underlined}${bright_yellow}[$args_index/$args_amount]${reset}"
+    pretty_print "'$arg' ➜ $target_name"
+    echo
 
     # Construct useful variables from the paths
     source_dirpath=$(dirname "$source_path")
