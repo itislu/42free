@@ -577,6 +577,19 @@ update()
     return $success
 }
 
+# Filter out default arguments that do not exist or are already symbolic links
+filter_default_args()
+{
+    local filtered_default_args=()
+
+    for default_arg in "${default_args[@]}"; do
+        if [[ -e "$default_arg" ]] && [[ ! -L "$default_arg" ]]; then
+            filtered_default_args+=("$default_arg")
+        fi
+    done
+    default_args=("${filtered_default_args[@]}")
+}
+
 change_max_sizes()
 {
     local changed_max_size
@@ -720,11 +733,10 @@ while (( $# )); do
     shift
 done
 
-# Check if the script received any targets
+# Check if the script received any targets and check for updates
 if [[ -z "${args[*]}" ]]; then
-    update "quiet"
-    args=("${default_args[@]}")
     no_user_args=true
+    update "quiet"
 else
     no_user_args=false
     print_update_info "remind"
@@ -782,6 +794,12 @@ else
     convert_default_args "$sgoinfre"
 fi
 
+# If no arguments were given, use default arguments
+if $no_user_args; then
+    filter_default_args
+    args=("${default_args[@]}")
+fi
+
 # Print header
 pretty_print "$header"
 pretty_print "$delim_big"
@@ -807,9 +825,6 @@ for arg in "${args[@]}"; do
         done
         echo
         if prompt_single_key "$prompt_agree_all"; then
-            # This is a temporary solution.
-            # The no_user_args variable is for not displaying errors for paths that do not actually exist.
-            # In order to do it properly, all the default arguments would need to go through all the error checking first before they get printed out.
             no_user_args=false
         fi
     fi
