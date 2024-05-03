@@ -819,7 +819,6 @@ for arg in "${args[@]}"; do
         pretty_print "$msg_close_programs"
         pretty_print "$msg_manual_reminder"
         echo
-
         # Print all default arguments and prompt user if they agree to all of them
         pretty_print "${bold}The following directories will be moved to $target_name:${reset}"
         for default_arg in "${default_args[@]}"; do
@@ -829,11 +828,14 @@ for arg in "${args[@]}"; do
         if prompt_single_key "$prompt_agree_all"; then
             no_user_args=false
         fi
+        echo
     fi
 
     # Print delimiter
     if $need_delim; then
+        echo
         pretty_print "$delim_small"
+        echo
     fi
     need_delim=true
 
