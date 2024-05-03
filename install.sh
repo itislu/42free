@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Check OS
-os_name=$(uname -s)
-if [[ "$os_name" != "Linux" ]]; then
-    echo "42free currently only supports GNU/Linux. Sorry :("
-    exit 1
-fi
-
 # Define the URL of the latest release API endpoint
 api_url="https://api.github.com/repos/itislu/42free/releases/latest"
 

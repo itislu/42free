@@ -2,13 +2,6 @@
 
 current_version="v1.5.5+dev"
 
-# Check OS
-os_name=$(uname -s)
-if [[ "$os_name" != "Linux" ]]; then
-    echo "42free currently only supports GNU/Linux. Sorry :("
-    exit 1
-fi
-
 default_args=(
     "$HOME/.cache"
     "$HOME/.var/app/com.discordapp.Discord"
