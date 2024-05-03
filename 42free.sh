@@ -821,7 +821,7 @@ for arg in "${args[@]}"; do
         # Print all default arguments and prompt user if they agree to all of them
         pretty_print "${bold}The following directories will be moved to $target_name:${reset}"
         for default_arg in "${default_args[@]}"; do
-            pretty_print "  - $default_arg"
+            printf "%s\n" "  ▸ $default_arg"
         done
         echo
         if prompt_single_key "$prompt_agree_all"; then
