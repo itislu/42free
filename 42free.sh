@@ -909,9 +909,8 @@ for arg in "${args[@]}"; do
     fi
 
     # Check if the real base path of source is not actually already in target
-    arg_dirpath=$(dirname "$arg_path")
-    real_arg_dirpath=$(realpath "$arg_dirpath")
     real_arg_path=$(realpath "$arg_path")
+    real_arg_dirpath=$(realpath "$(dirname "$arg_path")")
     if { [[ "$arg_path" == $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
        { [[ "$arg_path" == $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
         pretty_print "$indicator_error '${bright_blue}$source_subpath${reset}' is already in the $target_name directory."
