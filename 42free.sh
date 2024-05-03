@@ -88,7 +88,7 @@ bright_yellow="\e[93m"
 bright_blue="\e[94m"
 bright_cyan="\e[96m"
 
-header="
+header="\n\
                 ${bold}${bright_yellow}📁  42free  📁${reset}"
 tagline="\
             ${bold}${bright_yellow}Never run \`ncdu\` again${reset}"
@@ -107,21 +107,21 @@ msg_manual="\
 $header
 $tagline
 $delim_big
-
+\n\
 The files get moved from '$HOME' to '$sgoinfre'.
-
+\n\
 A symbolic link is left behind in the original location.
 You only need to run 42free once for every directory or file you want to free the space of.
 All programs will then access them through the symlink and they will accumulate their space outside of your home directory.
-
+\n\
 $delim_small
-
+\n\
 ${bold}${underlined}Usage:${reset} ${bold}42free${reset} [target1 target2 ...]
     If no arguments are given, 42free will make some suggestions.
     Target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
     Closing all programs first will help to avoid errors during the move.
-
+\n\
 ${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
     -r, --restore    Move the directories and files back to their original
                      location in home.
@@ -135,7 +135,7 @@ ${bold}${underlined}Options:${reset} You can pass options anywhere in the argume
     -v, --version    Display version information and exit.
         --uninstall  Uninstall 42free.
     --               Stop interpreting options.
-
+\n\
 ${bold}${underlined}Error codes:${reset}
     1 - Input error
         An argument was invalid.
@@ -146,9 +146,9 @@ ${bold}${underlined}Error codes:${reset}
     3 - Major error
         An operation failed.
           (sgoinfre permissions, update failed, move failed, restore failed, cleanup failed)
-
+\n\
 $delim_small
-
+\n\
 To contribute, report bugs or share improvement ideas, visit
 ${underlined}${bright_blue}https://github.com/itislu/42free${reset}.
 "
@@ -179,11 +179,11 @@ prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' 
 prompt_symlink="Do you wish to create a symbolic link to it? [${bold}Y${reset}/${bold}n${reset}]"
 prompt_replace="Do you wish to continue and replace any duplicate files? [${bold}y${reset}/${bold}N${reset}]"
 
-# Automatically detect the size of the terminal window and preserve word boundaries at the edges
+# Automatically detect the size of the terminal window and preserve word boundaries
 pretty_print()
 {
     local terminal_width
-    local better_fmt
+    local lines
 
     # Get terminal width
     terminal_width=$(tput cols)
@@ -195,41 +195,11 @@ pretty_print()
     # Decrease by 5 to ensure it does not wrap around just before the actual end
     (( terminal_width -= 5 ))
 
-    # Process text to insert line breaks while preserving word boundaries without ANSI escape sequences affecting the line length
-    better_fmt="
-        # Insert a line break after terminal_width visible characters, skipping ANSI codes
-        :0
-        s/^((\\x1B\\[[ -?]*[@-~])*[^\\x1B]){$terminal_width}(\\x1B\\[[ -?]*[@-~]|[[:blank:]])*/\\0\\n/
-        Tx
-
-        # Adjust line breaks if they occur mid-word, finding a better break point
-        s/^(((\\x1B\\[[ -?]*[@-~])*.)+([[:blank:]]|[^[:blank:]]-))(.*)\\n/\\1\\n\\5/m
-
-        # Handle the first part of the line up to the new line, remove trailing blanks
-        :1
-        s/[[:blank:]]+((\\x1B\\[[ -?]*[@-~])*)\\n/\\n\\1/
-        t1
-
-        # Print the first part of the line that has been processed and formatted
-        P
-
-        # Clean up ANSI sequences from the start of the continuation lines for neatness
-        :2
-        s/^([[:blank:]]*)(\\x1B\\[[ -?]*[@-~])+/\\1/
-        t2
-
-        # Prepare unprocessed part of the line for further processing
-        s/^([[:blank:]]*).*\\n/\\1/m
-
-        # Loop back to start if there's more of the line to process
-        t0
-
-        # Print the rest of the line if no more processing is needed
-        :x
-        p"
-
-    # Use printf to handle escape sequences, pipe into sed with the dynamic script
-    printf "%b\n" "$1" | sed -En "$better_fmt"
+    # Split argument into an array and print each line individually with consistent formatting
+    IFS=$'\n' read -rd '' -a lines <<< "$1"
+    for line in "${lines[@]}"; do
+        printf "%b\n" "$(fmt -w $terminal_width <<< "$line")"
+    done
 }
 
 print_stderr()
