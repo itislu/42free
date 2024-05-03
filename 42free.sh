@@ -752,6 +752,11 @@ if [[ ! -d "$sgoinfre" ]]; then
     ft_exit $major_error
 fi
 
+# Print header
+pretty_print "$header"
+pretty_print "$delim_big"
+echo
+
 # Check if the permissions of user's sgoinfre directory are rwx------
 if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "$msg_sgoinfre_permissions"
@@ -802,16 +807,10 @@ fi
 
 # Store the amount of arguments
 args_amount=${#args[@]}
-
-# Print header
-pretty_print "$header"
-pretty_print "$delim_big"
-echo
-
-# Loop over all arguments
 args_index=0
 need_delim=false
 
+# Loop over all arguments
 for arg in "${args[@]}"; do
     args_index=$(( args_index + 1 ))
 
