@@ -4,7 +4,7 @@
 
 ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
 
-#### ✋ 42free currently only supports GNU/Linux.
+#### ⚙️ 42free supports Linux and macOS.
 
 <br>
 
@@ -87,9 +87,6 @@ bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh
 <br>
 
 ## 🛠️ Installation
-
-> [!NOTE]
-> **42free currently only supports GNU/Linux.**
 
 To install 42free, you can use one of the following commands:
 
