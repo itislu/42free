@@ -63,11 +63,11 @@ yellow="\e[33m"
 bright_green="\e[92m"
 bright_yellow="\e[93m"
 
-# Automatically detect the size of the terminal window and preserve word boundaries at the edges
+# Automatically detect the size of the terminal window and preserve word boundaries
 pretty_print()
 {
     local terminal_width
-    local better_fmt
+    local lines
 
     # Get terminal width
     terminal_width=$(tput cols)
@@ -79,41 +79,13 @@ pretty_print()
     # Decrease by 5 to ensure it does not wrap around just before the actual end
     (( terminal_width -= 5 ))
 
-    # Process text to insert line breaks while preserving word boundaries without ANSI escape sequences affecting the line length
-    better_fmt="
-        # Insert a line break after terminal_width visible characters, skipping ANSI codes
-        :0
-        s/^((\\x1B\\[[ -?]*[@-~])*[^\\x1B]){$terminal_width}(\\x1B\\[[ -?]*[@-~]|[[:blank:]])*/\\0\\n/
-        Tx
+	# Split input into an array
+    IFS=$'\n' read -rd '' -a lines <<< "$1"
 
-        # Adjust line breaks if they occur mid-word, finding a better break point
-        s/^(((\\x1B\\[[ -?]*[@-~])*.)+([[:blank:]]|[^[:blank:]]-))(.*)\\n/\\1\\n\\5/m
-
-        # Handle the first part of the line up to the new line, remove trailing blanks
-        :1
-        s/[[:blank:]]+((\\x1B\\[[ -?]*[@-~])*)\\n/\\n\\1/
-        t1
-
-        # Print the first part of the line that has been processed and formatted
-        P
-
-        # Clean up ANSI sequences from the start of the continuation lines for neatness
-        :2
-        s/^([[:blank:]]*)(\\x1B\\[[ -?]*[@-~])+/\\1/
-        t2
-
-        # Prepare unprocessed part of the line for further processing
-        s/^([[:blank:]]*).*\\n/\\1/m
-
-        # Loop back to start if there's more of the line to process
-        t0
-
-        # Print the rest of the line if no more processing is needed
-        :x
-        p"
-
-    # Use printf to handle escape sequences, pipe into sed with the dynamic script
-    printf "%b\n" "$1" | sed -En "$better_fmt"
+    # Iterate over the array and print each line with consistent formatting
+    for line in "${lines[@]}"; do
+        printf "%b\n" "$(fmt -w $terminal_width <<< "$line")"
+    done
 }
 
 ft_exit()
