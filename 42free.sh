@@ -2,11 +2,17 @@
 
 current_version="v1.5.5+dev"
 
+# Exit codes
+success=0
+input_error=1
+minor_error=2
+major_error=3
+
 # Check OS
 os_name=$(uname -s)
-if [[ "$os_name" != "Linux" ]]; then
-    echo "42free currently only supports GNU/Linux. Sorry :("
-    exit 1
+if [[ "$os_name" != "Linux" ]] && [[ "$os_name" != "Darwin" ]]; then
+    echo "42free currently only supports Linux and macOS. Sorry :("
+    exit $major_error
 fi
 
 default_args=(
@@ -62,12 +68,6 @@ elif command -v wget &>/dev/null; then
     downloader="wget"
     downloader_opts_stdout="-qO-"
 fi
-
-# Exit codes
-success=0
-input_error=1
-minor_error=2
-major_error=3
 
 # Flags
 bad_input=false
@@ -145,7 +145,7 @@ ${bold}${underlined}Error codes:${reset}
           (symbolic link, file conflict, no space left)
     3 - Major error
         An operation failed.
-          (sgoinfre permissions, update failed, move failed, restore failed, cleanup failed)
+          (operating system not supported, sgoinfre permissions, update failed, move failed, restore failed, cleanup failed)
 \n\
 $delim_small
 \n\

@@ -1,10 +1,16 @@
 #!/bin/bash
 
+# Exit codes
+success=0
+download_failed=1
+install_failed=2
+compatibility_issue=3
+
 # Check OS
 os_name=$(uname -s)
-if [[ "$os_name" != "Linux" ]]; then
-    echo "42free currently only supports GNU/Linux. Sorry :("
-    exit 1
+if [[ "$os_name" != "Linux" ]] && [[ "$os_name" != "Darwin" ]]; then
+    echo "42free currently only supports Linux and macOS. Sorry :("
+    exit $compatibility_issue
 fi
 
 # Define the URL of the latest release API endpoint
@@ -46,11 +52,6 @@ elif command -v wget &>/dev/null; then
     downloader_opts_stdout="-qO-"
     downloader_opts_file="-qO"
 fi
-
-# Exit codes
-success=0
-download_failed=1
-install_failed=2
 
 # Flags
 changed_config=false
