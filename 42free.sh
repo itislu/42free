@@ -8,14 +8,7 @@ input_error=1
 minor_error=2
 major_error=3
 
-# Check OS
-os_name=$(uname -s)
-if [[ "$os_name" != "Linux" ]] && [[ "$os_name" != "Darwin" ]]; then
-    echo "42free currently only supports Linux and macOS. Sorry :("
-    exit $major_error
-fi
-
-default_args=(
+default_args_linux=(
     "$HOME/.cache"
     "$HOME/.var/app/com.discordapp.Discord"
     "$HOME/.var/app/com.slack.Slack"
@@ -32,6 +25,34 @@ default_args=(
     "$HOME/.var/app/com.opera.Opera/cache"
     "$HOME/.var/app/com.opera.Opera/config/opera/Default/Service Worker"
 )
+
+default_args_macos=(
+    "$HOME/Library/Caches"
+    "$HOME/Library/Application Support/Code/Cache"
+    "$HOME/Library/Application Support/Code/CachedData"
+    "$HOME/Library/Application Support/Code/CachedExtensionVSIXs"
+    "$HOME/Library/Application Support/Code/Crashpad"
+    "$HOME/Library/Application Support/Code/User/workspaceStorage"
+    "$HOME/Library/Application Support/Code/Service Worker"
+    "$HOME/Library/Application Support/Slack/Cache"
+    "$HOME/Library/Application Support/Slack/Service Worker"
+    "$HOME/Library/Application Support/discord/Cache"
+    "$HOME/Library/Application Support/discord/Service Worker"
+    "$HOME/Library/Application Support/BraveSoftware/Brave-Browser/Default/Service Worker"
+    "$HOME/Library/Application Support/Google/Chrome/Default/Service Worker"
+    "$HOME/Library/Application Support/Opera Software/Opera Stable/Service Worker"
+)
+
+# Check OS
+os_name=$(uname -s)
+if [[ "$os_name" == "Linux" ]]; then
+    default_args=("${default_args_linux[@]}")
+elif [[ "$os_name" == "Darwin" ]]; then
+    default_args=("${default_args_macos[@]}")
+else
+    echo "42free currently only supports Linux and macOS. Sorry :("
+    exit $major_error
+fi
 
 # Standard variables
 stderr=""
