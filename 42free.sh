@@ -38,8 +38,8 @@ stderr=""
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
-sgoinfre_root="/sgoinfre/goinfre/Perso/$USER"
-sgoinfre_alt="/nfs/sgoinfre/goinfre/Perso/$USER"
+sgoinfre_root=$(find /sgoinfre/ -type d -name "$USER" -print -quit 2>/dev/null | grep -oE "^.*$USER" | head -n 1)
+sgoinfre_alt="/nfs/$sgoinfre_root"
 sgoinfre="$sgoinfre_root"
 sgoinfre_permissions=$(stat -c "%A" "$sgoinfre" 2>/dev/null)
 
