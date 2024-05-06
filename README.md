@@ -191,6 +191,16 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
 <br>
 
+### 🏆 BIG thank you to all contributors!
+
+| Contributor | Contribution |
+| --- | --- |
+| [@JonatV](https://github.com/JonatV) | Thank you for helping with macOS support! |
+| [@Anantiz](https://github.com/Anantiz) | Thank you for stress testing! |
+| [@alexandregv](https://github.com/alexandregv) | Thank you for showing me how 42 Paris does it! |
+
+<br>
+
 ---
 
 <br>
