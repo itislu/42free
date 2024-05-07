@@ -312,7 +312,7 @@ move_files()
     local operation=$3
 
     # Move the files in a background job
-    pretty_print "${operation^} '$(basename "$source_path")' to '$target_dirpath'..."
+    pretty_print "$(tr '[:lower:]' '[upper]' <<< ${operation:0:1})${operation:1} '$(basename "$source_path")' to '$target_dirpath'..."
     stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
     rsync_job=$!
 
@@ -1036,7 +1036,7 @@ for arg in "${args[@]}"; do
 
     # Check if the target directory would go above its maximum recommended size
     if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
-        pretty_print "$indicator_warning ${operation^} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
+        pretty_print "$indicator_warning $(tr '[:lower:]' '[upper]' <<< ${operation:0:1})${operation:1} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
