@@ -939,8 +939,8 @@ for arg in "${args[@]}"; do
     fi
 
     # Check if the real base path of source is not actually already in target
-    real_arg_path=$(realpath "$arg_path")
-    real_arg_dirpath=$(realpath "$(dirname "$arg_path")")
+    real_arg_path=$(cd "$(dirname "$arg_path")" && pwd -P)/$(basename "$arg_path")
+    real_arg_dirpath=$(cd "$(dirname "$arg_path")" && pwd -P)
     if { [[ "$arg_path" == $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
        { [[ "$arg_path" == $target_base/* ]] && [[ "$real_arg_dirpath/" != $target_base/* ]]; }; then
         pretty_print "$indicator_error '${bright_blue}$source_subpath${reset}' is already in the $target_name directory."
@@ -952,7 +952,7 @@ for arg in "${args[@]}"; do
 
     # If the source directory or file has already been moved to sgoinfre, skip it
     if [[ -L "$source_path" ]]; then
-        real_source_path=$(realpath "$source_path")
+        real_source_path=$(cd "$(dirname "$source_path")" && pwd -P)/$(basename "$source_path")
         if ! $restore && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
             if ! $no_user_args; then
                 pretty_print "'${bold}${bright_cyan}$source_subpath${reset}' has already been moved to sgoinfre."
