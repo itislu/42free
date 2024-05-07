@@ -298,6 +298,14 @@ convert_default_args()
     done
 }
 
+# If realpath command is not available, define a custom function as a replacement
+if ! command -v realpath &>/dev/null; then
+    realpath()
+    {
+        perl -MCwd -e 'print Cwd::realpath($ARGV[0]), "\n"' "$1"
+    }
+fi
+
 move_files()
 {
     local source_path=$1
