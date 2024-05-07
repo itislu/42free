@@ -210,8 +210,18 @@ done
 
 pretty_print "${yellow}Downloading '$dest_file' into '$dest_dir'...${reset}"
 
-# Get the URL of the asset from the latest release
-script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_download_url" | cut -d '"' -f 4)
+# Get the URL of the asset from the latest release or a dev version from the branch specified as an argument
+if [[ -n $1 ]] && [[ $1 != "update" ]]; then
+    pretty_print "${bold}${yellow}Using dev version from branch '$1'...${reset}"
+    if git ls-remote --heads https://github.com/itislu/42free.git "$1" 2>/dev/null | grep -q "$1$"; then
+        script_url="https://raw.githubusercontent.com/itislu/42free/$1/$dest_file"
+    else
+        pretty_print "${bold}${red}Branch '$1' does not exist.${reset}"
+        exit $download_failed
+    fi
+else
+    script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_download_url" | cut -d '"' -f 4)
+fi
 
 # Download the script
 mkdir -p "$dest_dir"
