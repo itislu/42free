@@ -47,8 +47,10 @@ default_args_macos=(
 os_name=$(uname -s)
 if [[ "$os_name" == "Linux" ]]; then
     default_args=("${default_args_linux[@]}")
+    stat_human_readable="stat -c %A"
 elif [[ "$os_name" == "Darwin" ]]; then
     default_args=("${default_args_macos[@]}")
+    stat_human_readable="stat -f %Sp"
 else
     echo "42free currently only supports Linux and macOS. Sorry :("
     exit $major_error
@@ -62,7 +64,7 @@ script_path="$script_dir/42free.sh"
 sgoinfre_root=$(find /sgoinfre/ -type d -name "$USER" -print -quit 2>/dev/null | grep -oE "^.*$USER" | head -n 1)
 sgoinfre_alt="/nfs/$sgoinfre_root"
 sgoinfre="$sgoinfre_root"
-sgoinfre_permissions=$(stat -c "%A" "$sgoinfre" 2>/dev/null)
+sgoinfre_permissions=$($stat_human_readable "$sgoinfre" 2>/dev/null)
 
 # Shell config files
 bash_config="$HOME/.bashrc"
