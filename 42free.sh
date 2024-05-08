@@ -312,7 +312,7 @@ move_files()
     local operation=$3
 
     # Move the files in a background job
-    pretty_print "${operation^} '$(basename "$source_path")' to '$target_dirpath'..."
+    pretty_print "$(tr '[:lower:]' '[:upper:]' <<< ${operation:0:1})${operation:1} '$(basename "$source_path")' to '$target_dirpath'..."
     stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
     rsync_job=$!
 
@@ -643,7 +643,7 @@ change_max_sizes()
 
         # Change MAX_SIZE in all shell config files
         for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
-            if sed -i "/^export ${dir^^}_MAX_SIZE=/c\export ${dir^^}_MAX_SIZE=${!max_size_var_name}" "$config_file" 2>/dev/null; then
+            if sed -i "/^export $(tr '[:lower:]' '[:upper:]' <<< "${dir}")_MAX_SIZE=/c\export $(tr '[:lower:]' '[:upper:]' <<< "${dir}")_MAX_SIZE=${!max_size_var_name}" "$config_file" 2>/dev/null; then
                 changed_max_size=true
             fi
         done
@@ -1036,7 +1036,7 @@ for arg in "${args[@]}"; do
 
     # Check if the target directory would go above its maximum recommended size
     if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
-        pretty_print "$indicator_warning ${operation^} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
+        pretty_print "$indicator_warning $(tr '[:lower:]' '[:upper:]' <<< ${operation:0:1})${operation:1} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
             arg_skipped=true
