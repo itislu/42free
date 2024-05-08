@@ -352,6 +352,17 @@ cleanup_empty_dirs()
     done
 }
 
+symlink()
+{
+    local target_path=$1
+    local link_path=$2
+
+    if [[ -d "$link_path" ]]; then
+        link_path=$(dirname "$link_path")
+    fi
+    ln -s "$target_path" "$link_path"
+}
+
 clear_prev_line()
 {
     printf "\e[1K\e[1A\n"
@@ -939,7 +950,7 @@ for arg in "${args[@]}"; do
             pretty_print "'${bright_yellow}$source_path${reset}' has already been moved to sgoinfre."
             pretty_print "It is located at '${bright_green}$target_path${reset}'."
             if prompt_single_key "$prompt_symlink"; then
-                if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
+                if stderr=$(symlink "$target_path" "$source_path" 2>&1); then
                     pretty_print "$indicator_success Symbolic link created."
                 else
                     pretty_print "$indicator_error Cannot create symbolic link."
@@ -1096,7 +1107,7 @@ for arg in "${args[@]}"; do
             fi
 
             # Create the symbolic link
-            ln -sT "$target_path" "$link" 2>/dev/null
+            symlink "$target_path" "$link" 2>/dev/null
             pretty_print "$link_create_msg"
 
             # Calculate and print how much space was already partially moved
@@ -1137,14 +1148,14 @@ for arg in "${args[@]}"; do
 
     if ! $restore; then
         # Create the symbolic link
-        if stderr=$(ln -sT "$target_path" "$source_path" 2>&1); then
+        if stderr=$(symlink "$target_path" "$source_path" 2>&1); then
             pretty_print "Symbolic link left behind."
         else
             pretty_print "$indicator_warning Cannot create symbolic link with name '$source_basename'."
             print_stderr
             syscmd_failed=true
             # Create the symbolic link with a tmp name
-            if stderr=$(ln -sT "$target_path" "$source_path~42free_tmp~" 2>&1); then
+            if stderr=$(symlink "$target_path" "$source_path~42free_tmp~" 2>&1); then
                 pretty_print "Symbolic link left behind with a tmp name."
             else
                 print_stderr
