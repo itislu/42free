@@ -493,8 +493,8 @@ calculate_usage_color()
 
 print_available_space()
 {
-    local source_base_size_in_bytes=$1
-    local target_base_size_in_bytes=$2
+    local source_base_size_in_kb=$1
+    local target_base_size_in_kb=$2
     local source_base_size
     local target_base_size
     local home_size
@@ -502,8 +502,8 @@ print_available_space()
     local home_color
     local sgoinfre_color
 
-    source_base_size=$(echo "$source_base_size_in_bytes/1024/1024/1024" | bc -l | xargs printf "%.2f")
-    target_base_size=$(echo "$target_base_size_in_bytes/1024/1024/1024" | bc -l | xargs printf "%.2f")
+    source_base_size=$(echo "$source_base_size_in_kb/1024/1024" | bc -l | xargs printf "%.2f")
+    target_base_size=$(echo "$target_base_size_in_kb/1024/1024" | bc -l | xargs printf "%.2f")
 
     if ! $restore; then
         home_size=$source_base_size
@@ -1004,38 +1004,38 @@ for arg in "${args[@]}"; do
     fi
 
     # Get the current sizes of the source and target base directories
-    if [[ -z "$target_base_size_in_bytes" ]]; then
+    if [[ -z "$target_base_size_in_kb" ]]; then
         pretty_print "Getting the current sizes of the $source_name and $target_name directories..."
 
         tmpfile_source_base_size="/tmp/42free~source_base_size"
         tmpfile_target_base_size="/tmp/42free~target_base_size"
 
         # Run parallel jobs and wait for both to finish
-        du -sb "$source_base" 2>/dev/null | cut -f1 > $tmpfile_source_base_size &
+        du -sk "$source_base" 2>/dev/null | cut -f1 > $tmpfile_source_base_size &
         source_base_size_job=$!
-        du -sb "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
+        du -sk "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
         target_base_size_job=$!
         wait_for_jobs "searching" $source_base_size_job $target_base_size_job
 
         # Read the sizes from the temporary files
-        source_base_size_in_bytes=$(cat $tmpfile_source_base_size 2>/dev/null)
-        target_base_size_in_bytes=$(cat $tmpfile_target_base_size 2>/dev/null)
+        source_base_size_in_kb=$(cat $tmpfile_source_base_size 2>/dev/null)
+        target_base_size_in_kb=$(cat $tmpfile_target_base_size 2>/dev/null)
         rm -f $tmpfile_source_base_size $tmpfile_target_base_size
     fi
 
     # Get the size of the directory or file to be moved
     pretty_print "Getting the size of '$source_basename'..."
     size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
-    size_in_bytes=$(du -sb "$source_path" 2>/dev/null | cut -f1)
+    size_in_kb=$(du -sk "$source_path" 2>/dev/null | cut -f1)
 
     # Get the size of any target that will be replaced
-    existing_target_size_in_bytes="$(du -sb "$target_path" 2>/dev/null | cut -f1)"
+    existing_target_size_in_kb="$(du -sk "$target_path" 2>/dev/null | cut -f1)"
 
-    # Convert target_max_size from GB to bytes
-    max_size_in_bytes=$(( target_max_size * 1024 * 1024 * 1024 ))
+    # Convert target_max_size from GB to kilobytes
+    max_size_in_kb=$(( target_max_size * 1024 * 1024 ))
 
     # Check if the target directory would go above its maximum recommended size
-    if (( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes > max_size_in_bytes )); then
+    if (( target_base_size_in_kb + size_in_kb - existing_target_size_in_kb > max_size_in_kb )); then
         pretty_print "$indicator_warning $(tr '[:lower:]' '[:upper:]' <<< ${operation:0:1})${operation:1} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
@@ -1088,9 +1088,9 @@ for arg in "${args[@]}"; do
             pretty_print "$link_create_msg"
 
             # Calculate and print how much space was already partially moved
-            leftover_size_in_bytes=$(du -sb "$source_old" 2>/dev/null | cut -f1)
-            outcome_size_in_bytes=$(( size_in_bytes - leftover_size_in_bytes ))
-            outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_bytes)"
+            leftover_size_in_kb=$(du -sk "$source_old" 2>/dev/null | cut -f1)
+            outcome_size_in_kb=$(( size_in_kb - leftover_size_in_kb ))
+            outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_kb)"
             pretty_print "${bold}$outcome_size${reset} of ${bold}$size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
@@ -1118,7 +1118,7 @@ for arg in "${args[@]}"; do
         fi
 
         # Force recalculation of the target directory size in next iteration
-        unset target_base_size_in_bytes
+        unset target_base_size_in_kb
         continue
     fi
     pretty_print "$indicator_success '${bright_yellow}$source_basename${reset}' successfully $operation_success to '${bright_green}$target_dirpath${reset}'."
@@ -1146,8 +1146,8 @@ for arg in "${args[@]}"; do
     fi
 
     # Update the directory sizes
-    source_base_size_in_bytes=$(( source_base_size_in_bytes - size_in_bytes ))
-    target_base_size_in_bytes=$(( target_base_size_in_bytes + size_in_bytes - existing_target_size_in_bytes ))
+    source_base_size_in_kb=$(( source_base_size_in_kb - size_in_kb ))
+    target_base_size_in_kb=$(( target_base_size_in_kb + size_in_kb - existing_target_size_in_kb ))
 
     # Print result
     if ! $restore; then
@@ -1156,7 +1156,7 @@ for arg in "${args[@]}"; do
         outcome_color="${bright_blue}"
     fi
     pretty_print "${bold}${outcome_color}$size $outcome.${reset}"
-    print_available_space "$source_base_size_in_bytes" "$target_base_size_in_bytes"
+    print_available_space "$source_base_size_in_kb" "$target_base_size_in_kb"
 
 # Process the next argument
 done
