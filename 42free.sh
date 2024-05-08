@@ -1098,16 +1098,16 @@ for arg in "${args[@]}"; do
             # Rename the directory with the files that could not be moved
             source_old="$source_path~42free-old_$(get_timestamp)~"
             if mv -T "$source_path" "$source_old" 2>/dev/null; then
-                link="$source_path"
+                link_path="$source_path"
                 link_create_msg="Symbolic link created and the files that could not be moved are left in '${bold}$source_old${reset}'."
             else
                 source_old="$source_path"
-                link="$source_path~42free_tmp~"
+                link_path="$source_path~42free_tmp~"
                 link_create_msg="Symbolic link left behind with a tmp name."
             fi
 
             # Create the symbolic link
-            symlink "$target_path" "$link" 2>/dev/null
+            symlink "$target_path" "$link_path" 2>/dev/null
             pretty_print "$link_create_msg"
 
             # Calculate and print how much space was already partially moved
@@ -1118,7 +1118,7 @@ for arg in "${args[@]}"; do
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
             if prompt_with_enter "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory? [${bold}y${reset}/${bold}N${reset}]"; then
-                rm -f "$link" 2>/dev/null;
+                rm -f "$link_path" 2>/dev/null;
                 mv -T "$source_old" "$source_path" 2>/dev/null
                 if ! move_files "$target_path" "$source_dirpath" "restoring"; then
                     pretty_print "$indicator_error Could not fully restore '$source_basename' to '$source_dirpath'."
