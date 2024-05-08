@@ -1025,8 +1025,8 @@ for arg in "${args[@]}"; do
 
     # Get the size of the directory or file to be moved
     pretty_print "Getting the size of '$source_basename'..."
-    size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
-    size_in_kb=$(du -sk "$source_path" 2>/dev/null | cut -f1)
+    source_size="$(du -sh "$source_path" 2>/dev/null | cut -f1)B"
+    source_size_in_kb=$(du -sk "$source_path" 2>/dev/null | cut -f1)
 
     # Get the size of any target that will be replaced
     existing_target_size_in_kb="$(du -sk "$target_path" 2>/dev/null | cut -f1)"
@@ -1035,7 +1035,7 @@ for arg in "${args[@]}"; do
     max_size_in_kb=$(( target_max_size * 1024 * 1024 ))
 
     # Check if the target directory would go above its maximum recommended size
-    if (( target_base_size_in_kb + size_in_kb - existing_target_size_in_kb > max_size_in_kb )); then
+    if (( target_base_size_in_kb + source_size_in_kb - existing_target_size_in_kb > max_size_in_kb )); then
         pretty_print "$indicator_warning $(tr '[:lower:]' '[:upper:]' <<< ${operation:0:1})${operation:1} '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
         if ! prompt_single_key "$prompt_continue_still"; then
             print_skip_arg "$arg"
@@ -1089,9 +1089,9 @@ for arg in "${args[@]}"; do
 
             # Calculate and print how much space was already partially moved
             leftover_size_in_kb=$(du -sk "$source_old" 2>/dev/null | cut -f1)
-            outcome_size_in_kb=$(( size_in_kb - leftover_size_in_kb ))
+            outcome_size_in_kb=$(( source_size_in_kb - leftover_size_in_kb ))
             outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_kb)"
-            pretty_print "${bold}$outcome_size${reset} of ${bold}$size${reset} $outcome."
+            pretty_print "${bold}$outcome_size${reset} of ${bold}$source_size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
             if prompt_with_enter "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory? [${bold}y${reset}/${bold}N${reset}]"; then
@@ -1146,8 +1146,8 @@ for arg in "${args[@]}"; do
     fi
 
     # Update the directory sizes
-    source_base_size_in_kb=$(( source_base_size_in_kb - size_in_kb ))
-    target_base_size_in_kb=$(( target_base_size_in_kb + size_in_kb - existing_target_size_in_kb ))
+    source_base_size_in_kb=$(( source_base_size_in_kb - source_size_in_kb ))
+    target_base_size_in_kb=$(( target_base_size_in_kb + source_size_in_kb - existing_target_size_in_kb ))
 
     # Print result
     if ! $restore; then
@@ -1155,7 +1155,7 @@ for arg in "${args[@]}"; do
     else
         outcome_color="${bright_blue}"
     fi
-    pretty_print "${bold}${outcome_color}$size $outcome.${reset}"
+    pretty_print "${bold}${outcome_color}$source_size $outcome.${reset}"
     print_available_space "$source_base_size_in_kb" "$target_base_size_in_kb"
 
 # Process the next argument
