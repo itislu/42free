@@ -1,28 +1,27 @@
 <div align="center">
 
-# 📁&nbsp; 42free &nbsp;📁
-
-### 42free is a shell script that helps you manage your limited storage on 42 campuses.
-
-#### ⚙️ 42free supports Linux and macOS.
-
-<br>
-
-### 🚀 Quick Install
-
-```bash
-bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
-```
-
-<br>
-
-<a href="https://github.com/itislu/42free/releases">
+  # 📁&nbsp; 42free &nbsp;📁
+  
+  ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
+  
+  #### ⚙️ 42free supports Linux and macOS.
+  
+  <br>
+  
+  ### 🚀 Quick Install
+  
+  ```bash
+  bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
+  ```
+  
+  <br>
+  
+  <a href="https://github.com/itislu/42free/releases">
     <img
-        alt="GitHub Downloads (all assets, all releases)"
-        src="https://img.shields.io/github/downloads/itislu/42free/total?style=for-the-badge&logo=GNOME%20Terminal&logoColor=%23241f31&logoSize=auto&label=downloads&labelColor=%23f8d765&color=%23241f31"
+      alt="GitHub Downloads (all assets, all releases)"
+      src="https://img.shields.io/github/downloads/itislu/42free/total?style=for-the-badge&logo=GNOME%20Terminal&logoColor=%23241f31&logoSize=auto&label=downloads&labelColor=%23f8d765&color=%23241f31"
     >
-</a>
-
+  </a>
 </div>
 
 <br>
