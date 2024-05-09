@@ -131,11 +131,12 @@ $header
 $tagline
 $delim_big
 \n\
-The files get moved from '$HOME' to '$sgoinfre'.
+42free helps you free up storage space in your home directory by moving files to your personal sgoinfre directory.
 \n\
-A symbolic link is left behind in the original location.
+It leaves behind a symbolic link in the original location.
+All programs then access the moved files through the symlink and they will accumulate their space outside of your home directory.
+\n\
 You only need to run 42free once for every directory or file you want to free the space of.
-All programs will then access them through the symlink and they will accumulate their space outside of your home directory.
 \n\
 $delim_small
 \n\
