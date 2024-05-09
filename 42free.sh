@@ -309,6 +309,25 @@ capitalize_full()
     tr '[:lower:]' '[:upper:]' <<< "$1"
 }
 
+# Convert a size from bytes to a human-readable format
+bytes_to_human()
+{
+    local size_in_bytes=$1
+
+    python3 -c "
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
+size_in_bytes = $size_in_bytes
+suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+i = 0
+while size_in_bytes >= 1024 and i < len(suffixes) - 1:
+    size_in_bytes /= 1024
+    i += 1
+print(locale.format_string('%0.1f', size_in_bytes) + suffixes[i])
+"
+}
+
 # If realpath command is not available, define a custom function as a replacement
 if ! command -v realpath &>/dev/null; then
     realpath()
@@ -1113,7 +1132,7 @@ for arg in "${args[@]}"; do
             # Calculate and print how much space was already partially moved
             leftover_size_in_kb=$(du -sk "$source_old" 2>/dev/null | cut -f1)
             outcome_size_in_kb=$(( source_size_in_kb - leftover_size_in_kb ))
-            outcome_size="$(numfmt --to=iec --suffix=B $outcome_size_in_kb)"
+            outcome_size="$(bytes_to_human $(( outcome_size_in_kb * 1024 )))"
             pretty_print "${bold}$outcome_size${reset} of ${bold}$source_size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
