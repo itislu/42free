@@ -198,6 +198,7 @@ prompt_agree_all="Do you agree with all of those? [${bold}Y${reset}/${bold}n${re
 prompt_continue="Do you wish to continue? [${bold}Y${reset}/${bold}n${reset}]"
 prompt_continue_still="Do you still wish to continue? [${bold}y${reset}/${bold}N${reset}]"
 prompt_continue_with_rest="Do you wish to continue with the other arguments? [${bold}y${reset}/${bold}N${reset}]"
+prompt_input_sgoinfre="Do you wish to input the path to your sgoinfre directory manually? [${bold}Y${reset}/${bold}n${reset}]"
 prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'? [${bold}Y${reset}/${bold}n${reset}]"
 prompt_symlink="Do you wish to create a symbolic link to it? [${bold}Y${reset}/${bold}n${reset}]"
 prompt_replace="Do you wish to continue and replace any duplicate files? [${bold}y${reset}/${bold}N${reset}]"
@@ -286,6 +287,24 @@ prompt_single_key()
         return 0
     fi
     return 1
+}
+
+# Prompt the user for a valid path to their personal sgoinfre directory
+prompt_sgoinfre_path()
+{
+    pretty_print "Please enter the path to your personal sgoinfre directory:"
+    while true; do
+        read -rp "> "
+        REPLY=$(eval echo "$REPLY")
+        if [[ ! -d "$REPLY" ]]; then
+            pretty_print " ✖ Not an existing directory."
+            pretty_print "Please try again."
+        else
+            pretty_print " ✔ Directory exists."
+            sgoinfre="$REPLY"
+            break
+        fi
+    done
 }
 
 # Convert the base path of the default arguments
@@ -822,7 +841,13 @@ if [[ ! -d "$sgoinfre" ]]; then
     pretty_print "  - The campus you are on."
     pretty_print "  - The path to your sgoinfre directory."
     pretty_print "${underlined}${bright_blue}https://github.com/itislu/42free/issues${reset}"
-    ft_exit $major_error
+    echo
+    # Prompt user if they wish to input the path manually
+    if prompt_single_key "$prompt_input_sgoinfre"; then
+        prompt_sgoinfre_path
+    else
+        ft_exit $major_error
+    fi
 fi
 
 # Print header
