@@ -64,7 +64,6 @@ script_path="$script_dir/42free.sh"
 sgoinfre_root=$(find /sgoinfre/ -type d -name "$USER" -print -quit 2>/dev/null | grep -oE "^.*$USER" | head -n 1)
 sgoinfre_alt="/nfs/$sgoinfre_root"
 sgoinfre="$sgoinfre_root"
-sgoinfre_permissions=$($stat_human_readable "$sgoinfre" 2>/dev/null)
 
 # Shell config files
 bash_config="$HOME/.bashrc"
@@ -856,6 +855,7 @@ pretty_print "$delim_big"
 echo
 
 # Check if the permissions of user's sgoinfre directory are rwx------
+sgoinfre_permissions=$($stat_human_readable "$sgoinfre" 2>/dev/null)
 if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_single_key "$prompt_change_permissions"; then
