@@ -62,6 +62,13 @@ script_path="$script_dir/42free.sh"
 sgoinfre_root=$(find /sgoinfre/ -type d -name "$USER" -print -quit 2>/dev/null | grep -oE "^.*$USER" | head -n 1)
 sgoinfre_alt="/nfs/$sgoinfre_root"
 sgoinfre="$sgoinfre_root"
+sgoinfre_permissions=$( \
+    if [[ "$os_name" == "Linux" ]]; then
+        stat -c %A "$sgoinfre"
+    elif [[ "$os_name" == "Darwin" ]]; then
+        stat -f %Sp "$sgoinfre"
+    fi 2>/dev/null
+)
 
 # Shell config files
 bash_config="$HOME/.bashrc"
