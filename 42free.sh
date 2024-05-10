@@ -726,6 +726,9 @@ change_max_sizes()
         if $changed_max_size; then
             pretty_print "${yellow}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${reset}"
             changed_config=true
+        else
+            pretty_print "$indicator_error Could not change the warning size for your $dir directory."
+            syscmd_failed=true
         fi
     done
 }
