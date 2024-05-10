@@ -690,6 +690,18 @@ filter_default_args()
     default_args=("${filtered_default_args[@]}")
 }
 
+sed_inplace()
+{
+    local script=$1
+    local file=$2
+
+    if [[ "$os_name" == "Linux" ]]; then
+        sed -i "$script" "$file"
+    elif [[ "$os_name" == "Darwin" ]]; then
+        sed -i '' "$script" "$file"
+    fi
+}
+
 change_max_sizes()
 {
     local changed_max_size
@@ -713,7 +725,7 @@ change_max_sizes()
 
         # Change MAX_SIZE in all shell config files
         for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
-            if sed -i "/^export $max_size_var_name=/c\export $max_size_var_name=${!max_size_var_name}" "$config_file" 2>/dev/null; then
+            if sed_inplace "/^export $max_size_var_name=/c\export $max_size_var_name=${!max_size_var_name}" "$config_file" 2>/dev/null; then
                 changed_max_size=true
             fi
         done
@@ -742,15 +754,15 @@ clean_config_files()
         esac
         if [[ -f "$config_file" ]]; then
             if grep -q "alias 42free=" "$config_file" 2>/dev/null; then
-                sed -i '/^alias 42free=/d' "$config_file" 2>/dev/null
+                sed_inplace '/^alias 42free=/d' "$config_file" 2>/dev/null
                 pretty_print "${yellow}42free alias removed from $shell_name.${reset}"
             fi
             if grep -q "^export HOME_MAX_SIZE=" "$config_file" 2>/dev/null; then
-                sed -i '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null
+                sed_inplace '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null
                 pretty_print "${yellow}HOME_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE_MAX_SIZE=" "$config_file" 2>/dev/null; then
-                sed -i '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null
+                sed_inplace '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null
                 pretty_print "${yellow}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
         fi
