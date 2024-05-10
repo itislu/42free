@@ -244,7 +244,17 @@ ft_exit()
         # If exec failed, inform the user to start a new shell
         pretty_print "Please start a new shell to make the changed 42free configs available."
     fi
-    exit "$1"
+    if [[ $1 =~ ^-?[0-9]+$ ]]; then
+        exit "$1"
+    elif $syscmd_failed; then
+        exit $major_error
+    elif $arg_skipped; then
+        exit $minor_error
+    elif $bad_input; then
+        exit $input_error
+    else
+        exit $success
+    fi
 }
 
 print_skip_arg()
@@ -798,7 +808,7 @@ while (( $# )); do
             ;;
         -m|--max-size)
             change_max_sizes
-            ft_exit $success
+            ft_exit
             ;;
         -u|--update)
             update
@@ -1248,12 +1258,4 @@ for arg in "${args[@]}"; do
 # Process the next argument
 done
 
-if $syscmd_failed; then
-    ft_exit $major_error
-elif $arg_skipped; then
-    ft_exit $minor_error
-elif $bad_input; then
-    ft_exit $input_error
-else
-    ft_exit $success
-fi
+ft_exit
