@@ -47,10 +47,8 @@ default_args_macos=(
 os_name=$(uname -s)
 if [[ "$os_name" == "Linux" ]]; then
     default_args=("${default_args_linux[@]}")
-    stat_human_readable="stat -c %A"
 elif [[ "$os_name" == "Darwin" ]]; then
     default_args=("${default_args_macos[@]}")
-    stat_human_readable="stat -f %Sp"
 else
     echo "42free currently only supports Linux and macOS. Sorry :("
     exit $major_error
@@ -345,6 +343,17 @@ while size_in_bytes >= 1024 and i < len(suffixes) - 1:
     i += 1
 print(locale.format_string('%0.1f', size_in_bytes) + suffixes[i])
 "
+}
+
+stat_human_readable()
+{
+    local path=$1
+
+    if [[ "$os_name" == "Linux" ]]; then
+        stat -c %A "$path"
+    elif [[ "$os_name" == "Darwin" ]]; then
+        stat -f %Sp "$path"
+    fi
 }
 
 # If realpath command is not available, define a custom function as a replacement
@@ -855,7 +864,7 @@ pretty_print "$delim_big"
 echo
 
 # Check if the permissions of user's sgoinfre directory are rwx------
-sgoinfre_permissions=$($stat_human_readable "$sgoinfre" 2>/dev/null)
+sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
 if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "$msg_sgoinfre_permissions"
     if prompt_single_key "$prompt_change_permissions"; then
