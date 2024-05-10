@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current_version="v1.6.3+dev"
+current_version="v1.7.0"
 
 # Exit codes
 success=0
