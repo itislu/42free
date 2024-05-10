@@ -178,13 +178,6 @@ ${bold}42free $current_version${reset}
 A script made for 42 students to take advantage of symbolic links to free up storage without data loss.
 For more information, visit ${underlined}${bright_blue}https://github.com/itislu/42free${reset}."
 
-msg_sgoinfre_permissions="\
-$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'.
-They are currently set to '${bold}$sgoinfre_permissions${reset}'.
-It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
-
-msg_sgoinfre_permissions_keep="Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
-
 msg_close_programs="${bold}${bright_yellow}Close all programs first to avoid errors during the move.${reset}"
 
 msg_manual_reminder="To see the manual, run '${bold}42free --help${reset}'."
@@ -878,7 +871,9 @@ echo
 # Check if the permissions of user's sgoinfre directory are rwx------
 sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
 if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
-    pretty_print "$msg_sgoinfre_permissions"
+    pretty_print "$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'."
+    pretty_print "They are currently set to '${bold}$sgoinfre_permissions${reset}'."
+    pretty_print "It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
     if prompt_single_key "$prompt_change_permissions"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
             pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${bold}rwx------${reset}'."
@@ -889,10 +884,10 @@ if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
             if ! prompt_single_key "$prompt_continue_still"; then
                 ft_exit $major_error
             fi
-            pretty_print "$msg_sgoinfre_permissions_keep"
+            pretty_print "Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
         fi
     else
-        pretty_print "$msg_sgoinfre_permissions_keep"
+        pretty_print "Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
     fi
 fi
 
