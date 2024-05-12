@@ -107,9 +107,9 @@ add_to_config()
     local line=$3
     local msg=$4
 
-    if ! grep "$pattern" "$config_file" &>/dev/null; then
+    if ! grep -q "$pattern" "$config_file" 2>/dev/null; then
         mkdir -p "$(dirname "$config_file")"
-        if ! $changed_config; then
+        if [[ -n "$(tail -c 1 "$config_file")" ]]; then
             printf "\n" >> "$config_file"
         fi
         printf "%s\n" "$line" >> "$config_file"
