@@ -376,10 +376,9 @@ move_files()
     # Move the files in a background job
     pretty_print "$(capitalize_initial "$operation") '$(basename "$source_path")' to '$target_dirpath'..."
     stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
-    rsync_job=$!
 
     # Wait for rsync to finish
-    wait_for_jobs "$operation" $rsync_job
+    wait_for_jobs "$operation" $!
     rsync_status=$?
 
     cleanup_empty_dirs "$source_path"
@@ -1115,10 +1114,10 @@ for arg in "${args[@]}"; do
 
         # Run parallel jobs and wait for both to finish
         du -sk "$source_base" 2>/dev/null | cut -f1 > $tmpfile_source_base_size &
-        source_base_size_job=$!
+        jobs+=($!)
         du -sk "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
-        target_base_size_job=$!
-        wait_for_jobs "searching" $source_base_size_job $target_base_size_job
+        jobs+=($!)
+        wait_for_jobs "searching" "${jobs[@]}"
 
         # Read the sizes from the temporary files
         source_base_size_in_kb=$(cat $tmpfile_source_base_size 2>/dev/null)
