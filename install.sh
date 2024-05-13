@@ -14,7 +14,7 @@ if [[ "$os_name" != "Linux" ]] && [[ "$os_name" != "Darwin" ]]; then
 fi
 
 # Define the URL of the latest release API endpoint
-api_url="https://api.github.com/repos/itislu/42free/releases/latest"
+latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Array of supported campuses
 # Add new campuses to end of list before "Other" (will be printed alphanumerically sorted anyway)
@@ -220,7 +220,7 @@ if [[ -n $1 ]] && [[ $1 != "update" ]]; then
         exit $download_failed
     fi
 else
-    script_url=$("$downloader" "$downloader_opts_stdout" "$api_url" | grep "browser_download_url" | cut -d '"' -f 4)
+    script_url=$("$downloader" "$downloader_opts_stdout" "$latest_release_url" | grep "browser_download_url" | cut -d '"' -f 4)
 fi
 
 # Download the script
