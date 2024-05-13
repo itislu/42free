@@ -1,21 +1,21 @@
 <div align="center">
 
   # 📁&nbsp; 42free &nbsp;📁
-  
+
   ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
-  
+
   #### ⚙️ 42free supports Linux and macOS.
-  
+
   <br>
-  
+
   ### 🚀 Quick Install
-  
+
   ```bash
   bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/main/install.sh)
   ```
-  
+
   <br>
-  
+
   <a href="https://github.com/itislu/42free/releases">
     <img
       alt="GitHub Downloads (all assets, all releases)"
@@ -198,6 +198,10 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 | [@Anantiz](https://github.com/Anantiz) | Thank you for stress testing! |
 | [@alexandregv](https://github.com/alexandregv) | Thank you for showing me how 42 Paris does it! |
 | [@loyc12](https://github.com/loyc12) | Thank you for helping to increase compatibility with more campuses! |
+
+Also thank you to all my peers at 42 Vienna for the constant feedback! ❤️<br>
+[@LeaYeh](https://github.com/LeaYeh), [@ismayilguliyev28](https://github.com/ismayilguliyev28), [@Rperkmann](https://github.com/Rperkmann), [@michaela811](https://github.com/michaela811), [@grignetta](https://github.com/grignetta), [@yenthing](https://github.com/yenthing), [@leske42](https://github.com/leske42), [@ARWChair](https://github.com/ARWChair)<br>
+And thank you to [@Zekao](https://github.com/Zekao) for sparking the idea in the first place.
 
 <br>
 
