@@ -233,6 +233,13 @@ if [[ -n $1 ]] && [[ $1 != "update" ]]; then
         pretty_print "${bold}${red}Branch '$1' does not exist.${reset}"
         exit $download_failed
     fi
+elif [[ $1 == "update" && -n $2 ]]; then
+    if git ls-remote --tags https://github.com/itislu/42free.git "$2" 2>/dev/null | grep -q "$2$"; then
+        script_url="https://raw.githubusercontent.com/itislu/42free/$2/$dest_file"
+    else
+        pretty_print "${bold}${red}Version '$2' does not exist.${reset}"
+        exit $download_failed
+    fi
 else
     script_url=$("$downloader" "$downloader_opts_stdout" "$latest_release_url" | grep "browser_download_url" | cut -d '"' -f 4)
 fi
@@ -285,7 +292,11 @@ fi
 
 # Check if it's an update or a fresh install
 if [[ $1 == "update" ]]; then
-    pretty_print "${bold}${bright_green}Update completed.${reset}"
+    if [[ -n $2 ]]; then
+        pretty_print "${bold}${bright_green}Update to $2 completed.${reset}"
+    else
+        pretty_print "${bold}${bright_green}Update completed.${reset}"
+    fi
 else
     pretty_print "${bold}${bright_green}Installation completed.${reset}"
     pretty_print "You can now use the 42free command in your terminal."

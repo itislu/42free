@@ -1071,7 +1071,7 @@ update() {
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
         if prompt_single_key "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") "update"; ft_exit $?
+            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") "update" "$latest_version"; ft_exit $?
         else
             pretty_print "Not updating."
         fi
