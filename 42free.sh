@@ -519,16 +519,16 @@ wait_for_jobs()
     # Hide cursor
     tput civis
     # Print frames while jobs are running
-    while any_job_running "${job_pids[@]}"; do
+    while true; do
         for frame in "${frames[@]}"; do
             if ! any_job_running "${job_pids[@]}"; then
-                break
+                break 2
             fi
             printf "\r%s" "$frame"
             sleep "$pacing"
         done
     done
-      # Clear line on completion
+    # Clear line on completion
     printf "\r\e[K"
     # Show cursor
     tput cnorm
