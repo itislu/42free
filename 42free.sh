@@ -246,16 +246,18 @@ print_one_stderr()
 
 ft_exit()
 {
+    local exit_code=$1
+
     if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
-        if [[ $1 -eq 0 ]] && [[ -x "$SHELL" ]]; then
+        if [[ $exit_code -eq 0 ]] && [[ -x "$SHELL" ]]; then
             exec $SHELL
         fi
         # If exec failed, inform the user to start a new shell
         pretty_print "Please start a new shell to make the changed 42free configs available."
     fi
-    if [[ $1 =~ ^-?[0-9]+$ ]]; then
-        exit "$1"
+    if [[ $exit_code =~ ^-?[0-9]+$ ]]; then
+        exit $exit_code
     elif $syscmd_failed; then
         exit $major_error
     elif $arg_skipped; then
@@ -529,6 +531,7 @@ move_files()
     local source_path=$1
     local target_dirpath=$2
     local operation=$3
+    local rsync_status
 
     # Move the files in a background job
     pretty_print "$(capitalize_initial "$operation") '$(basename "$source_path")' to '$target_dirpath'..."
@@ -538,12 +541,12 @@ move_files()
     wait_for_jobs "all" "$operation" $!
     rsync_status=$?
 
-    cleanup_empty_dirs "$source_path"
-
     # Check the exit status of rsync
     if [[ $rsync_status -ne 0 ]]; then
         syscmd_failed=true
     fi
+
+    cleanup_empty_dirs "$source_path"
     return $rsync_status
 }
 
