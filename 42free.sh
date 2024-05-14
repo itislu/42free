@@ -907,6 +907,7 @@ print_update_info()
         latest_version=$(get_latest_version_number "quiet")
     fi
 
+    # If current version number is not the latest, print update info
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         # If reminder already printed before, don't print again
         if [[ "$1" == "remind" ]] && $printed_update_info; then
@@ -932,7 +933,7 @@ update()
         return $?
     fi
 
-    # Compare the latest version with the current version number
+    # If current version number is not the latest, prompt for update
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
         if prompt_single_key "$prompt_update"; then
