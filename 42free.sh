@@ -706,8 +706,30 @@ sed_inplace()
     if [[ "$os_name" == "Linux" ]]; then
         sed -i "$script" "$file"
     elif [[ "$os_name" == "Darwin" ]]; then
-        sed -i '' "$script" "$file"
+        sed -i "" "$script" "$file"
     fi
+}
+
+# Change or add a line in a shell config file
+change_config()
+{
+    local line=$1
+    local config_file=$2
+
+    if ! grep -q "^${line%%=*}=" "$config_file"; then
+        mkdir -p "$(dirname "$config_file")"
+        if [[ -n "$(tail -c 1 "$config_file")" ]]; then
+            printf "\n" >> "$config_file"
+        fi
+        printf "%s\n" "$line" >> "$config_file"
+        changed_config=true
+        return 0
+    elif ! grep -q "^$line$" "$config_file"; then
+        sed_inplace "|^${line%%=*}=|c\\$line" "$config_file"
+        changed_config=true
+        return 0
+    fi
+    return 1
 }
 
 change_max_sizes()
@@ -733,17 +755,15 @@ change_max_sizes()
 
         # Change MAX_SIZE in all shell config files
         for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
-            if sed_inplace "/^export $max_size_var_name=/c\export $max_size_var_name=${!max_size_var_name}" "$config_file" 2>/dev/null; then
+            if change_config "export $max_size_var_name=${!max_size_var_name}" "$config_file" 2>/dev/null; then
                 changed_max_size=true
             fi
         done
 
         if $changed_max_size; then
             pretty_print "${yellow}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${reset}"
-            changed_config=true
         else
-            pretty_print "$indicator_error Could not change the warning size for your $dir directory."
-            syscmd_failed=true
+            pretty_print "${yellow}The warning size for your $dir directory was already set to ${!max_size_var_name}GB.${reset}"
         fi
     done
 }
@@ -765,15 +785,15 @@ clean_config_files()
         esac
         if [[ -f "$config_file" ]]; then
             if grep -q "alias 42free=" "$config_file" 2>/dev/null; then
-                sed_inplace '/^alias 42free=/d' "$config_file" 2>/dev/null
+                sed_inplace "/^alias 42free=/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}42free alias removed from $shell_name.${reset}"
             fi
             if grep -q "^export HOME_MAX_SIZE=" "$config_file" 2>/dev/null; then
-                sed_inplace '/^export HOME_MAX_SIZE=/d' "$config_file" 2>/dev/null
+                sed_inplace "/^export HOME_MAX_SIZE=/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}HOME_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE_MAX_SIZE=" "$config_file" 2>/dev/null; then
-                sed_inplace '/^export SGOINFRE_MAX_SIZE=/d' "$config_file" 2>/dev/null
+                sed_inplace "/^export SGOINFRE_MAX_SIZE=/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
         fi

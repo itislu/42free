@@ -100,22 +100,38 @@ ft_exit()
     exit "$1"
 }
 
-add_to_config()
+sed_inplace()
 {
-    local config_file=$1
-    local pattern=$2
-    local line=$3
-    local msg=$4
+    local script=$1
+    local file=$2
 
-    if ! grep -q "$pattern" "$config_file" 2>/dev/null; then
+    if [[ "$os_name" == "Linux" ]]; then
+        sed -i "$script" "$file"
+    elif [[ "$os_name" == "Darwin" ]]; then
+        sed -i "" "$script" "$file"
+    fi
+}
+
+# Change or add a line in a shell config file
+change_config()
+{
+    local line=$1
+    local config_file=$2
+
+    if ! grep -q "^${line%%=*}=" "$config_file"; then
         mkdir -p "$(dirname "$config_file")"
         if [[ -n "$(tail -c 1 "$config_file")" ]]; then
             printf "\n" >> "$config_file"
         fi
         printf "%s\n" "$line" >> "$config_file"
-        pretty_print "${yellow}$msg${reset}"
         changed_config=true
+        return 0
+    elif ! grep -q "^$line$" "$config_file"; then
+        sed_inplace "|^${line%%=*}=|c\\$line" "$config_file"
+        changed_config=true
+        return 0
     fi
+    return 1
 }
 
 # Check if it's an update or a fresh install
@@ -248,12 +264,15 @@ for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
             shell_name="fish"
             ;;
     esac
-    msg="Added 42free alias to $shell_name."
-    add_to_config "$config_file" "alias 42free=" "alias 42free='bash $dest_dir/$dest_file'" "$msg"
-    msg="Added HOME_MAX_SIZE environment variable set to $home_max_size to $shell_name."
-    add_to_config "$config_file" "export HOME_MAX_SIZE=" "export HOME_MAX_SIZE=$home_max_size" "$msg"
-    msg="Added SGOINFRE_MAX_SIZE environment variable set to $sgoinfre_max_size to $shell_name."
-    add_to_config "$config_file" "export SGOINFRE_MAX_SIZE=" "export SGOINFRE_MAX_SIZE=$sgoinfre_max_size" "$msg"
+    if change_config "alias 42free='bash $dest_dir/$dest_file'" "$config_file" 2>/dev/null; then
+        pretty_print "${yellow}Added 42free alias to $shell_name.${reset}"
+    fi
+    if change_config "export HOME_MAX_SIZE=$home_max_size" "$config_file" 2>/dev/null; then
+        pretty_print "${yellow}Added HOME_MAX_SIZE environment variable set to $home_max_size to $shell_name.${reset}"
+    fi
+    if change_config "export SGOINFRE_MAX_SIZE=$sgoinfre_max_size" "$config_file" 2>/dev/null; then
+        pretty_print "${yellow}Added SGOINFRE_MAX_SIZE environment variable set to $sgoinfre_max_size to $shell_name.${reset}"
+    fi
 done
 
 # Check user's default shell
