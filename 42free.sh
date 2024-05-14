@@ -183,15 +183,15 @@ msg_close_programs="${bold}${bright_yellow}Close all programs first to avoid err
 msg_manual_reminder="To see the manual, run '${bold}42free --help${reset}'."
 
 # Prompts
-prompt_update="Do you wish to update? [${bold}Y${reset}/${bold}n${reset}]"
-prompt_agree_all="Do you agree with all of those? [${bold}Y${reset}/${bold}n${reset}]"
-prompt_continue="Do you wish to continue? [${bold}Y${reset}/${bold}n${reset}]"
-prompt_continue_still="Do you still wish to continue? [${bold}y${reset}/${bold}N${reset}]"
-prompt_continue_with_rest="Do you wish to continue with the other arguments? [${bold}y${reset}/${bold}N${reset}]"
-prompt_input_sgoinfre="Do you wish to input the path to your sgoinfre directory manually? [${bold}Y${reset}/${bold}n${reset}]"
-prompt_change_permissions="Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'? [${bold}Y${reset}/${bold}n${reset}]"
-prompt_symlink="Do you wish to create a symbolic link to it? [${bold}Y${reset}/${bold}n${reset}]"
-prompt_replace="Do you wish to continue and replace any duplicate files? [${bold}y${reset}/${bold}N${reset}]"
+prompt_update="Do you wish to update?"
+prompt_agree_all="Do you agree with all of those?"
+prompt_continue="Do you wish to continue?"
+prompt_continue_still="Do you still wish to continue?"
+prompt_continue_with_rest="Do you wish to continue with the other arguments?"
+prompt_correct_path="Is this the correct path to your personal sgoinfre directory?"
+prompt_symlink="Do you wish to create a symbolic link to it?"
+prompt_replace="Do you wish to continue and replace any duplicate files?"
+prompt_uninstall="Do you wish to uninstall 42free?"
 
 # Automatically detect the size of the terminal window and preserve word boundaries
 pretty_print()
@@ -266,9 +266,9 @@ print_skip_arg()
 # Default is 'no', for 'yes' needs y/Y/yes/Yes + Enter key
 prompt_with_enter()
 {
-    pretty_print "$1"
+    pretty_print "$1 [${bold}y${reset}/${bold}N${reset}]"
     read -rp "> "
-    if [[ $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
+    if [[ "$REPLY" =~ ^[Yy]([Ee][Ss])?$ ]]; then
         return 0
     fi
     return 1
@@ -278,12 +278,12 @@ prompt_with_enter()
 # Default is 'yes', only needs y/Y key
 prompt_single_key()
 {
-    pretty_print "$1"
+    pretty_print "$1 [${bold}Y${reset}/${bold}n${reset}]"
     read -n 1 -rp "> "
-    if [[ -n $REPLY ]]; then
+    if [[ -n "$REPLY" ]]; then
         echo
     fi
-    if [[ $REPLY =~ ^([Yy]?)$|^$ ]]; then
+    if [[ "$REPLY" =~ ^([Yy]?)$|^$ ]]; then
         return 0
     fi
     return 1
@@ -802,7 +802,7 @@ clean_config_files()
 
 uninstall()
 {
-    if prompt_with_enter "Do you wish to uninstall 42free? [${bold}y${reset}/${bold}N${reset}]"; then
+    if prompt_with_enter "$prompt_uninstall"; then
         pretty_print "Uninstalling 42free..."
         if stderr=$(rm -f "$script_path" 2>&1); then
             pretty_print "${yellow}Script deleted.${reset}"
@@ -912,7 +912,7 @@ if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'."
     pretty_print "They are currently set to '${bold}$sgoinfre_permissions${reset}'."
     pretty_print "It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
-    if prompt_single_key "$prompt_change_permissions"; then
+    if prompt_single_key "Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'?"; then
         if stderr=$(chmod 700 "$sgoinfre"); then
             pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${bold}rwx------${reset}'."
         else
@@ -1216,7 +1216,7 @@ for arg in "${args[@]}"; do
             pretty_print "${bold}$outcome_size${reset} of ${bold}$source_size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
-            if prompt_with_enter "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory? [${bold}y${reset}/${bold}N${reset}]"; then
+            if prompt_with_enter "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory?"; then
                 rm -f "$link_path" 2>/dev/null;
                 mv -T "$source_old" "$source_path" 2>/dev/null
                 if ! move_files "$target_path" "$source_dirpath" "restoring"; then
