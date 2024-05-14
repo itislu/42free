@@ -1416,8 +1416,8 @@ for arg in "${args[@]}"; do
     if [[ -z "$target_base_size_in_kb" ]]; then
         pretty_print "Getting the current sizes of the $source_name and $target_name directories..."
 
-        tmpfile_source_base_size="/tmp/42free~source_base_size"
-        tmpfile_target_base_size="/tmp/42free~target_base_size"
+        tmpfile_source_base_size="/tmp/42free~$$~source_base_size"
+        tmpfile_target_base_size="/tmp/42free~$$~target_base_size"
 
         # Run parallel jobs and wait for both to finish
         du -sk "$source_base" 2>/dev/null | cut -f1 > $tmpfile_source_base_size &
