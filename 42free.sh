@@ -59,9 +59,12 @@ stderr=""
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
-sgoinfre_root=$(find /sgoinfre /System/Volumes/Data/sgoinfre -type d -name "$USER" -print -quit 2>/dev/null | grep -oE "^.*$USER" | head -n 1)
-sgoinfre_alt="/nfs/$sgoinfre_root"
-sgoinfre="$sgoinfre_root"
+sgoinfre="$SGOINFRE"
+sgoinfre_alt_mount="/nfs"
+sgoinfre_common_locations=(
+    "/sgoinfre"
+    "/System/Volumes/Data/sgoinfre"
+)
 
 # Shell config files
 bash_config="$HOME/.bashrc"
@@ -182,6 +185,13 @@ msg_close_programs="${bold}${bright_yellow}Close all programs first to avoid err
 
 msg_manual_reminder="To see the manual, run '${bold}42free --help${reset}'."
 
+msg_report_sgoinfre="\n\
+$indicator_error${bold} There does not seem to be a sgoinfre directory available on your campus.${reset}
+If you are sure there is one, please open an issue on GitHub and mention the following:
+  - The campus you are on.
+  - The path to your sgoinfre directory.
+${underlined}${bright_blue}https://github.com/itislu/42free/issues${reset}"
+
 # Prompts
 prompt_update="Do you wish to update?"
 prompt_agree_all="Do you agree with all of those?"
@@ -257,6 +267,14 @@ ft_exit()
     fi
 }
 
+exit_no_sgoinfre()
+{
+    if [[ ! -d $sgoinfre ]]; then
+        pretty_print "$msg_report_sgoinfre"
+        ft_exit $major_error
+    fi
+}
+
 print_skip_arg()
 {
     pretty_print "Skipping '$1'."
@@ -295,15 +313,60 @@ prompt_sgoinfre_path()
     pretty_print "Please enter the path to your personal sgoinfre directory:"
     while true; do
         read -rp "> "
+        # Expand all variables in reply
         REPLY=$(eval echo "$REPLY")
+
+        # Check if directory exists
         if [[ ! -d "$REPLY" ]]; then
             pretty_print " ✖ Not an existing directory."
             pretty_print "Please try again."
+
+        # Check if absolute path
+        elif [[ ! "$REPLY" =~ ^/ ]]; then
+            pretty_print " ✖ Not an absolute path."
+            pretty_print "Please enter the full path."
+
+        # Check if sgoinfre directory
+        elif [[ ! "$REPLY" =~ sgoinfre ]]; then
+            pretty_print "There is no mention of 'sgoinfre' in the path:"
+            pretty_print "'$REPLY'"
+            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+                sgoinfre="$REPLY"
+                break
+            fi
+            pretty_print " ✖ Not a sgoinfre directory."
+            pretty_print "Please enter the path to your personal sgoinfre directory."
+
+        # Check if user's directory
+        elif [[ ! "$REPLY" =~ $USER ]]; then
+            pretty_print "There is no mention of your username in the path:"
+            pretty_print "'$REPLY'"
+            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+                sgoinfre="$REPLY"
+                break
+            fi
+            pretty_print " ✖ Not your personal sgoinfre directory."
+            pretty_print "Please enter the path to your personal sgoinfre directory."
+
+        # Prompt user for confirmation
         else
             pretty_print " ✔ Directory exists."
-            sgoinfre="$REPLY"
-            break
+            pretty_print "Dereferencing all symbolic links in the path..."
+            REPLY=$(realpath "$REPLY")
+            pretty_print "'$REPLY'"
+            if prompt_single_key "$prompt_correct_path"; then
+                sgoinfre="$REPLY"
+                break
+            fi
+            pretty_print "Please try again."
         fi
+    done
+}
+
+export_all_functions()
+{
+    for fn in $(declare -F | cut -d " " -f 3); do
+        export -f "$fn"
     done
 }
 
@@ -338,14 +401,108 @@ bytes_to_human()
 import locale
 
 locale.setlocale(locale.LC_ALL, '')
-size_in_bytes = $size_in_bytes
+size_in_bytes = '$size_in_bytes'
 suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 i = 0
+
 while size_in_bytes >= 1024 and i < len(suffixes) - 1:
     size_in_bytes /= 1024
     i += 1
 print(locale.format_string('%0.1f', size_in_bytes) + suffixes[i])
 "
+}
+
+# Breadth-first search to find a directory with a specific name and containing a specific pattern in its path
+find_dir_bfs()
+{
+    local start_dir=$1
+    local exclude_dir=$2
+    local target_dir=$3
+    local path_pattern=$4
+
+    python3 -c "
+import os
+import queue
+
+def bfs_find(start_dir, exclude_dir, target_dir, path_pattern):
+    q = queue.Queue()
+    q.put(start_dir)
+
+    while not q.empty():
+        current_dir = q.get()
+        try:
+            # Skip processing for the excluded directory
+            if current_dir.startswith(exclude_dir):
+                continue
+
+            with os.scandir(current_dir) as it:
+                for entry in it:
+                    if entry.is_dir():
+                        full_path = entry.path
+                        dir_name = os.path.basename(full_path)
+
+                        # Stop if the directory name is the target and the path contains the pattern
+                        if dir_name == target_dir and path_pattern in full_path:
+                            print(full_path)
+                            return
+
+                        # Add subdirectories to the queue for further processing
+                        q.put(full_path)
+        except Exception:
+            continue
+
+bfs_find('$start_dir', '$exclude_dir', '$target_dir', '$path_pattern')
+"
+}
+
+# Depth-first search to find a directory with a specific name and containing a specific pattern in its path
+find_dir_dfs()
+{
+    local start_dir=$1
+    local exclude_dir=$2
+    local target_dir=$3
+    local path_pattern=$4
+    local result
+
+    result=$(find "$start_dir" -maxdepth 12 -path "$exclude_dir" -prune -o -path "*$path_pattern*" -type d -name "$target_dir" -print -quit |
+        perl -ne "BEGIN {\$path_pattern = quotemeta('$path_pattern'); \$target_dir = quotemeta('$target_dir')}
+            print \"\$1\n\" if /^(.*?\$path_pattern.*?\/\$target_dir)(?:\/|\$)/")
+
+    if [[ -n $result ]]; then
+        echo "$result"
+        return 0
+    fi
+    return 1
+}
+
+# Run breadth-first and depth-first search in parallel and wait for the first to finish
+find_dir()
+{
+    local timeout=$1
+    shift
+    local jobs=()
+    local tmpfile_bfs="/tmp/42free~$$~bfs"
+    local tmpfile_dfs="/tmp/42free~$$~dfs"
+    local result
+
+    find_dir_bfs "$@" > "$tmpfile_bfs" &
+    jobs+=($!)
+    find_dir_dfs "$@" > "$tmpfile_dfs" &
+    jobs+=($!)
+
+    wait_for_jobs "$timeout" "any" "searching_dir" "${jobs[@]}"
+
+    result=$(cat "$tmpfile_bfs" 2>/dev/null)
+    if [[ ! -d $result ]]; then
+        result=$(cat "$tmpfile_dfs" 2>/dev/null)
+    fi
+    rm -f "$tmpfile_bfs" "$tmpfile_dfs"
+
+    if [[ -d $result ]]; then
+        echo "$result"
+        return 0
+    fi
+    return 1
 }
 
 stat_human_readable()
@@ -378,7 +535,7 @@ move_files()
     stderr=$(rsync -a --remove-source-files "$source_path" "$target_dirpath/" 2>&1) &
 
     # Wait for rsync to finish
-    wait_for_jobs "$operation" $!
+    wait_for_jobs "all" "$operation" $!
     rsync_status=$?
 
     cleanup_empty_dirs "$source_path"
@@ -412,35 +569,12 @@ symlink()
     ln -s "$target_path" "$link_path"
 }
 
-clear_prev_line()
-{
-    printf "\e[1K\e[1A\n"
-}
-
-show_cursor()
-{
-    tput cnorm
-    clear_prev_line
-    exit 130
-}
-
-any_job_running()
-{
-    local job_pids=("$@")
-
-    for job_pid in "${job_pids[@]}"; do
-        if kill -0 "$job_pid" 2>/dev/null; then
-            return 0
-        fi
-    done
-    return 1
-}
-
-wait_for_jobs()
+# Set animation variables, default to simple spinner
+set_animation()
 {
     if [[ "$1" == "moving" ]]; then
-        local pacing=0.1
-        local frames=(
+        pacing=0.1
+        frames=(
             '  📁          📁'
             '  📂          📁'
             '  📂📄        📁'
@@ -455,10 +589,10 @@ wait_for_jobs()
             '  📁          📂'
             '  📁          📁'
         )
-        shift
+        return 0
     elif [[ "$1" == "restoring" ]]; then
-        local pacing=0.1
-        local frames=(
+        pacing=0.1
+        frames=(
             '  📁          📁'
             '  📁          📂'
             '  📁        📄📂'
@@ -473,10 +607,10 @@ wait_for_jobs()
             '  📂          📁'
             '  📁          📁'
         )
-        shift
+        return 0
     elif [[ "$1" == "searching" ]]; then
-        local pacing=0.25
-        local frames=(
+        pacing=0.25
+        frames=(
             '  🔎📁📁📁📁📁📁'
             '  🔎📂📁📁📁📁📁'
             '  📄🔎📁📁📁📁📁'
@@ -498,30 +632,107 @@ wait_for_jobs()
             '  📄🔍📁📁📁📁📁'
             '  🔍📁📁📁📁📁📁'
         )
-        shift
+        return 0
+    elif [[ "$1" == "searching_dir" ]]; then
+        pacing=0.5
+        frames=(
+            '  🔎📁📁📁📁📁📁'
+            '  📂🔎📁📁📁📁📁'
+            '  📂📂🔎📁📁📁📁'
+            '  📂📂📂🔎📁📁📁'
+            '  📂📂📂📂🔎📁📁'
+            '  📂📂📂📂📂🔎📁'
+            '  📂📂📂📂📂📂🔎'
+            '  📂📂📂📂📂📂🔍'
+            '  📂📂📂📂📂🔍📂'
+            '  📂📂📂📂🔍📂📂'
+            '  📂📂📂🔍📂📂📂'
+            '  📂📂🔍📂📂📂📂'
+            '  📂🔍📂📂📂📂📂'
+            '  🔍📂📂📂📂📂📂'
+            '  🔎📂📂📂📂📂📂'
+            '  📁🔎📂📂📂📂📂'
+            '  📁📁🔎📂📂📂📂'
+            '  📁📁📁🔎📂📂📂'
+            '  📁📁📁📁🔎📂📂'
+            '  📁📁📁📁📁🔎📂'
+            '  📁📁📁📁📁📁🔎'
+            '  📁📁📁📁📁📁🔍'
+            '  📁📁📁📁📁🔍📁'
+            '  📁📁📁📁🔍📁📁'
+            '  📁📁📁🔍📁📁📁'
+            '  📁📁🔍📁📁📁📁'
+            '  📁🔍📁📁📁📁📁'
+            '  🔍📁📁📁📁📁📁'
+        )
+        return 0
     else
-        local pacing=0.25
-        local frames=(
+        pacing=0.25
+        frames=(
             '  | '
             '  / '
             '  - '
             '  \ '
         )
     fi
+    return 1
+}
 
+clear_prev_line()
+{
+    printf "\e[1K\e[1A\n"
+}
+
+restore_cursor_exit()
+{
+    tput cnorm
+    clear_prev_line
+    exit
+}
+
+any_job_running()
+{
     local job_pids=("$@")
-    local exit_status=0
 
-    # Trap SIGINT to enable cursor again and clear line
-    trap show_cursor SIGINT
+    for job_pid in "${job_pids[@]}"; do
+        if kill -0 "$job_pid" 2>/dev/null; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+all_jobs_running()
+{
+    local job_pids=("$@")
+
+    for job_pid in "${job_pids[@]}"; do
+        if ! kill -0 "$job_pid" 2>/dev/null; then
+            return 1
+        fi
+    done
+    return 0
+}
+
+# Needs frames and job_pids arrays being set
+animate_while_jobs_running()
+{
+    # Catch SIGINT and SIGTERM to enable cursor again and clear line
+    trap restore_cursor_exit SIGINT SIGTERM
 
     # Hide cursor
     tput civis
     # Print frames while jobs are running
     while true; do
         for frame in "${frames[@]}"; do
-            if ! any_job_running "${job_pids[@]}"; then
-                break 2
+            if [[ "$mode" == "any" ]]; then
+                if ! all_jobs_running "${job_pids[@]}"; then
+                    break 2
+                fi
+            else
+                if ! any_job_running "${job_pids[@]}"; then
+                    break 2
+                fi
             fi
             printf "\r%s" "$frame"
             sleep "$pacing"
@@ -529,18 +740,63 @@ wait_for_jobs()
     done
     # Clear line on completion
     printf "\r\e[K"
-    # Show cursor
+    # Restore cursor
     tput cnorm
 
-    # Reset signal trap
-    trap - SIGINT
+    # Reset signal traps
+    trap - SIGINT SIGTERM
+}
 
-    # Collect exit status
+# Arguments: [n(s|m|h|d)] [any|all] [moving|restoring|searching|searching_dir] job_pids...
+wait_for_jobs()
+{
+    local timeout
+    local mode
+    local pacing
+    local frames=()
+    local job_pids=()
+    local exit_status
+    local job_exit_status
+
+    # Check for timeout, requires a time unit, default to no timeout
+    if [[ $1 =~ ^[0-9]+[smhd]$ ]]; then
+        timeout=$1
+        shift
+        # Run in subshell to avoid all functions being exported afterwards
+        (
+            export_all_functions
+            timeout "$timeout" bash -c 'wait_for_jobs "$@"' wait_for_jobs "$@"
+        )
+        return $?
+    fi
+
+    # Check for mode, default to "all"
+    if [[ "$1" == "any" || "$1" == "all" ]]; then
+        mode=$1
+        shift
+    else
+        mode="all"
+    fi
+
+    # Check for animation, default to simple spinner
+    if set_animation "$1"; then
+        shift
+    fi
+
+    job_pids=("$@")
+    animate_while_jobs_running
+
+    # Collect exit status of finished jobs, stop others
+    exit_status=0
     for job_pid in "${job_pids[@]}"; do
-        wait "$job_pid" 2>/dev/null
-        job_exit_status=$?
-        if [[ $job_exit_status -ne 0 ]]; then
-            exit_status=$job_exit_status
+        if ! kill -0 "$job_pid" 2>/dev/null; then
+            wait "$job_pid" 2>/dev/null
+            job_exit_status=$?
+            if [[ $job_exit_status -ne 0 ]]; then
+                exit_status=$job_exit_status
+            fi
+        else
+            kill -SIGTERM "$job_pid" 2>/dev/null
         fi
     done
     return $exit_status
@@ -885,26 +1141,57 @@ else
     print_update_info "remind"
 fi
 
-# Check if sgoinfre exists
-if [[ ! -d "$sgoinfre" ]]; then
-    pretty_print "$indicator_error${bold} There does not seem to be a sgoinfre directory available on your campus.${reset}"
-    pretty_print "If you are sure there is one, please open an issue on GitHub and mention the following things:"
-    pretty_print "  - The campus you are on."
-    pretty_print "  - The path to your sgoinfre directory."
-    pretty_print "${underlined}${bright_blue}https://github.com/itislu/42free/issues${reset}"
-    echo
-    # Prompt user if they wish to input the path manually
-    if prompt_single_key "$prompt_input_sgoinfre"; then
-        prompt_sgoinfre_path
-    else
-        ft_exit $major_error
-    fi
-fi
-
 # Print header
 pretty_print "$header"
 pretty_print "$delim_big"
 echo
+
+# Check if path to user's sgoinfre directory is known
+if [[ ! -d "$sgoinfre" ]]; then
+    pretty_print "Searching your sgoinfre directory..."
+
+    # Quick search in common locations
+    sgoinfre=$(timeout 1s find "${sgoinfre_common_locations[@]}" -maxdepth 6 -type d -name "$USER" -print -quit 2>/dev/null |
+        perl -ne "print \"\$1\n\" if /^(.*?\/sgoinfre\/.*?\/$USER)(?:\/|\$)/")
+
+    # In-depth search
+    if [[ ! -d $sgoinfre ]]; then
+        sgoinfre=$(find_dir "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null)
+    fi
+
+    if [[ -d $sgoinfre ]]; then
+        pretty_print "Located your sgoinfre directory at '${bold}$sgoinfre${reset}'."
+    else
+        # Prompt user to input the path manually
+        pretty_print "$indicator_error${bold} Could not find your sgoinfre directory.${reset}"
+        trap exit_no_sgoinfre EXIT
+        prompt_sgoinfre_path
+        trap - EXIT
+    fi
+
+    # Save the path into all supported shell config files where it doesn't exist yet
+    pretty_print "Saving the path of your sgoinfre directory..."
+    for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
+        case "$config_file" in
+            "$bash_config")
+                shell_name="bash"
+                ;;
+            "$zsh_config")
+                shell_name="zsh"
+                ;;
+            "$fish_config")
+                shell_name="fish"
+                ;;
+        esac
+        if change_config "export SGOINFRE=$sgoinfre" "$config_file" 2>/dev/null; then
+            pretty_print "${yellow}Added SGOINFRE environment variable to $shell_name.${reset}"
+        fi
+    done
+fi
+
+# Save possible mount points of sgoinfre
+sgoinfre_std="$sgoinfre"
+sgoinfre_alt="$sgoinfre_alt_mount/$sgoinfre"
 
 # Check if the permissions of user's sgoinfre directory are rwx------
 sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
@@ -1004,7 +1291,7 @@ for arg in "${args[@]}"; do
     if [[ "$arg_path" == $sgoinfre_alt/* ]]; then
         sgoinfre="$sgoinfre_alt"
     else
-        sgoinfre="$sgoinfre_root"
+        sgoinfre="$sgoinfre_std"
     fi
     # Update variables with updated sgoinfre path
     if ! $restore; then
@@ -1084,7 +1371,7 @@ for arg in "${args[@]}"; do
     # If the source directory or file has already been moved to sgoinfre, skip it
     if [[ -L "$source_path" ]]; then
         real_source_path=$(realpath "$source_path")
-        if ! $restore && [[ "$real_source_path" =~ ^($sgoinfre_root|$sgoinfre_alt)/ ]]; then
+        if ! $restore && [[ "$real_source_path" =~ ^($sgoinfre_std|$sgoinfre_alt)/ ]]; then
             if ! $no_user_args; then
                 pretty_print "'${bold}${bright_cyan}$source_subpath${reset}' has already been moved to sgoinfre."
                 pretty_print "It is located at '$real_source_path'."
@@ -1137,7 +1424,7 @@ for arg in "${args[@]}"; do
         jobs+=($!)
         du -sk "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
         jobs+=($!)
-        wait_for_jobs "searching" "${jobs[@]}"
+        wait_for_jobs "all" "searching" "${jobs[@]}"
 
         # Read the sizes from the temporary files
         source_base_size_in_kb=$(cat $tmpfile_source_base_size 2>/dev/null)
