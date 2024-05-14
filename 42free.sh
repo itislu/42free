@@ -149,6 +149,8 @@ ${bold}${underlined}Usage:${reset} ${bold}42free${reset} [target1 target2 ...]
 ${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
     -r, --restore    Move the directories and files back to their original
                      location in home.
+    -s, --sgoinfre   Change the path that 42free considers as your personal
+                     sgoinfre directory.
     -m, --max-size   Change the warning sizes for the home and sgoinfre
                      directories (in GB).
                      Current sizes:
@@ -312,7 +314,7 @@ prompt_single_key()
 # Prompt the user for a valid path to their personal sgoinfre directory
 prompt_sgoinfre_path()
 {
-    pretty_print "Please enter the path to your personal sgoinfre directory:"
+    pretty_print "$1"
     while true; do
         read -rp "> "
         # Expand all variables in reply
@@ -991,6 +993,34 @@ change_config()
     return 1
 }
 
+change_sgoinfre()
+{
+    local prompt
+    local changed_sgoinfre
+
+    if [[ -n "$SGOINFRE" ]]; then
+        pretty_print "Your personal sgoinfre directory for 42free is currently set to '${bold}$SGOINFRE${reset}'."
+        prompt="If you would like to change it, please enter a new path:"
+    else
+        pretty_print "Your personal sgoinfre directory for 42free is currently not set."
+        prompt="Please enter the path to your personal sgoinfre directory:"
+    fi
+    prompt_sgoinfre_path "$prompt"
+    # Change SGOINFRE in all shell config files
+    pretty_print "Saving the path of your sgoinfre directory..."
+    changed_sgoinfre=false
+    for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
+        if change_config "export SGOINFRE=$sgoinfre" "$config_file" 2>/dev/null; then
+            changed_sgoinfre=true
+        fi
+    done
+    if $changed_sgoinfre; then
+        pretty_print "$indicator_success Your personal sgoinfre directory for 42free is now set to '${bold}$sgoinfre${reset}'."
+    else
+        pretty_print "Your personal sgoinfre directory for 42free was already set to '${bold}$sgoinfre${reset}'."
+    fi
+}
+
 change_max_sizes()
 {
     local changed_max_size
@@ -1055,6 +1085,10 @@ clean_config_files()
                 sed_inplace "/^export SGOINFRE_MAX_SIZE=/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
+            if grep -q "^export SGOINFRE=" "$config_file" 2>/dev/null; then
+                sed_inplace "/^export SGOINFRE=/d" "$config_file" 2>/dev/null
+                pretty_print "${yellow}SGOINFRE environment variable removed from $shell_name.${reset}"
+            fi
         fi
     done
 }
@@ -1089,6 +1123,10 @@ while (( $# )); do
     case "$1" in
         -r|--restore)
             restore=true
+            ;;
+        -s|--sgoinfre)
+            change_sgoinfre
+            ft_exit $success
             ;;
         -m|--max-size)
             change_max_sizes
@@ -1168,12 +1206,13 @@ if [[ ! -d "$sgoinfre" ]]; then
         # Prompt user to input the path manually
         pretty_print "$indicator_error${bold} Could not find your sgoinfre directory.${reset}"
         trap exit_no_sgoinfre EXIT
-        prompt_sgoinfre_path
+        prompt_sgoinfre_path "Please enter the path to your personal sgoinfre directory manually:"
         trap - EXIT
     fi
 
     # Save the path into all supported shell config files where it doesn't exist yet
     pretty_print "Saving the path of your sgoinfre directory..."
+    pretty_print "If you want to change it in the future, run '42free --sgoinfre'."
     for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
         case "$config_file" in
             "$bash_config")

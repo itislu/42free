@@ -129,6 +129,7 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 > | Option | Description |
 > | --- | --- |
 > | `--restore` | Use the `-r` option to move directories and files back to their original location. |
+> | `--sgoinfre` | To change the path that 42free considers as your personal sgoinfre directory, run `42free -s`. |
 > | `--max-size` | To change the warning sizes for the home and sgoinfre directories, run `42free -m`. |
 > | `--update` | To update to the latest version, run `42free -u`. |
 > | `--version` | To see the version information, run `42free -v`. |
