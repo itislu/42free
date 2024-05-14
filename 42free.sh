@@ -1050,9 +1050,9 @@ change_max_sizes()
         done
 
         if $changed_max_size; then
-            pretty_print "${yellow}The warning size for your $dir directory has been set to ${!max_size_var_name}GB.${reset}"
+            pretty_print "$indicator_success The warning size for your $dir directory has been set to ${bold}${!max_size_var_name}GB${reset}."
         else
-            pretty_print "${yellow}The warning size for your $dir directory was already set to ${!max_size_var_name}GB.${reset}"
+            pretty_print "The warning size for your $dir directory was already set to ${bold}${!max_size_var_name}GB${reset}."
         fi
     done
 }
