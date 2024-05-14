@@ -150,13 +150,13 @@ ${bold}${underlined}Options:${reset} You can pass options anywhere in the argume
     -r, --restore    Move the directories and files back to their original
                      location in home.
     -s, --sgoinfre   Change the path that 42free considers as your personal
-                     sgoinfre directory.
+                     sgoinfre directory and exit.
     -m, --max-size   Change the warning sizes for the home and sgoinfre
-                     directories (in GB).
+                     directories (in GB) and exit.
                      Current sizes:
                        HOME_MAX_SIZE=$home_max_size
                        SGOINFRE_MAX_SIZE=$sgoinfre_max_size
-    -u, --update     Check for a new version of 42free.
+    -u, --update     Check for a new version of 42free and exit.
     -h, --help       Display this help message and exit.
     -v, --version    Display version information and exit.
         --uninstall  Uninstall 42free.
