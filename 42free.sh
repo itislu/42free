@@ -1243,7 +1243,9 @@ sgoinfre_alt="$sgoinfre_alt_mount/$sgoinfre"
 
 # Check if the permissions of user's sgoinfre directory are rwx------
 sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
-if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
+# Remove 'd' from permissions for more clarity
+sgoinfre_permissions=${sgoinfre_permissions#d}
+if ! $restore && [[ "$sgoinfre_permissions" != "rwx------" ]]; then
     pretty_print "$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'."
     pretty_print "They are currently set to '${bold}$sgoinfre_permissions${reset}'."
     pretty_print "It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
