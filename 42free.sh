@@ -349,7 +349,7 @@ bytes_to_human()
 import locale
 
 locale.setlocale(locale.LC_ALL, '')
-size_in_bytes = '$size_in_bytes'
+size_in_bytes = $size_in_bytes
 suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 i = 0
 
