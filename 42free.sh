@@ -1248,7 +1248,7 @@ if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
     pretty_print "They are currently set to '${bold}$sgoinfre_permissions${reset}'."
     pretty_print "It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
     if prompt_single_key "Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'?"; then
-        if stderr=$(chmod 700 "$sgoinfre"); then
+        if stderr=$(chmod 700 "$sgoinfre" 2>&1); then
             pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${bold}rwx------${reset}'."
         else
             pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
