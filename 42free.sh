@@ -1551,7 +1551,7 @@ for arg in "${args[@]}"; do
             pretty_print "${bold}$outcome_size${reset} of ${bold}$source_size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
-            if prompt_with_enter "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory?"; then
+            if prompt_single_key "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory?"; then
                 rm -f "$link_path" 2>/dev/null;
                 mv -T "$source_old" "$source_path" 2>/dev/null
                 if ! move_files "$target_path" "$source_dirpath" "restoring"; then
@@ -1561,6 +1561,7 @@ for arg in "${args[@]}"; do
                 else
                     pretty_print "'${bold}$source_basename${reset}' has been restored to '${bold}$source_dirpath${reset}'."
                 fi
+                pretty_print "Try to close all programs before trying again."
             else
                 pretty_print "Try to close all programs and move the rest from '${bold}$source_old${reset}' manually."
             fi
