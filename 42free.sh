@@ -311,62 +311,6 @@ prompt_single_key()
     return 1
 }
 
-# Prompt the user for a valid path to their personal sgoinfre directory
-prompt_sgoinfre_path()
-{
-    pretty_print "$1"
-    while true; do
-        read -rp "> "
-        # Expand all variables in reply
-        REPLY=$(eval echo "$REPLY")
-
-        # Check if directory exists
-        if [[ ! -d "$REPLY" ]]; then
-            pretty_print " ✖ Not an existing directory."
-            pretty_print "Please try again."
-
-        # Check if absolute path
-        elif [[ ! "$REPLY" =~ ^/ ]]; then
-            pretty_print " ✖ Not an absolute path."
-            pretty_print "Please enter the full path."
-
-        # Check if sgoinfre directory
-        elif [[ ! "$REPLY" =~ sgoinfre ]]; then
-            pretty_print "There is no mention of 'sgoinfre' in the path:"
-            pretty_print "'$REPLY'"
-            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
-                sgoinfre="$REPLY"
-                break
-            fi
-            pretty_print " ✖ Not a sgoinfre directory."
-            pretty_print "Please enter the path to your personal sgoinfre directory."
-
-        # Check if user's directory
-        elif [[ ! "$REPLY" =~ $USER ]]; then
-            pretty_print "There is no mention of your username in the path:"
-            pretty_print "'$REPLY'"
-            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
-                sgoinfre="$REPLY"
-                break
-            fi
-            pretty_print " ✖ Not your personal sgoinfre directory."
-            pretty_print "Please enter the path to your personal sgoinfre directory."
-
-        # Prompt user for confirmation
-        else
-            pretty_print " ✔ Directory exists."
-            pretty_print "Dereferencing all symbolic links in the path..."
-            REPLY=$(realpath "$REPLY")
-            pretty_print "'$REPLY'"
-            if prompt_single_key "$prompt_correct_path"; then
-                sgoinfre="$REPLY"
-                break
-            fi
-            pretty_print "Please try again."
-        fi
-    done
-}
-
 export_all_functions()
 {
     for fn in $(declare -F | cut -d " " -f 3); do
@@ -507,6 +451,106 @@ find_dir()
         return 0
     fi
     return 1
+}
+
+find_sgoinfre()
+{
+    pretty_print "Searching your sgoinfre directory..."
+
+    # Quick search in common locations
+    sgoinfre=$(timeout 1s find "${sgoinfre_common_locations[@]}" -maxdepth 6 -type d -name "$USER" -print -quit 2>/dev/null |
+        perl -ne "print \"\$1\n\" if /^(.*?\/sgoinfre\/.*?\/$USER)(?:\/|\$)/")
+
+    # In-depth search
+    if [[ ! -d $sgoinfre ]]; then
+        sgoinfre=$(find_dir "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null)
+    fi
+
+    if [[ -d $sgoinfre ]]; then
+        pretty_print "Located your sgoinfre directory at '${bold}$sgoinfre${reset}'."
+    else
+        # Prompt user to input the path manually
+        pretty_print "$indicator_error${bold} Could not find your sgoinfre directory.${reset}"
+        trap exit_no_sgoinfre EXIT
+        prompt_sgoinfre_path "Please enter the path to your personal sgoinfre directory manually:"
+        trap - EXIT
+    fi
+
+    # Save the path into all supported shell config files where it doesn't exist yet
+    pretty_print "Saving the path of your sgoinfre directory..."
+    pretty_print "If you want to change it in the future, run '42free --sgoinfre'."
+    for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
+        case "$config_file" in
+            "$bash_config")
+                shell_name="bash"
+                ;;
+            "$zsh_config")
+                shell_name="zsh"
+                ;;
+            "$fish_config")
+                shell_name="fish"
+                ;;
+        esac
+        if change_config "export SGOINFRE=$sgoinfre" "$config_file" 2>/dev/null; then
+            pretty_print "${yellow}Added SGOINFRE environment variable to $shell_name.${reset}"
+        fi
+    done
+}
+
+# Prompt the user for a valid path to their personal sgoinfre directory
+prompt_sgoinfre_path()
+{
+    pretty_print "$1"
+    while true; do
+        read -rp "> "
+        # Expand all variables in reply
+        REPLY=$(eval echo "$REPLY")
+
+        # Check if directory exists
+        if [[ ! -d "$REPLY" ]]; then
+            pretty_print " ✖ Not an existing directory."
+            pretty_print "Please try again."
+
+        # Check if absolute path
+        elif [[ ! "$REPLY" =~ ^/ ]]; then
+            pretty_print " ✖ Not an absolute path."
+            pretty_print "Please enter the full path."
+
+        # Check if sgoinfre directory
+        elif [[ ! "$REPLY" =~ sgoinfre ]]; then
+            pretty_print "There is no mention of 'sgoinfre' in the path:"
+            pretty_print "'$REPLY'"
+            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+                sgoinfre="$REPLY"
+                break
+            fi
+            pretty_print " ✖ Not a sgoinfre directory."
+            pretty_print "Please enter the path to your personal sgoinfre directory."
+
+        # Check if user's directory
+        elif [[ ! "$REPLY" =~ $USER ]]; then
+            pretty_print "There is no mention of your username in the path:"
+            pretty_print "'$REPLY'"
+            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+                sgoinfre="$REPLY"
+                break
+            fi
+            pretty_print " ✖ Not your personal sgoinfre directory."
+            pretty_print "Please enter the path to your personal sgoinfre directory."
+
+        # Prompt user for confirmation
+        else
+            pretty_print " ✔ Directory exists."
+            pretty_print "Dereferencing all symbolic links in the path..."
+            REPLY=$(realpath "$REPLY")
+            pretty_print "'$REPLY'"
+            if prompt_single_key "$prompt_correct_path"; then
+                sgoinfre="$REPLY"
+                break
+            fi
+            pretty_print "Please try again."
+        fi
+    done
 }
 
 stat_human_readable()
@@ -1190,46 +1234,7 @@ echo
 
 # Check if path to user's sgoinfre directory is known
 if [[ ! -d "$sgoinfre" ]]; then
-    pretty_print "Searching your sgoinfre directory..."
-
-    # Quick search in common locations
-    sgoinfre=$(timeout 1s find "${sgoinfre_common_locations[@]}" -maxdepth 6 -type d -name "$USER" -print -quit 2>/dev/null |
-        perl -ne "print \"\$1\n\" if /^(.*?\/sgoinfre\/.*?\/$USER)(?:\/|\$)/")
-
-    # In-depth search
-    if [[ ! -d $sgoinfre ]]; then
-        sgoinfre=$(find_dir "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null)
-    fi
-
-    if [[ -d $sgoinfre ]]; then
-        pretty_print "Located your sgoinfre directory at '${bold}$sgoinfre${reset}'."
-    else
-        # Prompt user to input the path manually
-        pretty_print "$indicator_error${bold} Could not find your sgoinfre directory.${reset}"
-        trap exit_no_sgoinfre EXIT
-        prompt_sgoinfre_path "Please enter the path to your personal sgoinfre directory manually:"
-        trap - EXIT
-    fi
-
-    # Save the path into all supported shell config files where it doesn't exist yet
-    pretty_print "Saving the path of your sgoinfre directory..."
-    pretty_print "If you want to change it in the future, run '42free --sgoinfre'."
-    for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
-        case "$config_file" in
-            "$bash_config")
-                shell_name="bash"
-                ;;
-            "$zsh_config")
-                shell_name="zsh"
-                ;;
-            "$fish_config")
-                shell_name="fish"
-                ;;
-        esac
-        if change_config "export SGOINFRE=$sgoinfre" "$config_file" 2>/dev/null; then
-            pretty_print "${yellow}Added SGOINFRE environment variable to $shell_name.${reset}"
-        fi
-    done
+    find_sgoinfre
 fi
 
 # Save possible mount points of sgoinfre
