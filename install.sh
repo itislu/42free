@@ -65,8 +65,7 @@ bright_green="\e[92m"
 bright_yellow="\e[93m"
 
 # Automatically detect the size of the terminal window and preserve word boundaries
-pretty_print()
-{
+pretty_print() {
     local terminal_width
     local lines
 
@@ -87,8 +86,7 @@ pretty_print()
     done
 }
 
-ft_exit()
-{
+ft_exit() {
     if $changed_config; then
         # Start the default shell to make changes of the shell config available immediately
         if [[ $1 -eq 0 ]] && [[ -x "$SHELL" ]]; then
@@ -100,8 +98,7 @@ ft_exit()
     exit "$1"
 }
 
-sed_inplace()
-{
+sed_inplace() {
     local script=$1
     local file=$2
 
@@ -113,8 +110,7 @@ sed_inplace()
 }
 
 # Change or add a line in a shell config file
-change_config()
-{
+change_config() {
     local line=$1
     local config_file=$2
 

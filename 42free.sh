@@ -206,8 +206,7 @@ prompt_replace="Do you wish to continue and replace any duplicate files?"
 prompt_uninstall="Do you wish to uninstall 42free?"
 
 # Automatically detect the size of the terminal window and preserve word boundaries
-pretty_print()
-{
+pretty_print() {
     local terminal_width
     local lines
 
@@ -228,15 +227,13 @@ pretty_print()
     done
 }
 
-print_stderr()
-{
+print_stderr() {
     while IFS= read -r line; do
         pretty_print "STDERR: $line"
     done <<< "$stderr"
 }
 
-print_one_stderr()
-{
+print_one_stderr() {
     line=$(head -n 1 <<< "$stderr")
     if [[ -n "$line" ]]; then
         pretty_print "STDERR: $line"
@@ -246,8 +243,7 @@ print_one_stderr()
     fi
 }
 
-ft_exit()
-{
+ft_exit() {
     local exit_code=$1
 
     if $changed_config; then
@@ -271,23 +267,20 @@ ft_exit()
     fi
 }
 
-exit_no_sgoinfre()
-{
+exit_no_sgoinfre() {
     if [[ ! -d $sgoinfre ]]; then
         pretty_print "$msg_report_sgoinfre"
         ft_exit $major_error
     fi
 }
 
-print_skip_arg()
-{
+print_skip_arg() {
     pretty_print "Skipping '$1'."
 }
 
 # Prompt the user for confirmation
 # Default is 'no', for 'yes' needs y/Y/yes/Yes + Enter key
-prompt_with_enter()
-{
+prompt_with_enter() {
     pretty_print "$1 [${bold}y${reset}/${bold}N${reset}]"
     read -rp "> "
     if [[ "$REPLY" =~ ^[Yy]([Ee][Ss])?$ ]]; then
@@ -298,8 +291,7 @@ prompt_with_enter()
 
 # Prompt the user for confirmation
 # Default is 'yes', only needs y/Y key
-prompt_single_key()
-{
+prompt_single_key() {
     pretty_print "$1 [${bold}Y${reset}/${bold}n${reset}]"
     read -n 1 -rp "> "
     if [[ -n "$REPLY" ]]; then
@@ -311,16 +303,14 @@ prompt_single_key()
     return 1
 }
 
-export_all_functions()
-{
+export_all_functions() {
     for fn in $(declare -F | cut -d " " -f 3); do
         export -f "$fn"
     done
 }
 
 # Convert the base path of the default arguments
-convert_default_args()
-{
+convert_default_args() {
     local replacement_base=$1
 
     for i in "${!default_args[@]}"; do
@@ -329,20 +319,17 @@ convert_default_args()
 }
 
 # Capitalize the first letter of a string
-capitalize_initial()
-{
+capitalize_initial() {
     echo "$(tr '[:lower:]' '[:upper:]' <<< "${1:0:1}")${1:1}"
 }
 
 # Capitalize all letters of a string
-capitalize_full()
-{
+capitalize_full() {
     tr '[:lower:]' '[:upper:]' <<< "$1"
 }
 
 # Convert a size from bytes to a human-readable format
-bytes_to_human()
-{
+bytes_to_human() {
     local size_in_bytes=$1
 
     python3 -c "
@@ -361,8 +348,7 @@ print(locale.format_string('%0.1f', size_in_bytes) + suffixes[i])
 }
 
 # Breadth-first search to find a directory with a specific name and containing a specific pattern in its path
-find_dir_bfs()
-{
+find_dir_bfs() {
     local start_dir=$1
     local exclude_dir=$2
     local target_dir=$3
@@ -404,8 +390,7 @@ bfs_find('$start_dir', '$exclude_dir', '$target_dir', '$path_pattern')
 }
 
 # Depth-first search to find a directory with a specific name and containing a specific pattern in its path
-find_dir_dfs()
-{
+find_dir_dfs() {
     local start_dir=$1
     local exclude_dir=$2
     local target_dir=$3
@@ -424,8 +409,7 @@ find_dir_dfs()
 }
 
 # Run breadth-first and depth-first search in parallel and wait for the first to finish
-find_dir()
-{
+find_dir() {
     local timeout=$1
     shift
     local jobs=()
@@ -453,8 +437,7 @@ find_dir()
     return 1
 }
 
-find_sgoinfre()
-{
+find_sgoinfre() {
     pretty_print "Searching your sgoinfre directory..."
 
     # Quick search in common locations
@@ -498,8 +481,7 @@ find_sgoinfre()
 }
 
 # Prompt the user for a valid path to their personal sgoinfre directory
-prompt_sgoinfre_path()
-{
+prompt_sgoinfre_path() {
     pretty_print "$1"
     while true; do
         read -rp "> "
@@ -553,8 +535,7 @@ prompt_sgoinfre_path()
     done
 }
 
-change_sgoinfre_permissions()
-{
+change_sgoinfre_permissions() {
     pretty_print "$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'."
     pretty_print "They are currently set to '${bold}$sgoinfre_permissions${reset}'."
     pretty_print "It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
@@ -576,8 +557,7 @@ change_sgoinfre_permissions()
     return 0
 }
 
-stat_human_readable()
-{
+stat_human_readable() {
     local path=$1
 
     if [[ "$os_name" == "Linux" ]]; then
@@ -589,14 +569,12 @@ stat_human_readable()
 
 # If realpath command is not available, define a custom function as a replacement
 if ! command -v realpath &>/dev/null; then
-    realpath()
-    {
+    realpath() {
         perl -MCwd -e 'print Cwd::realpath($ARGV[0]), "\n"' "$1"
     }
 fi
 
-move_files()
-{
+move_files() {
     local source_path=$1
     local target_dirpath=$2
     local operation=$3
@@ -619,8 +597,7 @@ move_files()
     return $rsync_status
 }
 
-cleanup_empty_dirs()
-{
+cleanup_empty_dirs() {
     local dir=$1
 
     find "$dir" -type d -empty -delete 2>/dev/null
@@ -630,8 +607,7 @@ cleanup_empty_dirs()
     done
 }
 
-symlink()
-{
+symlink() {
     local target_path=$1
     local link_path=$2
 
@@ -642,8 +618,7 @@ symlink()
 }
 
 # Set animation variables, default to simple spinner
-set_animation()
-{
+set_animation() {
     if [[ "$1" == "moving" ]]; then
         pacing=0.1
         frames=(
@@ -750,20 +725,17 @@ set_animation()
     return 1
 }
 
-clear_prev_line()
-{
+clear_prev_line() {
     printf "\e[1K\e[1A\n"
 }
 
-restore_cursor_exit()
-{
+restore_cursor_exit() {
     tput cnorm
     clear_prev_line
     exit
 }
 
-any_job_running()
-{
+any_job_running() {
     local job_pids=("$@")
 
     for job_pid in "${job_pids[@]}"; do
@@ -774,8 +746,7 @@ any_job_running()
     return 1
 }
 
-all_jobs_running()
-{
+all_jobs_running() {
     local job_pids=("$@")
 
     for job_pid in "${job_pids[@]}"; do
@@ -787,8 +758,7 @@ all_jobs_running()
 }
 
 # Needs frames and job_pids arrays being set
-animate_while_jobs_running()
-{
+animate_while_jobs_running() {
     # Catch SIGINT and SIGTERM to enable cursor again and clear line
     trap restore_cursor_exit SIGINT SIGTERM
 
@@ -820,8 +790,7 @@ animate_while_jobs_running()
 }
 
 # Arguments: [n(s|m|h|d)] [any|all] [moving|restoring|searching|searching_dir] job_pids...
-wait_for_jobs()
-{
+wait_for_jobs() {
     local timeout
     local mode
     local pacing
@@ -875,8 +844,7 @@ wait_for_jobs()
 }
 
 # Calculate a color based on the percentage of used space
-calculate_usage_color()
-{
+calculate_usage_color() {
     local size=$1
     local max_size=$2
     local percentage
@@ -897,8 +865,7 @@ calculate_usage_color()
     echo "$color"
 }
 
-print_available_space()
-{
+print_available_space() {
     local source_base_size_in_kb=$1
     local target_base_size_in_kb=$2
     local source_base_size
@@ -934,13 +901,11 @@ print_available_space()
     fi
 }
 
-get_timestamp()
-{
+get_timestamp() {
     date +%Y%m%d%H%M%S
 }
 
-get_latest_version_number()
-{
+get_latest_version_number() {
     # Check if curl or wget is available
     if [[ -z "$downloader" ]]; then
         if [[ "$1" != "quiet" ]]; then
@@ -964,8 +929,7 @@ get_latest_version_number()
     return 0
 }
 
-print_update_info()
-{
+print_update_info() {
     local top_border="┌────────────────────────────────────────────┐"
     local side_border="│"
     local bottom_border="└────────────────────────────────────────────┘"
@@ -994,8 +958,7 @@ print_update_info()
     fi
 }
 
-update()
-{
+update() {
     if ! latest_version=$(get_latest_version_number "$1"); then
         return $?
     fi
@@ -1015,8 +978,7 @@ update()
 }
 
 # Filter out default arguments that do not exist or are already symbolic links
-filter_default_args()
-{
+filter_default_args() {
     local filtered_default_args=()
 
     for default_arg in "${default_args[@]}"; do
@@ -1027,8 +989,7 @@ filter_default_args()
     default_args=("${filtered_default_args[@]}")
 }
 
-sed_inplace()
-{
+sed_inplace() {
     local script=$1
     local file=$2
 
@@ -1040,8 +1001,7 @@ sed_inplace()
 }
 
 # Change or add a line in a shell config file
-change_config()
-{
+change_config() {
     local line=$1
     local config_file=$2
 
@@ -1061,8 +1021,7 @@ change_config()
     return 1
 }
 
-change_sgoinfre()
-{
+change_sgoinfre() {
     local prompt
     local changed_sgoinfre
 
@@ -1089,8 +1048,7 @@ change_sgoinfre()
     fi
 }
 
-change_max_sizes()
-{
+change_max_sizes() {
     local changed_max_size
 
     for dir in home sgoinfre; do
@@ -1126,8 +1084,7 @@ change_max_sizes()
 }
 
 # Remove everything added from installation in all shell config files
-clean_config_files()
-{
+clean_config_files() {
     for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
         case "$config_file" in
             "$bash_config")
@@ -1161,8 +1118,7 @@ clean_config_files()
     done
 }
 
-uninstall()
-{
+uninstall() {
     if prompt_with_enter "$prompt_uninstall"; then
         pretty_print "Uninstalling 42free..."
         if stderr=$(rm -f "$script_path" 2>&1); then
