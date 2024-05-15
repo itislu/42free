@@ -1254,7 +1254,7 @@ if ! $restore && [[ "$sgoinfre_permissions" != "drwx------" ]]; then
             pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
             print_stderr
             syscmd_failed=true
-            if ! prompt_single_key "$prompt_continue_still"; then
+            if ! prompt_with_enter "$prompt_continue_still"; then
                 ft_exit $major_error
             fi
             pretty_print "Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
