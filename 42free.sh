@@ -1265,6 +1265,14 @@ args_amount=${#args[@]}
 args_index=0
 need_delim=false
 
+# Check if nothing to be done
+if [[ $args_amount -eq 0 ]]; then
+    pretty_print "${bold}Nothing to be done.${reset}"
+    pretty_print "You can specifiy which directories or files you would like to move to $target_name with arguments."
+    pretty_print "Example: '${bold}42free /path/to/large/directory LargeFileInCurDir${reset}'"
+    pretty_print "Run '42free --help' for more information."
+fi
+
 # Loop over all arguments
 for arg in "${args[@]}"; do
     args_index=$(( args_index + 1 ))
