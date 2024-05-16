@@ -482,39 +482,41 @@ find_sgoinfre() {
 
 # Prompt the user for a valid path to their personal sgoinfre directory
 prompt_sgoinfre_path() {
+    local reply
+
     pretty_print "$1"
     while true; do
         read -rp "> "
         # Expand all variables in reply
-        REPLY=$(eval echo "$REPLY")
+        reply=$(eval echo "$REPLY")
 
         # Check if directory exists
-        if [[ ! -d "$REPLY" ]]; then
+        if [[ ! -d "$reply" ]]; then
             pretty_print " ✖ Not an existing directory."
             pretty_print "Please try again."
 
         # Check if absolute path
-        elif [[ ! "$REPLY" =~ ^/ ]]; then
+        elif [[ ! "$reply" =~ ^/ ]]; then
             pretty_print " ✖ Not an absolute path."
             pretty_print "Please enter the full path."
 
         # Check if sgoinfre directory
-        elif [[ ! "$REPLY" =~ sgoinfre ]]; then
+        elif [[ ! "$reply" =~ sgoinfre ]]; then
             pretty_print "There is no mention of 'sgoinfre' in the path:"
-            pretty_print "'$REPLY'"
+            pretty_print "'${bold}$reply${reset}'"
             if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
-                sgoinfre="$REPLY"
+                sgoinfre="$reply"
                 break
             fi
             pretty_print " ✖ Not a sgoinfre directory."
             pretty_print "Please enter the path to your personal sgoinfre directory."
 
         # Check if user's directory
-        elif [[ ! "$REPLY" =~ $USER ]]; then
+        elif [[ ! "$reply" =~ $USER ]]; then
             pretty_print "There is no mention of your username in the path:"
-            pretty_print "'$REPLY'"
+            pretty_print "'${bold}$reply${reset}'"
             if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
-                sgoinfre="$REPLY"
+                sgoinfre="$reply"
                 break
             fi
             pretty_print " ✖ Not your personal sgoinfre directory."
@@ -524,10 +526,10 @@ prompt_sgoinfre_path() {
         else
             pretty_print " ✔ Directory exists."
             pretty_print "Dereferencing all symbolic links in the path..."
-            REPLY=$(realpath "$REPLY")
-            pretty_print "'$REPLY'"
+            reply=$(realpath "$reply")
+            pretty_print "'${bold}$reply${reset}'"
             if prompt_single_key "$prompt_correct_path"; then
-                sgoinfre="$REPLY"
+                sgoinfre="$reply"
                 break
             fi
             pretty_print "Please try again."
