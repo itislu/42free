@@ -33,6 +33,7 @@ dest_file="42free.sh"
 bash_config="$HOME/.bashrc"
 zsh_config="$HOME/.zshrc"
 fish_config="$HOME/.config/fish/config.fish"
+config_marker="    # Added by 42free"
 
 # Max sizes in GB
 if [[ -n "$HOME_MAX_SIZE" ]] && [[ "$HOME_MAX_SIZE" =~ ^[0-9]+$ ]]; then
@@ -119,11 +120,11 @@ change_config() {
         if [[ -n "$(tail -c 1 "$config_file")" ]]; then
             printf "\n" >> "$config_file"
         fi
-        printf "%s\n" "$line" >> "$config_file"
+        printf "%s\n" "$line$config_marker" >> "$config_file"
         changed_config=true
         return 0
-    elif ! grep -q "^$line$" "$config_file"; then
-        sed_inplace "s|^${line%%=*}=.*|$line|" "$config_file"
+    elif ! grep -q "^$line$config_marker$" "$config_file"; then
+        sed_inplace "s|^${line%%=*}=.*|$line$config_marker|" "$config_file"
         changed_config=true
         return 0
     fi

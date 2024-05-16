@@ -70,6 +70,7 @@ sgoinfre_common_locations=(
 bash_config="$HOME/.bashrc"
 zsh_config="$HOME/.zshrc"
 fish_config="$HOME/.config/fish/config.fish"
+config_marker="    # Added by 42free"
 
 # Max sizes in GB
 if [[ -n "$HOME_MAX_SIZE" ]] && [[ "$HOME_MAX_SIZE" =~ ^[0-9]+$ ]]; then
@@ -1012,11 +1013,11 @@ change_config() {
         if [[ -n "$(tail -c 1 "$config_file")" ]]; then
             printf "\n" >> "$config_file"
         fi
-        printf "%s\n" "$line" >> "$config_file"
+        printf "%s\n" "$line$config_marker" >> "$config_file"
         changed_config=true
         return 0
-    elif ! grep -q "^$line$" "$config_file"; then
-        sed_inplace "s|^${line%%=*}=.*|$line|" "$config_file"
+    elif ! grep -q "^$line$config_marker$" "$config_file"; then
+        sed_inplace "s|^${line%%=*}=.*|$line$config_marker|" "$config_file"
         changed_config=true
         return 0
     fi
@@ -1101,19 +1102,19 @@ clean_config_files() {
         esac
         if [[ -f "$config_file" ]]; then
             if grep -q "alias 42free=" "$config_file" 2>/dev/null; then
-                sed_inplace "/^alias 42free=/d" "$config_file" 2>/dev/null
+                sed_inplace "/^alias 42free=.*$config_marker$/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}42free alias removed from $shell_name.${reset}"
             fi
             if grep -q "^export HOME_MAX_SIZE=" "$config_file" 2>/dev/null; then
-                sed_inplace "/^export HOME_MAX_SIZE=/d" "$config_file" 2>/dev/null
+                sed_inplace "/^export HOME_MAX_SIZE=.*$config_marker$/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}HOME_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE_MAX_SIZE=" "$config_file" 2>/dev/null; then
-                sed_inplace "/^export SGOINFRE_MAX_SIZE=/d" "$config_file" 2>/dev/null
+                sed_inplace "/^export SGOINFRE_MAX_SIZE=.*$config_marker$/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE=" "$config_file" 2>/dev/null; then
-                sed_inplace "/^export SGOINFRE=/d" "$config_file" 2>/dev/null
+                sed_inplace "/^export SGOINFRE=.*$config_marker$/d" "$config_file" 2>/dev/null
                 pretty_print "${yellow}SGOINFRE environment variable removed from $shell_name.${reset}"
             fi
         fi
