@@ -118,13 +118,14 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 - Use 42free by running the `42free` command in the terminal.
 
 - You can also specify any amount of files or directories you want to free the space of.
-
-- The arguments can be given as absolute or relative paths.
+  - The arguments can be given as absolute or relative paths.
+  - Example: `42free /path/to/large/directory LargeFileInCurDir`
 
 > [!TIP]
 > - **Closing all programs first will help to avoid errors during the move.**
 >
 > - **You can pass options anywhere in your command to change the behavior of 42free.**
+>   - Example: `42free -r /path/to/large/directory LargeFileInCurDir`
 >
 > | Option | Description |
 > | --- | --- |
