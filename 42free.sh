@@ -144,6 +144,7 @@ ${bold}${underlined}Usage:${reset} ${bold}42free${reset} [target1 target2 ...]
     If no arguments are given, 42free will make some suggestions.
     Target paths can be absolute or relative to your current directory.
     42free will automatically detect if an argument is the source or the destination.
+    Example: '${bold}42free /path/to/large/directory LargeFileInCurDir${reset}'
     Closing all programs first will help to avoid errors during the move.
 \n\
 ${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
