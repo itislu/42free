@@ -482,6 +482,7 @@ find_sgoinfre() {
 
     # In-depth search
     if [[ ! -d $sgoinfre ]]; then
+        pretty_print "This can take up to 1 minute..."
         find_dir "sgoinfre" "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null
     fi
 
