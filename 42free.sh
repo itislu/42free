@@ -1381,9 +1381,14 @@ need_delim=false
 
 # Check if nothing to be done
 if [[ $args_amount -eq 0 ]]; then
+    if $restore; then
+        example="42free -r /path/to/directory/in/sgoinfre LinkInCurDir"
+    else
+        example="42free /path/to/large/directory LargeFileInCurDir"
+    fi
     pretty_print "${bold}Nothing to be done.${reset}"
     pretty_print "You can specify which directories or files you would like to move to $target_name with arguments."
-    pretty_print "Example: '${bold}42free /path/to/large/directory LargeFileInCurDir${reset}'"
+    pretty_print "Example: '${bold}$example${reset}'"
     pretty_print "Run '42free --help' for more information."
 fi
 
