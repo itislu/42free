@@ -900,7 +900,6 @@ wait_for_jobs() {
         timeout=$1
         shift
     fi
-
     # Check for mode, default to "all"
     if [[ "$1" == "any" || "$1" == "all" ]]; then
         mode=$1
@@ -908,13 +907,11 @@ wait_for_jobs() {
     else
         mode="all"
     fi
-
     # Check for animation, default to simple spinner
     if [[ "$1" == "moving" || "$1" == "restoring" || "$1" == "searching" || "$1" == "searching_dir" ]]; then
         animation=$1
         shift
     fi
-
     job_pids=("$@")
 
     # Start animation with or without timeout
