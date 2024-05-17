@@ -444,6 +444,8 @@ find_dir_dfs() {
 
 # Run breadth-first and depth-first search in parallel and wait for the first to finish
 find_dir() {
+    local result_var=$1
+    shift
     local timeout=$1
     shift
     local jobs=()
@@ -465,7 +467,7 @@ find_dir() {
     rm -f "$tmpfile_bfs" "$tmpfile_dfs"
 
     if [[ -d $result ]]; then
-        echo "$result"
+        eval "$result_var='$result'"
         return 0
     fi
     return 1
@@ -480,7 +482,7 @@ find_sgoinfre() {
 
     # In-depth search
     if [[ ! -d $sgoinfre ]]; then
-        sgoinfre=$(find_dir "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null)
+        find_dir "sgoinfre" "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null
     fi
 
     if [[ -d $sgoinfre ]]; then
