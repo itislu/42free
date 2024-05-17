@@ -1139,18 +1139,22 @@ clean_config_files() {
         if [[ -f "$config_file" ]]; then
             if grep -q "alias 42free=" "$config_file" 2>/dev/null; then
                 sed_inplace "/^alias 42free=/d" "$config_file" 2>/dev/null
+                changed_config=true
                 pretty_print "${yellow}42free alias removed from $shell_name.${reset}"
             fi
             if grep -q "^export HOME_MAX_SIZE=" "$config_file" 2>/dev/null; then
                 sed_inplace "/^export HOME_MAX_SIZE=/d" "$config_file" 2>/dev/null
+                changed_config=true
                 pretty_print "${yellow}HOME_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE_MAX_SIZE=" "$config_file" 2>/dev/null; then
                 sed_inplace "/^export SGOINFRE_MAX_SIZE=/d" "$config_file" 2>/dev/null
+                changed_config=true
                 pretty_print "${yellow}SGOINFRE_MAX_SIZE environment variable removed from $shell_name.${reset}"
             fi
             if grep -q "^export SGOINFRE=" "$config_file" 2>/dev/null; then
                 sed_inplace "/^export SGOINFRE=/d" "$config_file" 2>/dev/null
+                changed_config=true
                 pretty_print "${yellow}SGOINFRE environment variable removed from $shell_name.${reset}"
             fi
         fi
@@ -1165,6 +1169,12 @@ uninstall() {
             # If script_dir is empty, remove it
             find "$script_dir" -maxdepth 0 -type d -empty -delete 2>/dev/null
             clean_config_files
+            # Remove everything set by 42free from current shell environment
+            if alias 42free &>/dev/null || [[ -n "$HOME_MAX_SIZE" ]] || [[ -n "$SGOINFRE_MAX_SIZE" ]] || [[ -n "$SGOINFRE" ]]; then
+                unalias 42free 2>/dev/null
+                unset HOME_MAX_SIZE SGOINFRE_MAX_SIZE SGOINFRE
+                changed_config=true
+            fi
             pretty_print "$indicator_success 42free has been uninstalled."
             ft_exit $success
         else
