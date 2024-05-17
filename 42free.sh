@@ -204,6 +204,7 @@ prompt_continue_with_rest="Do you wish to continue with the other arguments?"
 prompt_correct_path="Is this the correct path to your personal sgoinfre directory?"
 prompt_symlink="Do you wish to create a symbolic link to it?"
 prompt_replace="Do you wish to continue and replace any duplicate files?"
+prompt_merge="Do you wish to continue and merge the directories, replacing any duplicate files?"
 prompt_uninstall="Do you wish to uninstall 42free?"
 
 # Automatically detect the size of the terminal window and preserve word boundaries
@@ -1482,7 +1483,12 @@ for arg in "${args[@]}"; do
     # Check if an existing directory or file would get replaced
     if [[ -e "$target_path" ]] && ! ($restore && [[ -L "$target_path" ]]); then
         pretty_print "$indicator_warning '${bold}$source_subpath${reset}' already exists in the $target_name directory."
-        if ! prompt_with_enter "$prompt_replace"; then
+        if [[ -d "$target_path" ]]; then
+            prompt="$prompt_merge"
+        else
+            prompt="$prompt_replace"
+        fi
+        if ! prompt_with_enter "$prompt"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
