@@ -430,13 +430,13 @@ find_dir_dfs() {
     local exclude_dir=$2
     local target_dir=$3
     local path_pattern=$4
-    local result
+    local result_path
 
-    result=$(find "$start_dir" -maxdepth 12 -path "$exclude_dir" -prune -o -path "*$path_pattern*" -type d -name "$target_dir" -print -quit)
-    result=$(trim_path "$result" "$target_dir" "$path_pattern")
+    result_path=$(find "$start_dir" -maxdepth 12 -path "$exclude_dir" -prune -o -path "*$path_pattern*" -type d -name "$target_dir" -print -quit)
+    result_path=$(trim_path "$result_path" "$target_dir" "$path_pattern")
 
-    if [[ -d $result ]]; then
-        echo "$result"
+    if [[ -d $result_path ]]; then
+        echo "$result_path"
         return 0
     fi
     return 1
@@ -451,7 +451,7 @@ find_dir() {
     local jobs=()
     local tmpfile_bfs="/tmp/42free~$$~bfs"
     local tmpfile_dfs="/tmp/42free~$$~dfs"
-    local result
+    local result_path
 
     find_dir_bfs "$@" > "$tmpfile_bfs" &
     jobs+=($!)
@@ -460,14 +460,14 @@ find_dir() {
 
     wait_for_jobs "$timeout" "any" "searching_dir" "${jobs[@]}"
 
-    result=$(cat "$tmpfile_bfs" 2>/dev/null)
-    if [[ ! -d $result ]]; then
-        result=$(cat "$tmpfile_dfs" 2>/dev/null)
+    result_path=$(cat "$tmpfile_bfs" 2>/dev/null)
+    if [[ ! -d $result_path ]]; then
+        result_path=$(cat "$tmpfile_dfs" 2>/dev/null)
     fi
     rm -f "$tmpfile_bfs" "$tmpfile_dfs"
 
-    if [[ -d $result ]]; then
-        eval "$result_var='$result'"
+    if [[ -d $result_path ]]; then
+        eval "$result_var='$result_path'"
         return 0
     fi
     return 1
