@@ -609,7 +609,7 @@ stat_human_readable() {
 # If realpath command is not available, define a custom function as a replacement
 if ! command -v realpath &>/dev/null; then
     realpath() {
-        perl -MCwd -e 'print Cwd::realpath($ARGV[0]), "\n"' "$1"
+        python3 -c "import os; print(os.path.realpath('$1'))"
     }
 fi
 
