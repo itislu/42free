@@ -486,6 +486,11 @@ find_sgoinfre() {
         find_dir "sgoinfre" "60s" "/" "$HOME" "$USER" "/sgoinfre/" 2>/dev/null
     fi
 
+    # Dereference all symbolic links in the result
+    if [[ -e $sgoinfre ]]; then
+        sgoinfre=$(realpath "$sgoinfre" 2>/dev/null)
+    fi
+
     if [[ -d $sgoinfre ]]; then
         pretty_print "Located your sgoinfre directory at '${bold}$sgoinfre${reset}'."
     else
