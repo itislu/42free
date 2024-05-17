@@ -803,7 +803,13 @@ all_jobs_running() {
 
 # Needs frames and job_pids arrays being set
 animate_while_jobs_running() {
-    # Catch SIGINT and SIGTERM to enable cursor again and clear line
+    local mode=$1
+    local animation=$2
+    local job_pids=("${@:3}")
+
+    set_animation "$animation"
+
+    # Catch signals to enable cursor again and clear line
     trap restore_cursor_exit SIGINT SIGTERM
 
     # Hide cursor
@@ -833,26 +839,30 @@ animate_while_jobs_running() {
     trap - SIGINT SIGTERM
 }
 
+stop_jobs() {
+    local job_pids=("$@")
+
+    for job_pid in "${job_pids[@]}"; do
+        kill -SIGTERM "$job_pid" 2>/dev/null
+    done
+}
+
 # Arguments: [n(s|m|h|d)] [any|all] [moving|restoring|searching|searching_dir] job_pids...
 wait_for_jobs() {
     local timeout
     local mode
-    local pacing
-    local frames=()
+    local animation
     local job_pids=()
     local exit_status
     local job_exit_status
+
+    # Catch signals to stop any running jobs
+    trap stop_jobs SIGINT SIGTERM
 
     # Check for timeout, requires a time unit, default to no timeout
     if [[ $1 =~ ^[0-9]+[smhd]$ ]]; then
         timeout=$1
         shift
-        # Run in subshell to avoid all functions being exported afterwards
-        (
-            export_all_functions
-            timeout "$timeout" bash -c 'wait_for_jobs "$@"' wait_for_jobs "$@"
-        )
-        return $?
     fi
 
     # Check for mode, default to "all"
@@ -864,12 +874,23 @@ wait_for_jobs() {
     fi
 
     # Check for animation, default to simple spinner
-    if set_animation "$1"; then
+    if [[ "$1" == "moving" || "$1" == "restoring" || "$1" == "searching" || "$1" == "searching_dir" ]]; then
+        animation=$1
         shift
     fi
 
     job_pids=("$@")
-    animate_while_jobs_running
+
+    # Start animation with or without timeout
+    if [[ -n "$timeout" ]]; then
+        # Run in subshell to avoid all functions being exported afterwards
+        (
+            export_all_functions
+            timeout "$timeout" bash -c 'animate_while_jobs_running "$@"' animate_while_jobs_running "$mode" "$animation" "${job_pids[@]}"
+        )
+    else
+        animate_while_jobs_running "$mode" "$animation" "${job_pids[@]}"
+    fi
 
     # Collect exit status of finished jobs, stop others
     exit_status=0
@@ -884,6 +905,9 @@ wait_for_jobs() {
             kill -SIGTERM "$job_pid" 2>/dev/null
         fi
     done
+
+    # Reset signal traps
+    trap - SIGINT SIGTERM
     return $exit_status
 }
 
