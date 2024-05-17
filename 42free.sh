@@ -618,6 +618,42 @@ if ! command -v realpath &>/dev/null; then
     }
 fi
 
+# If timeout command is not available, define a custom function as a replacement
+if ! command -v timeout &>/dev/null; then
+    timeout() {
+        local duration=$1
+        local cmd=("${@:2}")
+
+        python3 -c "
+import subprocess
+import sys
+
+def convert_to_seconds(duration):
+    units = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}
+    if duration[-1] in units:
+        return float(duration[:-1]) * units[duration[-1]]
+    else:
+        return float(duration)
+
+duration = convert_to_seconds(sys.argv[1])
+cmd = sys.argv[2:]
+
+try:
+    if duration > 0:
+        proc = subprocess.Popen(cmd)
+        proc.communicate(timeout=duration)
+    else:
+        subprocess.run(cmd)
+except subprocess.TimeoutExpired:
+    # Send SIGTERM and wait until subprocess terminates
+    proc.terminate()
+    proc.wait()
+    # Exit code 124 is used by GNU 'timeout' for timeout expiration
+    sys.exit(124)
+" "$duration" "${cmd[@]}"
+    }
+fi
+
 move_files() {
     local source_path=$1
     local target_dirpath=$2
