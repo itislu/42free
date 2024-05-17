@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-current_version="v1.8.1"
+current_version="v1.8.1+dev"
 
 # Exit codes
 success=0
