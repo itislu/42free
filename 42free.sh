@@ -527,15 +527,16 @@ prompt_sgoinfre_path() {
         # Expand all variables in reply
         reply=$(eval echo "$REPLY" 2>/dev/null)
 
+        # Get real absolute path
+        if [[ -d "$reply" ]]; then
+            pretty_print "Dereferencing all symbolic links in the path..."
+        fi
+        reply=$(realpath "$reply" 2>/dev/null)
+
         # Check if directory exists
         if [[ ! -d "$reply" ]]; then
             pretty_print " ✖ Not an existing directory."
             pretty_print "Please try again."
-
-        # Check if absolute path
-        elif [[ ! "$reply" =~ ^/ ]]; then
-            pretty_print " ✖ Not an absolute path."
-            pretty_print "Please enter the full path."
 
         # Check if sgoinfre directory
         elif [[ ! "$reply" =~ sgoinfre ]]; then
@@ -562,8 +563,6 @@ prompt_sgoinfre_path() {
         # Prompt user for confirmation
         else
             pretty_print " ✔ Directory exists."
-            pretty_print "Dereferencing all symbolic links in the path..."
-            reply=$(realpath "$reply")
             pretty_print "'${bold}$reply${reset}'"
             if prompt_single_key "$prompt_correct_path"; then
                 sgoinfre="$reply"
