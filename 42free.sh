@@ -347,6 +347,41 @@ print(locale.format_string('%0.1f', size_in_bytes) + suffixes[i])
 "
 }
 
+# Trim a string to the first occurrence of a target directory after a certain pattern
+trim_path() {
+    python3 -c "
+import sys
+
+path = '$1'
+target_dir = '$2'
+path_pattern = '$3'
+
+path_len = len(path)
+target_dir_len = len(target_dir)
+
+# Find the path pattern
+i = path.find(path_pattern)
+if i == -1:
+    sys.exit(1)
+
+i = path.find(target_dir, i)
+
+while i != -1:
+    end_of_target_dir = i + target_dir_len
+
+    # Check that target directory is an exact directory match
+    if ((i == 0 or path[i - 1] == '/') and
+        (end_of_target_dir == path_len or path[end_of_target_dir] == '/')):
+        # Print path until the first occurance of target directory
+        print(path[:end_of_target_dir])
+        sys.exit(0)
+
+    i = path.find(target_dir, i + 1)
+
+sys.exit(1)
+"
+}
+
 # Breadth-first search to find a directory with a specific name and containing a specific pattern in its path
 find_dir_bfs() {
     python3 -c "
@@ -397,11 +432,10 @@ find_dir_dfs() {
     local path_pattern=$4
     local result
 
-    result=$(find "$start_dir" -maxdepth 12 -path "$exclude_dir" -prune -o -path "*$path_pattern*" -type d -name "$target_dir" -print -quit |
-        perl -ne "BEGIN {\$path_pattern = quotemeta('$path_pattern'); \$target_dir = quotemeta('$target_dir')}
-            print \"\$1\n\" if /^(.*?\$path_pattern.*?\/\$target_dir)(?:\/|\$)/")
+    result=$(find "$start_dir" -maxdepth 12 -path "$exclude_dir" -prune -o -path "*$path_pattern*" -type d -name "$target_dir" -print -quit)
+    result=$(trim_path "$result" "$target_dir" "$path_pattern")
 
-    if [[ -n $result ]]; then
+    if [[ -d $result ]]; then
         echo "$result"
         return 0
     fi
@@ -441,8 +475,8 @@ find_sgoinfre() {
     pretty_print "Searching your sgoinfre directory..."
 
     # Quick search in common locations
-    sgoinfre=$(timeout 1s find "${sgoinfre_common_locations[@]}" -maxdepth 6 -type d -name "$USER" -print -quit 2>/dev/null |
-        perl -ne "print \"\$1\n\" if /^(.*?\/sgoinfre\/.*?\/$USER)(?:\/|\$)/")
+    sgoinfre=$(timeout 1s find "${sgoinfre_common_locations[@]}" -maxdepth 6 -type d -name "$USER" -print -quit 2>/dev/null)
+    sgoinfre=$(trim_path "$sgoinfre" "$$USER" "/sgoinfre/")
 
     # In-depth search
     if [[ ! -d $sgoinfre ]]; then
