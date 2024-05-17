@@ -54,30 +54,27 @@
 
 ## 📌 Overview
 
-**Never run `ncdu` again.**
-- You only need to run 42free once for every file or directory you want to free the space of.
-  <br>
-  From that point onwards, they will accumulate their space outside of your home directory.
-
-**Easy to use.**
-- 42free is designed to be easy to use. You don't have to go to a certain directory or give full paths as arguments.
-  You can use it from any directory and you can pass multiple arguments at once or none at all. It will detect what you want to do.
-
 **No data loss.**
-- You will not lose any data by running 42free, it only moves the data.
-  <br>
+- You will not lose any data by running 42free, it only moves the data to sgoinfre.<br>
   All programs that need the moved directories and files will continue to work normally.
 
-**You are in control.**
-- 42free will prompt you for confirmation if it encounters any unusual situation before doing anything.
-  <br>
-  It will not overwrite files without asking you.
+**No worries about storage anymore.**
+- You only need to run 42free once for every file or directory you want to free the space of.<br>
+  From that point onwards, they will accumulate their space outside of your home directory.
 
 **Reversable.**
 - You can always restore the moved directories and files back to their original location.
 
 **Storage limit aware.**
 - 42free will detect if moving more files to sgoinfre would go over the allowed storage limit and will warn you.
+
+**Easy to use.**
+- 42free is designed to be easy to use. You don't have to go to a certain directory or give full paths as arguments.
+  You can use it from any directory and you can pass multiple arguments at once, or none at all. It will detect what you want to do.
+
+**You are in control.**
+- 42free will prompt you for confirmation if it encounters any unusual situation before doing anything.<br>
+  It will not overwrite files without asking you.
 
 <br>
 
