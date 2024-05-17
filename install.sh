@@ -123,7 +123,9 @@ change_config() {
         changed_config=true
         return 0
     elif ! grep -q "^$line$" "$config_file"; then
-        sed_inplace "s|^${line%%=*}=.*|$line|" "$config_file"
+        # Escape any special characters
+        line=$(printf "%q" "$line")
+        sed_inplace "s'^${line%%=*}=.*'$line'" "$config_file"
         changed_config=true
         return 0
     fi

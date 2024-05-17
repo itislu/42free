@@ -511,7 +511,7 @@ find_sgoinfre() {
                 shell_name="fish"
                 ;;
         esac
-        if change_config "export SGOINFRE=$sgoinfre" "$config_file" 2>/dev/null; then
+        if change_config "export SGOINFRE='$sgoinfre'" "$config_file" 2>/dev/null; then
             pretty_print "${yellow}Added SGOINFRE environment variable to $shell_name.${reset}"
         fi
     done
@@ -525,7 +525,7 @@ prompt_sgoinfre_path() {
     while true; do
         read -rp "> "
         # Expand all variables in reply
-        reply=$(eval echo "$REPLY")
+        reply=$(eval echo "$REPLY" 2>/dev/null)
 
         # Check if directory exists
         if [[ ! -d "$reply" ]]; then
@@ -1053,7 +1053,9 @@ change_config() {
         changed_config=true
         return 0
     elif ! grep -q "^$line$" "$config_file"; then
-        sed_inplace "s|^${line%%=*}=.*|$line|" "$config_file"
+        # Escape any special characters
+        line=$(printf "%q" "$line")
+        sed_inplace "s'^${line%%=*}=.*'$line'" "$config_file"
         changed_config=true
         return 0
     fi
@@ -1076,7 +1078,7 @@ change_sgoinfre() {
     pretty_print "Saving the path of your sgoinfre directory..."
     changed_sgoinfre=false
     for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
-        if change_config "export SGOINFRE=$sgoinfre" "$config_file" 2>/dev/null; then
+        if change_config "export SGOINFRE='$sgoinfre'" "$config_file" 2>/dev/null; then
             changed_sgoinfre=true
         fi
     done
