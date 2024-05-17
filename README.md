@@ -125,7 +125,7 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 > - **Closing all programs first will help to avoid errors during the move.**
 >
 > - **You can pass options anywhere in your command to change the behavior of 42free.**
->   - Example: `42free -r /path/to/large/directory LargeFileInCurDir`
+>   - Example: `42free -r /path/to/large/directory/in/sgoinfre SymLinkInCurDir`
 >
 > | Option | Description |
 > | --- | --- |
