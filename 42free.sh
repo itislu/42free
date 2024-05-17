@@ -331,62 +331,61 @@ capitalize_full() {
 
 # Convert a size from bytes to a human-readable format
 bytes_to_human() {
-    local size_in_bytes=$1
-
     python3 -c "
 import locale
 
-locale.setlocale(locale.LC_ALL, '')
-size_in_bytes = $size_in_bytes
+size_in_bytes = $1
 suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 i = 0
 
 while size_in_bytes >= 1024 and i < len(suffixes) - 1:
     size_in_bytes /= 1024
     i += 1
+
+locale.setlocale(locale.LC_ALL, '')
 print(locale.format_string('%0.1f', size_in_bytes) + suffixes[i])
 "
 }
 
 # Breadth-first search to find a directory with a specific name and containing a specific pattern in its path
 find_dir_bfs() {
-    local start_dir=$1
-    local exclude_dir=$2
-    local target_dir=$3
-    local path_pattern=$4
-
     python3 -c "
 import os
 import queue
+import sys
 
-def bfs_find(start_dir, exclude_dir, target_dir, path_pattern):
-    q = queue.Queue()
-    q.put(start_dir)
+start_dir = '$1'
+exclude_dir = '$2'
+target_dir = '$3'
+path_pattern = '$4'
 
-    while not q.empty():
-        current_dir = q.get()
-        try:
-            # Skip processing for the excluded directory
-            if current_dir.startswith(exclude_dir):
-                continue
+q = queue.Queue()
+q.put(start_dir)
 
-            with os.scandir(current_dir) as it:
-                for entry in it:
-                    if entry.is_dir():
-                        full_path = entry.path
-                        dir_name = os.path.basename(full_path)
-
-                        # Stop if the directory name is the target and the path contains the pattern
-                        if dir_name == target_dir and path_pattern in full_path:
-                            print(full_path)
-                            return
-
-                        # Add subdirectories to the queue for further processing
-                        q.put(full_path)
-        except Exception:
+while not q.empty():
+    current_dir = q.get()
+    try:
+        # Skip processing for the excluded directory
+        if current_dir.startswith(exclude_dir):
             continue
 
-bfs_find('$start_dir', '$exclude_dir', '$target_dir', '$path_pattern')
+        with os.scandir(current_dir) as it:
+            for entry in it:
+                if entry.is_dir():
+                    full_path = entry.path
+                    dir_name = os.path.basename(full_path)
+
+                    # Stop if the directory name is the target and the path contains the pattern
+                    if dir_name == target_dir and path_pattern in full_path:
+                        print(full_path)
+                        sys.exit(0)
+
+                    # Add subdirectories to the queue for further processing
+                    q.put(full_path)
+    except Exception:
+        continue
+
+sys.exit(1)
 "
 }
 
