@@ -176,7 +176,7 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
     shopt -s nocasematch
     while true; do
         pretty_print "${bold}Choose your campus:${reset}"
-        pretty_print "$prompt_campuses"
+        printf "%b\n" "$prompt_campuses"
         read -rp "> "
 
         # Check if input is a valid number of the list
