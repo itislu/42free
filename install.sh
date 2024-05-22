@@ -174,6 +174,7 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
     while true; do
         pretty_print "${bold}Choose your campus:${reset}"
         printf "%b\n" "${prompt_campuses[@]}"
+        printf "\n"
         read -rp "> "
 
         # Check if input is a valid number of the list
