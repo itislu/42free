@@ -165,18 +165,15 @@ if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
     # Create list of campuses in this format: n) Campus Name
     i=1
     for campus_name in "${campus_names[@]}"; do
-        prompt_campuses+="${bold}$(( i++ ))${reset}) $campus_name\n"
+        prompt_campuses+=("${bold}$(( i++ ))${reset}) $campus_name")
     done
-
-    # Remove last newline
-    prompt_campuses="${prompt_campuses%\\n}"
 
     # Prompt user
     # Allow case-insensitive matching
     shopt -s nocasematch
     while true; do
         pretty_print "${bold}Choose your campus:${reset}"
-        printf "%b\n" "$prompt_campuses"
+        printf "%b\n" "${prompt_campuses[@]}"
         read -rp "> "
 
         # Check if input is a valid number of the list
