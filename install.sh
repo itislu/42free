@@ -22,6 +22,7 @@ latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 campuses=(
     "42 Vienna;5;30"
     "42 Berlin;5;30"
+    "19 Brussels;5;15"
     "Other;0;0"
 )
 

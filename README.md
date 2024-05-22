@@ -156,10 +156,11 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ## 🌍 Confirmed to work for the following campuses
 
-| Campus | home | sgoinfre |
-| --- | --- | --- |
-| 🇦🇹 42 Vienna | 5GB | 30GB |
-| 🇩🇪 42 Berlin | 5GB | 30GB |
+| Campus | home | sgoinfre | OS |
+| --- | --- | --- | --- |
+| 🇦🇹 42 Vienna | 5GB | 30GB | Linux |
+| 🇩🇪 42 Berlin | 5GB | 30GB | Linux |
+| 🇧🇪 19 Brussels | 5GB | 15GB | macOS |
 
 Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
