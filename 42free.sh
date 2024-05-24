@@ -1083,7 +1083,7 @@ filter_default_args() {
     local filtered_default_args=()
 
     for default_arg in "${default_args[@]}"; do
-        if [[ -e "$default_arg" ]] && [[ ! -L "$default_arg" ]]; then
+        if [[ -e "$default_arg" ]] && [[ ! -L "$default_arg" ]] && [[ $(realpath "$default_arg") != $target_base/* ]]; then
             filtered_default_args+=("$default_arg")
         fi
     done
@@ -1496,7 +1496,7 @@ for arg in "${args[@]}"; do
         continue
     fi
 
-    # Check if the real base path of source is not actually already in target
+    # Check if the parent directory of the argument is already in the target base directory
     real_arg_path=$(realpath "$arg_path")
     real_arg_dirpath=$(realpath "$(dirname "$arg_path")")
     if { [[ "$arg_path" == $source_base/* ]] && [[ "$real_arg_dirpath/" != $source_base/* ]]; } ||
