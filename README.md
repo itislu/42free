@@ -161,6 +161,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 | 🇦🇹 42 Vienna | 5GB | 30GB | Linux |
 | 🇩🇪 42 Berlin | 5GB | 30GB | Linux |
 | 🇧🇪 19 Brussels | 5GB | 15GB | macOS |
+| 🇹🇭 42 Bangkok | 15GB | 15GB | Linux |
 
 Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
@@ -198,6 +199,7 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 | [@Anantiz](https://github.com/Anantiz) | Thank you for stress testing! |
 | [@alexandregv](https://github.com/alexandregv) | Thank you for showing me how 42 Paris does it! |
 | [@loyc12](https://github.com/loyc12) | Thank you for helping to increase compatibility with more campuses! |
+| [@kcp2p](https://github.com/kcp2p) | Thank you for reporting the storage layout at 42 Bangkok! |
 
 Also thank you to all my peers at 42 Vienna for the constant feedback! ❤️<br>
 [@LeaYeh](https://github.com/LeaYeh), [@ismayilguliyev28](https://github.com/ismayilguliyev28), [@Rperkmann](https://github.com/Rperkmann), [@michaela811](https://github.com/michaela811), [@grignetta](https://github.com/grignetta), [@yenthing](https://github.com/yenthing), [@leske42](https://github.com/leske42), [@ARWChair](https://github.com/ARWChair)<br>
