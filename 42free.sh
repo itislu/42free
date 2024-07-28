@@ -1050,8 +1050,8 @@ print_update_info() {
         fi
         pretty_print "$top_border"
         pretty_print "$side_border ${bold}${underlined}${bright_yellow}A new version of 42free is available.${reset}      $side_border"
-        pretty_print "$side_border Current version: ${bold}${current_version#v}${reset}                     $side_border"
-        pretty_print "$side_border Latest version: ${bold}${latest_version#v}${reset}                      $side_border"
+        pretty_print "$side_border Current version: $(printf "%-*s" 36 "${bold}${current_version#v}${reset}")$side_border"
+        pretty_print "$side_border Latest version:  $(printf "%-*s" 36 "${bold}${latest_version#v}${reset}")$side_border"
         pretty_print "$side_border To see the changelog, visit                $side_border"
         pretty_print "$side_border ${underlined}${bright_blue}https://github.com/itislu/42free/releases${reset}. $side_border"
         if [[ "$1" == "remind" ]]; then
