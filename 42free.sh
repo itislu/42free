@@ -24,6 +24,8 @@ default_args_linux=(
     "$HOME/.var/app/com.google.Chrome/config/google-chrome/Default/Service Worker"
     "$HOME/.var/app/com.opera.Opera/cache"
     "$HOME/.var/app/com.opera.Opera/config/opera/Default/Service Worker"
+    "$HOME/.var/app/com.vivaldi.Vivaldi/cache"
+    "$HOME/.var/app/com.vivaldi.Vivaldi/config/vivaldi/Default/Service Worker"
 )
 
 default_args_macos=(
@@ -41,6 +43,7 @@ default_args_macos=(
     "$HOME/Library/Application Support/BraveSoftware/Brave-Browser/Default/Service Worker"
     "$HOME/Library/Application Support/Google/Chrome/Default/Service Worker"
     "$HOME/Library/Application Support/Opera Software/Opera Stable/Service Worker"
+    "$HOME/Library/Application Support/Vivaldi/Default/Service Worker"
 )
 
 # Check OS
