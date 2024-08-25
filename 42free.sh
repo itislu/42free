@@ -18,6 +18,8 @@ default_args_linux=(
     "$HOME/.config/Code/Crashpad"
     "$HOME/.config/Code/User/workspaceStorage"
     "$HOME/.config/Code/Service Worker"
+    "$HOME/.config/Code/WebStorage"
+    "$HOME/.config/google-chrome/Default/Service Worker"
     "$HOME/.var/app/com.brave.Browser/cache"
     "$HOME/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/Default/Service Worker"
     "$HOME/.var/app/com.google.Chrome/cache"
