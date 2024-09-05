@@ -38,6 +38,7 @@ default_args_macos=(
     "$HOME/Library/Application Support/Code/Crashpad"
     "$HOME/Library/Application Support/Code/User/workspaceStorage"
     "$HOME/Library/Application Support/Code/Service Worker"
+    "$HOME/Library/Application Support/Code/WebStorage"
     "$HOME/Library/Application Support/Slack/Cache"
     "$HOME/Library/Application Support/Slack/Service Worker"
     "$HOME/Library/Application Support/discord/Cache"
