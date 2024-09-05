@@ -9,9 +9,10 @@ minor_error=2
 major_error=3
 
 default_args_linux=(
+    # System: Cache
     "$HOME/.cache"
-    "$HOME/.var/app/com.discordapp.Discord"
-    "$HOME/.var/app/com.slack.Slack"
+
+    # Code editors: Visual Studio Code, Cursor
     "$HOME/.config/Code/Cache"
     "$HOME/.config/Code/CachedData"
     "$HOME/.config/Code/CachedExtensionVSIXs"
@@ -26,9 +27,15 @@ default_args_linux=(
     "$HOME/.config/Cursor/User/workspaceStorage"
     "$HOME/.config/Cursor/Service Worker"
     "$HOME/.config/Cursor/WebStorage"
-    "$HOME/.config/google-chrome/Default/Service Worker"
+
+    # Communication apps: Discord, Slack
+    "$HOME/.var/app/com.discordapp.Discord"
+    "$HOME/.var/app/com.slack.Slack"
+
+    # Browsers: Brave, Chrome, Opera, Vivaldi
     "$HOME/.var/app/com.brave.Browser/cache"
     "$HOME/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser/Default/Service Worker"
+    "$HOME/.config/google-chrome/Default/Service Worker"
     "$HOME/.var/app/com.google.Chrome/cache"
     "$HOME/.var/app/com.google.Chrome/config/google-chrome/Default/Service Worker"
     "$HOME/.var/app/com.opera.Opera/cache"
@@ -38,7 +45,10 @@ default_args_linux=(
 )
 
 default_args_macos=(
+    # System: Cache
     "$HOME/Library/Caches"
+
+    # Code editors: Visual Studio Code, Cursor
     "$HOME/Library/Application Support/Code/Cache"
     "$HOME/Library/Application Support/Code/CachedData"
     "$HOME/Library/Application Support/Code/CachedExtensionVSIXs"
@@ -53,10 +63,14 @@ default_args_macos=(
     "$HOME/Library/Application Support/Cursor/User/workspaceStorage"
     "$HOME/Library/Application Support/Cursor/Service Worker"
     "$HOME/Library/Application Support/Cursor/WebStorage"
-    "$HOME/Library/Application Support/Slack/Cache"
-    "$HOME/Library/Application Support/Slack/Service Worker"
+
+    # Communication apps: Discord, Slack
     "$HOME/Library/Application Support/discord/Cache"
     "$HOME/Library/Application Support/discord/Service Worker"
+    "$HOME/Library/Application Support/Slack/Cache"
+    "$HOME/Library/Application Support/Slack/Service Worker"
+
+    # Browsers: Brave, Chrome, Opera, Vivaldi
     "$HOME/Library/Application Support/BraveSoftware/Brave-Browser/Default/Service Worker"
     "$HOME/Library/Application Support/Google/Chrome/Default/Service Worker"
     "$HOME/Library/Application Support/Opera Software/Opera Stable/Service Worker"
