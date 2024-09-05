@@ -42,6 +42,10 @@ default_args_linux=(
     "$HOME/.var/app/com.opera.Opera/config/opera/Default/Service Worker"
     "$HOME/.var/app/com.vivaldi.Vivaldi/cache"
     "$HOME/.var/app/com.vivaldi.Vivaldi/config/vivaldi/Default/Service Worker"
+
+    # Package managers: Homebrew, Capt
+    "$HOME/.brew"
+    "$HOME/.capt"
 )
 
 default_args_macos=(
