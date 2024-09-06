@@ -12,6 +12,9 @@ default_args_linux=(
     # System: Cache
     "$HOME/.cache"
 
+    # Virtualization: Docker
+    "$HOME/.local/share/docker"
+
     # Code editors: Visual Studio Code, Cursor
     "$HOME/.config/Code/Cache"
     "$HOME/.config/Code/CachedData"
@@ -43,7 +46,7 @@ default_args_linux=(
     "$HOME/.var/app/com.vivaldi.Vivaldi/cache"
     "$HOME/.var/app/com.vivaldi.Vivaldi/config/vivaldi/Default/Service Worker"
 
-    # Package managers: Homebrew, Capt
+    # Package managers: Homebrew, capt
     "$HOME/.brew"
     "$HOME/.capt"
 )
