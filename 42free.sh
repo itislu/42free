@@ -55,6 +55,9 @@ default_args_macos=(
     # System: Cache
     "$HOME/Library/Caches"
 
+    # Virtualization: Docker
+    "$HOME/Library/Containers/com.docker.docker/Data/vms/0/data"
+
     # Code editors: Visual Studio Code, Cursor
     "$HOME/Library/Application Support/Code/Cache"
     "$HOME/Library/Application Support/Code/CachedData"
