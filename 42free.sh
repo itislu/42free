@@ -1362,13 +1362,14 @@ while (( $# )); do
     shift
 done
 
-# Check if the script received any targets and check for updates
+# Check for updates
+update "quiet"
+
+# Check if the script received any targets
 if [[ -z "${args[*]}" ]]; then
     no_user_args=true
-    update "quiet"
 else
     no_user_args=false
-    print_update_info "remind"
 fi
 
 # Print header
