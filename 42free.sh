@@ -100,6 +100,7 @@ fi
 
 # Standard variables
 stderr=""
+install_script="https://raw.githubusercontent.com/itislu/42free/main/install.sh"
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
@@ -1103,21 +1104,29 @@ print_update_info() {
     fi
 }
 
+# Prompt for update if a new version is available and run the new version with the original arguments
+# Possible arguments to this function:
+#   - "quiet": Do not print any messages
+#   - "exit": Exit after updating
 update() {
     if ! latest_version=$(get_latest_version_number "$1"); then
         return $?
     fi
 
-    # If current version number is not the latest, prompt for update
+    # Prompt for update if current version number is not the latest
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
         if prompt_single_key "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts_stdout" "https://raw.githubusercontent.com/itislu/42free/main/install.sh") "update"; ft_exit $?
+            bash <("$downloader" "$downloader_opts_stdout" "$install_script") "update"; update_status=$?; if [[ $update_status -eq 0 && "$1" != "exit" ]]; then exec "$0" "${args[@]}"; fi; ft_exit $update_status
         else
             pretty_print "Not updating."
         fi
     elif [[ "$1" != "quiet" ]]; then
         pretty_print "You are already using the latest version of 42free."
+    fi
+
+    if [[ "$1" == "exit" ]]; then
+        ft_exit $success
     fi
     return $success
 }
@@ -1314,8 +1323,7 @@ while (( $# )); do
             ft_exit
             ;;
         -u|--update)
-            update
-            ft_exit $?
+            update "exit"
             ;;
         -h|--help)
             print_update_info "remind"
