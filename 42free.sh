@@ -185,11 +185,11 @@ You only need to run 42free once for every directory or file you want to free th
 \n\
 $delim_small
 \n\
-${bold}${underlined}Usage:${reset} ${bold}42free${reset} [target1 target2 ...]
+${bold}${underlined}Usage:${reset} ${bold}42free${reset} [TARGET]... [OPTION]...
     If no arguments are given, 42free will make some suggestions.
-    Target paths can be absolute or relative to your current directory.
+    Target paths can be absolute or relative to the current directory.
     42free will automatically detect if an argument is the source or the destination.
-    Example: '${bold}42free /path/to/large/directory LargeFileInCurDir${reset}'
+    Example: '${bold}42free /path/to/large/directory largeFileInCurDir${reset}'
     Closing all programs first will help to avoid errors during the move.
 \n\
 ${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
@@ -1444,9 +1444,9 @@ need_delim=false
 # Check if nothing to be done
 if [[ $args_amount -eq 0 ]]; then
     if $restore; then
-        example="42free -r /path/to/directory/in/sgoinfre LinkInCurDir"
+        example="42free -r /path/to/directory/in/sgoinfre symLinkInCurDir"
     else
-        example="42free /path/to/large/directory LargeFileInCurDir"
+        example="42free /path/to/large/directory largeFileInCurDir"
     fi
     pretty_print "${bold}Nothing to be done.${reset}"
     pretty_print "You can specify which directories or files you would like to move to $target_name with arguments."
