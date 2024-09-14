@@ -32,19 +32,19 @@
 
 ## 🧭 Contents
 
-* [📌 Overview](#-overview)
+- [📌 Overview](#-overview)
 
-* [🛠️ Installation](#%EF%B8%8F-installation)
+- [🛠️ Installation](#%EF%B8%8F-installation)
 
-* [👩‍💻 Usage](#-usage)
+- [👩‍💻 Usage](#-usage)
 
-* [💡 How it works](#-how-it-works)
+- [💡 How it works](#-how-it-works)
 
-* [🌍 Confirmed to work for the following campuses](#-confirmed-to-work-for-the-following-campuses)
+- [🌍 Confirmed to work for the following campuses](#-confirmed-to-work-for-the-following-campuses)
 
-* [🤝 Contributing](#-contributing)
+- [🤝 Contributing](#-contributing)
 
-* [🐬 Fun fact](#-fun-fact)
+- [🐬 Fun fact](#-fun-fact)
 
 <br>
 
@@ -124,15 +124,15 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 > - **You can pass options anywhere in your command to change the behavior of 42free.**
 >   - Example: `42free -r /path/to/large/directory/in/sgoinfre SymLinkInCurDir`
 >
-> | Option | Description |
-> | --- | --- |
-> | `--restore` | Use the `-r` option to move directories and files back to their original location. |
-> | `--sgoinfre` | To change the path that 42free considers as your personal sgoinfre directory, run `42free -s`. |
-> | `--max-size` | To change the warning sizes for the home and sgoinfre directories, run `42free -m`. |
-> | `--update` | To update to the latest version, run `42free -u`. |
-> | `--version` | To see the version information, run `42free -v`. |
-> | `--uninstall` | To uninstall 42free, run `42free --uninstall`. |
-> | `--help` | To see the manual, run `42free -h`. |
+> | Option        | Description                                                                                    |
+> | ------------- | ---------------------------------------------------------------------------------------------- |
+> | `--restore`   | Use the `-r` option to move directories and files back to their original location.             |
+> | `--sgoinfre`  | To change the path that 42free considers as your personal sgoinfre directory, run `42free -s`. |
+> | `--max-size`  | To change the warning sizes for the home and sgoinfre directories, run `42free -m`.            |
+> | `--update`    | To update to the latest version, run `42free -u`.                                              |
+> | `--version`   | To see the version information, run `42free -v`.                                               |
+> | `--uninstall` | To uninstall 42free, run `42free --uninstall`.                                                 |
+> | `--help`      | To see the manual, run `42free -h`.                                                            |
 
 <br>
 
@@ -156,12 +156,12 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 ## 🌍 Confirmed to work for the following campuses
 
-| Campus | home | sgoinfre | OS |
-| --- | --- | --- | --- |
-| 🇦🇹 42 Vienna | 5GB | 30GB | Linux |
-| 🇩🇪 42 Berlin | 5GB | 30GB | Linux |
-| 🇧🇪 19 Brussels | 5GB | 15GB | macOS |
-| 🇹🇭 42 Bangkok | 15GB | 15GB | Linux |
+| Campus         | home | sgoinfre | OS    |
+| -------------- | ---- | -------- | ----- |
+| 🇦🇹 42 Vienna   | 5GB  | 30GB     | Linux |
+| 🇩🇪 42 Berlin   | 5GB  | 30GB     | Linux |
+| 🇧🇪 19 Brussels | 5GB  | 15GB     | macOS |
+| 🇹🇭 42 Bangkok  | 15GB | 15GB     | Linux |
 
 Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
@@ -193,13 +193,13 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
 ### 🏆 BIG thank you to all contributors!
 
-| Contributor | Contribution |
-| --- | --- |
-| [@JonatV](https://github.com/JonatV) | Thank you for helping with macOS support! |
-| [@Anantiz](https://github.com/Anantiz) | Thank you for stress testing! |
-| [@alexandregv](https://github.com/alexandregv) | Thank you for showing me how 42 Paris does it! |
-| [@loyc12](https://github.com/loyc12) | Thank you for helping to increase compatibility with more campuses! |
-| [@kcp2p](https://github.com/kcp2p) | Thank you for reporting the storage layout at 42 Bangkok! |
+| Contributor                                    | Contribution                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------------- |
+| [@JonatV](https://github.com/JonatV)           | Thank you for helping with macOS support!                           |
+| [@Anantiz](https://github.com/Anantiz)         | Thank you for stress testing!                                       |
+| [@alexandregv](https://github.com/alexandregv) | Thank you for showing me how 42 Paris does it!                      |
+| [@loyc12](https://github.com/loyc12)           | Thank you for helping to increase compatibility with more campuses! |
+| [@kcp2p](https://github.com/kcp2p)             | Thank you for reporting the storage layout at 42 Bangkok!           |
 
 Also thank you to all my peers at 42 Vienna for the constant feedback! ❤️<br>
 [@LeaYeh](https://github.com/LeaYeh), [@ismayilguliyev28](https://github.com/ismayilguliyev28), [@Rperkmann](https://github.com/Rperkmann), [@michaela811](https://github.com/michaela811), [@grignetta](https://github.com/grignetta), [@yenthing](https://github.com/yenthing), [@leske42](https://github.com/leske42), [@ARWChair](https://github.com/ARWChair)<br>
