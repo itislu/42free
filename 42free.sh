@@ -224,14 +224,22 @@ $delim_small
 To contribute, report bugs or share improvement ideas, visit
 ${underlined}${bright_blue}https://github.com/itislu/42free${reset}."
 
+msg_manual_reminder="To see the full manual, run '${bold}42free --help${reset}'."
+
+msg_manual_short="\
+${underlined}Usage:${reset} ${bold}42free${reset} [TARGET]...
+Free up space of TARGETs, or make suggestions if no arguments are given.
+${underlined}Example:${reset} '42free /path/to/large/directory largeFileInCurDir'
+Paths can be absolute or relative to the current directory.
+\n\
+$msg_manual_reminder"
+
 msg_version="\
 ${bold}42free $current_version${reset}
 A script made for 42 students to take advantage of symbolic links to free up storage without data loss.
 For more information, visit ${underlined}${bright_blue}https://github.com/itislu/42free${reset}."
 
 msg_close_programs="${bold}${bright_yellow}Close all programs first to avoid errors during the move.${reset}"
-
-msg_manual_reminder="To see the manual, run '${bold}42free --help${reset}'."
 
 msg_report_sgoinfre="\n\
 $indicator_error${bold} There does not seem to be a sgoinfre directory available on your campus.${reset}
@@ -1325,7 +1333,11 @@ while (( $# )); do
         -u|--update)
             update "exit"
             ;;
-        -h|--help)
+        -h)
+            pretty_print "$msg_manual_short"
+            ft_exit $success
+            ;;
+        --help)
             print_update_info "remind"
             pretty_print "$msg_manual"
             ft_exit $success

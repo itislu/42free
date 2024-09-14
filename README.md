@@ -132,7 +132,7 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 > | `--update`    | To update to the latest version, run `42free -u`.                                              |
 > | `--version`   | To see the version information, run `42free -v`.                                               |
 > | `--uninstall` | To uninstall 42free, run `42free --uninstall`.                                                 |
-> | `--help`      | To see the manual, run `42free -h`.                                                            |
+> | `--help`      | To see the manual, run `42free --help` (or `42free -h` for the short version).                 |
 
 <br>
 
