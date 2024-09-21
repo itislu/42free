@@ -210,7 +210,10 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
 Also thank you to all my peers at 42 Vienna for the constant feedback! ❤️<br>
 [@LeaYeh](https://github.com/LeaYeh), [@ismayilguliyev28](https://github.com/ismayilguliyev28), [@Rperkmann](https://github.com/Rperkmann), [@michaela811](https://github.com/michaela811), [@grignetta](https://github.com/grignetta), [@yenthing](https://github.com/yenthing), [@leske42](https://github.com/leske42), [@ARWChair](https://github.com/ARWChair)<br>
-And thank you to [@Zekao](https://github.com/Zekao) for sparking the idea in the first place.
+<details>
+  <summary>And thank you to <a href="https://github.com/Zekao">@Zekao</a> for sparking the idea in the first place.</summary>
+  <img src="https://github.com/user-attachments/assets/4ed0feda-4744-43f9-af2a-5c131d81d8a4">
+</details>
 
 <br>
 
