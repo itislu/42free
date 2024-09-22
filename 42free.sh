@@ -1735,7 +1735,6 @@ for arg in "${args[@]}"; do
                 link_path="$source_path~42free_tmp~"
                 link_create_msg="Symbolic link left behind with a tmp name."
             fi
-
             # Create the symbolic link
             symlink "$target_path" "$link_path" 2>/dev/null
             pretty_print "$link_create_msg"
