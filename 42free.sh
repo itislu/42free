@@ -168,6 +168,7 @@ delim_big="\
 # Indicators
 indicator_error="${bold}${red}ERROR:${reset}"
 indicator_warning="${bold}${bright_yellow}WARNING:${reset}"
+indicator_info="${bold}${bright_blue}INFO:${reset}"
 indicator_success="${bold}${bright_green}SUCCESS:${reset}"
 
 # Messages
@@ -651,6 +652,27 @@ change_sgoinfre_permissions() {
     else
         pretty_print "Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
     fi
+    return 0
+}
+
+create_sgoinfre_symlink() {
+    pretty_print "$indicator_info Could not find a symbolic link to your sgoinfre directory in your home directory."
+    pretty_print "It can be useful to have one there for easy access."
+    if prompt_single_key "Do you wish to create it?"; then
+        if stderr=$(symlink "$sgoinfre" "$HOME/sgoinfre" 2>&1); then
+            pretty_print "$indicator_success Created a symbolic link named 'sgoinfre' in your home directory."
+        else
+            pretty_print "$indicator_error Cannot create symbolic link."
+            print_stderr
+            syscmd_failed=true
+            if ! prompt_with_enter "$prompt_continue_still"; then
+                return 1
+            fi
+        fi
+    else
+        pretty_print "Not creating a symbolic link to your sgoinfre directory."
+    fi
+    echo
     return 0
 }
 
@@ -1404,6 +1426,14 @@ sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
 sgoinfre_permissions=${sgoinfre_permissions#d}
 if ! $restore && [[ "$sgoinfre_permissions" != "rwx------" ]]; then
     if ! change_sgoinfre_permissions; then
+        ft_exit $major_error
+    fi
+fi
+
+# Check if user has a symbolic link to their sgoinfre directory in their home directory
+sgoinfre_symlink=$(find "$HOME" -maxdepth 1 -type l -lname "$sgoinfre" -print -quit 2>/dev/null)
+if [[ -z $sgoinfre_symlink ]]; then
+    if ! create_sgoinfre_symlink; then
         ft_exit $major_error
     fi
 fi
