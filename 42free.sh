@@ -762,11 +762,15 @@ cleanup_empty_dirs() {
     done
 }
 
+# Cross-compatible implementation of `ln -T`
 symlink() {
     local target_path=$1
     local link_path=$2
 
     if [[ -d "$link_path" ]]; then
+        if [[ $(basename "$link_path") != $(basename "$target_path") ]]; then
+            target_path=$(dirname "$target_path")/$(basename "$link_path")
+        fi
         link_path=$(dirname "$link_path")
     fi
     ln -s "$target_path" "$link_path"
