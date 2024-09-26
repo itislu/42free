@@ -1424,24 +1424,6 @@ fi
 sgoinfre_std="$sgoinfre"
 sgoinfre_alt="$sgoinfre_alt_mount/$sgoinfre"
 
-# Check if the permissions of user's sgoinfre directory are rwx------
-sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
-# Remove 'd' from permissions for more clarity
-sgoinfre_permissions=${sgoinfre_permissions#d}
-if ! $restore && [[ "$sgoinfre_permissions" != "rwx------" ]]; then
-    if ! change_sgoinfre_permissions; then
-        ft_exit $major_error
-    fi
-fi
-
-# Check if user has a symbolic link to their sgoinfre directory in their home directory
-sgoinfre_symlink=$(find "$HOME" -maxdepth 1 -type l -lname "$sgoinfre" -print -quit 2>/dev/null)
-if [[ -z $sgoinfre_symlink ]]; then
-    if ! create_sgoinfre_symlink; then
-        ft_exit $major_error
-    fi
-fi
-
 # Check which direction the script should move the directories or files
 if ! $restore; then
     source_base="$HOME"
@@ -1462,6 +1444,24 @@ else
     operation_success="restored"
     outcome="occupied"
     convert_default_args "$sgoinfre"
+fi
+
+# Check if the permissions of user's sgoinfre directory are rwx------
+sgoinfre_permissions=$(stat_human_readable "$sgoinfre" 2>/dev/null)
+# Remove 'd' from permissions for more clarity
+sgoinfre_permissions=${sgoinfre_permissions#d}
+if ! $restore && [[ "$sgoinfre_permissions" != "rwx------" ]]; then
+    if ! change_sgoinfre_permissions; then
+        ft_exit $major_error
+    fi
+fi
+
+# Check if user has a symbolic link to their sgoinfre directory in their home directory
+sgoinfre_symlink=$(find "$HOME" -maxdepth 1 -type l -lname "$sgoinfre" -print -quit 2>/dev/null)
+if [[ -z $sgoinfre_symlink ]]; then
+    if ! create_sgoinfre_symlink; then
+        ft_exit $major_error
+    fi
 fi
 
 # If no arguments were given, use default arguments
