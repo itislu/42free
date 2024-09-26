@@ -1,0 +1,21 @@
+name: macOS Test Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    name: macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up sgoinfre
+        run: |
+          mkdir -p "/tmp/sgoinfre/$USER"
+
+      - name: Set up tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 180
