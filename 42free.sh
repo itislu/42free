@@ -1492,8 +1492,9 @@ fi
 for arg in "${args[@]}"; do
     args_index=$(( args_index + 1 ))
 
-    # Print reminder to close all programs first in first iteration of default arguments
+    # First iteration of default arguments
     if [[ $args_index -eq 1 ]] && $no_user_args; then
+        # Print reminder to close all programs first
         pretty_print "$msg_close_programs"
         pretty_print "$msg_manual_reminder"
         echo
