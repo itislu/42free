@@ -203,6 +203,8 @@ ${bold}${underlined}Options:${reset} You can pass options anywhere in the argume
                      Current sizes:
                        HOME_MAX_SIZE=$home_max_size
                        SGOINFRE_MAX_SIZE=$sgoinfre_max_size
+    -i, --info       Display the current storage usage of your home and
+                     sgoinfre directories and exit.
     -u, --update     Check for a new version of 42free and exit.
     -h, --help       Display this help message and exit.
     -v, --version    Display version information and exit.
@@ -1023,6 +1025,39 @@ wait_for_jobs() {
     return $exit_status
 }
 
+# Get the sizes of two directories in KB and set the values of the passed variable names
+set_directory_sizes() {
+    local dir1_size_var=$1
+    local dir2_size_var=$2
+    local dir1=$3
+    local dir2=$4
+    local dir1_name=$5
+    local dir2_name=$6
+    local tmpfile_dir1_size="/tmp/42free~$$~dir1_size"
+    local tmpfile_dir2_size="/tmp/42free~$$~dir2_size"
+    local jobs=()
+    local dir1_size_in_kb
+    local dir2_size_in_kb
+
+    pretty_print "Getting the current sizes of the $dir1_name and $dir2_name directories..."
+
+    # Run parallel jobs and wait for both to finish
+    du -sk "$dir1" 2>/dev/null | cut -f1 > "$tmpfile_dir1_size" &
+    jobs+=($!)
+    du -sk "$dir2" 2>/dev/null | cut -f1 > "$tmpfile_dir2_size" &
+    jobs+=($!)
+    wait_for_jobs "all" "searching" "${jobs[@]}"
+
+    # Read the sizes from the temporary files
+    dir1_size_in_kb=$(cat "$tmpfile_dir1_size" 2>/dev/null)
+    dir2_size_in_kb=$(cat "$tmpfile_dir2_size" 2>/dev/null)
+    rm -f "$tmpfile_dir1_size" "$tmpfile_dir2_size"
+
+    # Set the values of the passed variable names
+    eval "$dir1_size_var=$dir1_size_in_kb"
+    eval "$dir2_size_var=$dir2_size_in_kb"
+}
+
 # Calculate a color based on the percentage of used space
 calculate_usage_color() {
     local size=$1
@@ -1343,6 +1378,7 @@ uninstall() {
 args=()
 args_amount=0
 restore=false
+usage_info_only=false
 while (( $# )); do
     case "$1" in
         -r|--restore)
@@ -1355,6 +1391,9 @@ while (( $# )); do
         -m|--max-size)
             change_max_sizes
             ft_exit
+            ;;
+        -i|--info)
+            usage_info_only=true
             ;;
         -u|--update)
             update "exit"
@@ -1454,6 +1493,16 @@ if ! $restore && [[ "$sgoinfre_permissions" != "rwx------" ]]; then
     if ! change_sgoinfre_permissions; then
         ft_exit $major_error
     fi
+fi
+
+# If the --info option was given, only print the available space and exit
+if $usage_info_only; then
+    restore=false
+    set_directory_sizes "home_size_in_kb" "sgoinfre_size_in_kb" "$HOME" "$sgoinfre" "home" "sgoinfre"
+    # Move cursor up and clear line
+    printf "\033[A\r\e[K"
+    print_available_space "$home_size_in_kb" "$sgoinfre_size_in_kb"
+    ft_exit $success
 fi
 
 # Check if user has a symbolic link to their sgoinfre directory in their home directory
@@ -1659,22 +1708,7 @@ for arg in "${args[@]}"; do
 
     # Get the current sizes of the source and target base directories
     if [[ -z "$target_base_size_in_kb" ]]; then
-        pretty_print "Getting the current sizes of the $source_name and $target_name directories..."
-
-        tmpfile_source_base_size="/tmp/42free~$$~source_base_size"
-        tmpfile_target_base_size="/tmp/42free~$$~target_base_size"
-
-        # Run parallel jobs and wait for both to finish
-        du -sk "$source_base" 2>/dev/null | cut -f1 > $tmpfile_source_base_size &
-        jobs+=($!)
-        du -sk "$target_base" 2>/dev/null | cut -f1 > $tmpfile_target_base_size &
-        jobs+=($!)
-        wait_for_jobs "all" "searching" "${jobs[@]}"
-
-        # Read the sizes from the temporary files
-        source_base_size_in_kb=$(cat $tmpfile_source_base_size 2>/dev/null)
-        target_base_size_in_kb=$(cat $tmpfile_target_base_size 2>/dev/null)
-        rm -f $tmpfile_source_base_size $tmpfile_target_base_size
+        set_directory_sizes "source_base_size_in_kb" "target_base_size_in_kb" "$source_base" "$target_base" "$source_name" "$target_name"
     fi
 
     # Get the size of the directory or file to be moved
