@@ -196,8 +196,8 @@ ${bold}${underlined}Usage:${reset} ${bold}42free${reset} [TARGET]... [OPTION]...
 ${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
     -r, --restore    Move the directories and files back to their original
                      location in home.
-    -s, --sgoinfre   Change the path that 42free considers as your personal
-                     sgoinfre directory and exit.
+    -s, --sgoinfre   Change the path that 42free considers as your
+                     personal sgoinfre directory and exit.
     -m, --max-size   Change the warning sizes for the home and sgoinfre
                      directories (in GB) and exit.
                      Current sizes:
