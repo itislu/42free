@@ -1537,6 +1537,8 @@ if [[ $args_amount -eq 0 ]]; then
     pretty_print "Run '42free --help' for more information."
 fi
 
+moved_size_total_in_kb=0
+
 # Loop over all arguments
 for arg in "${args[@]}"; do
     args_index=$(( args_index + 1 ))
@@ -1846,7 +1848,16 @@ for arg in "${args[@]}"; do
     pretty_print "${bold}${outcome_color}$source_size $outcome.${reset}"
     print_available_space "$source_base_size_in_kb" "$target_base_size_in_kb"
 
+    moved_size_total_in_kb=$(( moved_size_total_in_kb + source_size_in_kb ))
+
 # Process the next argument
 done
+
+# Print total size of moved directories
+if [[ $args_amount -ne 1 ]]; then
+    pretty_print "$delim_big"
+    echo
+    pretty_print "${bold}Total size $outcome: $(echo "$moved_size_total_in_kb/1024/1024" | bc -l | xargs printf "%.2f")${reset}"
+fi
 
 ft_exit
