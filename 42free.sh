@@ -337,11 +337,14 @@ print_skip_arg() {
 }
 
 # Prompt the user for confirmation
-# Default is 'no', for 'yes' needs y/Y/yes/Yes + Enter key
+# Default is 'no', for 'yes' needs y/Y/yes,Yup,ya,... + Enter key
+# Regex: Match Y/y, optionally followed by one valid char, or 2+ valid chars after which one invalid is allowed
 prompt_with_enter() {
+    local cset="EeAaUuSsHhPp"
+
     pretty_print "$1 [${bold}y${reset}/${bold}N${reset}]"
     read -rp "> "
-    if [[ "$REPLY" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+    if [[ "$REPLY" =~ ^[Yy]([$cset]|[$cset]{2,}([^$cset][$cset]*)?)?$ ]]; then
         return 0
     fi
     return 1
