@@ -1,5 +1,25 @@
 <div align="center">
 
+  # ⚠️ 42 Vienna New Sgoinfre ⚠️
+
+  **Run the following script to update all symlinks from pointing to the old sgoinfre to the new sgoinfre path:**
+
+  ```bash
+  bash <(curl -sSL https://raw.githubusercontent.com/itislu/42free/vienna-new-sgoinfre/update_symlinks.sh)
+  ```
+
+  <br>
+
+  Old sgoinfre path: `/sgoinfre/goinfre/Perso/$USER`
+
+  New sgoinfre path: `/sgoinfre/$USER`
+
+  <br>
+
+  ---
+
+  <br>
+
   # 📁&nbsp; 42free &nbsp;📁
 
   ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
