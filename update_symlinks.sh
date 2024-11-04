@@ -2,7 +2,7 @@
 
 new_path="$HOME/sgoinfre"
 new_sgoinfre="/sgoinfre/$USER"
-transferred_sgoinfre="$new_sgoinfre/old_data"
+transferred_sgoinfre="$new_sgoinfre/old_data/$USER"
 
 # Prompt the user for confirmation
 # Default is 'yes', only needs y/Y key
