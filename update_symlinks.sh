@@ -25,8 +25,8 @@ if [ -z "$SGOINFRE" ]; then
         echo "Aborting"
         exit 0
     fi
-    export SGOINFRE="/sgoinfre/goinfre/Perso/$USER"
 fi
+export SGOINFRE="/sgoinfre/goinfre/Perso/$USER"
 
 # Make sure the new sgoinfre really exists
 if [ ! -d "$new_sgoinfre" ]; then
