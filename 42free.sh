@@ -1815,6 +1815,8 @@ for arg in "${args[@]}"; do
     pretty_print "$indicator_success '${bright_yellow}$source_basename${reset}' successfully $operation_success to '${bright_green}$target_dirpath${reset}'."
 
     if ! $restore; then
+        # Remove any file that was created the very short meantime between moving a file successfully and creating the symlink in its place
+        rm -rf "$source_path" 2>/dev/null
         # Create the symbolic link
         if stderr=$(symlink "$target_path" "$source_path" 2>&1); then
             pretty_print "Symbolic link left behind."
