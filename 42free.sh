@@ -190,7 +190,9 @@ ${bold}${underlined}Usage:${reset} ${bold}42free${reset} [TARGET]... [OPTION]...
     If no arguments are given, 42free will make some suggestions.
     Target paths can be absolute or relative to the current directory.
     42free will automatically detect if an argument is the source or the destination.
-    Example: '${bold}42free /path/to/large/directory largeFileInCurDir${reset}'
+\n\
+    Example:
+    '${bold}42free /path/to/large/directory largeFileInCurDir ...${reset}'
     Closing all programs first will help to avoid errors during the move.
 \n\
 ${bold}${underlined}Options:${reset} You can pass options anywhere in the arguments.
@@ -232,7 +234,7 @@ msg_manual_reminder="To see the full manual, run '${bold}42free --help${reset}'.
 msg_manual_short="\
 ${underlined}Usage:${reset} ${bold}42free${reset} [TARGET]...
 Free up space of TARGETs, or make suggestions if no arguments are given.
-${underlined}Example:${reset} '42free /path/to/large/directory largeFileInCurDir'
+${underlined}Example:${reset} '42free /path/to/large/directory largeFileInCurDir ...'
 Paths can be absolute or relative to the current directory.
 \n\
 $msg_manual_reminder"
@@ -1530,9 +1532,9 @@ need_delim=false
 # Check if nothing to be done
 if [[ $args_amount -eq 0 ]]; then
     if $restore; then
-        example="42free -r /path/to/directory/in/sgoinfre symLinkInCurDir"
+        example="42free -r /path/to/directory/in/sgoinfre symLinkInCurDir ..."
     else
-        example="42free /path/to/large/directory largeFileInCurDir"
+        example="42free /path/to/large/directory largeFileInCurDir ..."
     fi
     pretty_print "${bold}Nothing to be done.${reset}"
     pretty_print "You can specify which directories or files you would like to move to $target_name with arguments."

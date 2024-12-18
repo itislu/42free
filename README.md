@@ -121,7 +121,7 @@ It will also add an alias `42free` to your shells' config files (`.bashrc`, `.zs
 - **Optional:** You can specify any amount of files or directories you want to free the space of.
   - The arguments can be given as absolute or relative paths.
 
-  - Example: `42free /path/to/large/directory largeFileInCurDir`
+  - Example: `42free /path/to/large/directory largeFileInCurDir ...`
 
 <br>
 
