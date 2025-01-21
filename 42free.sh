@@ -338,6 +338,15 @@ print_skip_arg() {
     pretty_print "Skipping '$1'."
 }
 
+ft_read() {
+    read "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        echo
+    fi
+    return $status
+}
+
 # Prompt the user for confirmation
 # Default is 'no', for 'yes' needs y/Y/yes,Yup,ya,... + Enter key
 # Regex: Match Y/y, optionally followed by one valid char, or 2+ valid chars after which one invalid is allowed
@@ -345,7 +354,7 @@ prompt_with_enter() {
     local cset="EeAaUuSsHhPp"
 
     pretty_print "$1 [${bold}y${reset}/${bold}N${reset}]"
-    read -rp "> "
+    ft_read -rp "> "
     if [[ "$REPLY" =~ ^[Yy]([$cset]|[$cset]{2,}([^$cset][$cset]*)?)?$ ]]; then
         return 0
     fi
@@ -356,7 +365,7 @@ prompt_with_enter() {
 # Default is 'yes', only needs y/Y key
 prompt_single_key() {
     pretty_print "$1 [${bold}Y${reset}/${bold}n${reset}]"
-    read -n 1 -rp "> "
+    ft_read -n 1 -rp "> "
     if [[ -n "$REPLY" ]]; then
         echo
     fi
@@ -639,7 +648,7 @@ prompt_sgoinfre_path() {
 
     while true; do
         pretty_print "$prompt"
-        read -rp "> "
+        ft_read -rp "> "
         # Expand all variables in reply
         reply=$(eval echo "$REPLY" 2>/dev/null)
 
@@ -1308,7 +1317,7 @@ change_max_sizes() {
         # Prompt user for the maximum allowed size of the directory
         while true; do
             pretty_print "Enter the maximum allowed size of your ${bold}$dir${reset} directory in GB:"
-            read -rp "> "
+            ft_read -rp "> "
             if [[ $REPLY =~ ^[0-9]+$ ]]; then
                 declare "$max_size_var_name=$REPLY"
                 break
