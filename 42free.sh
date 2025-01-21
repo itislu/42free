@@ -584,59 +584,69 @@ find_sgoinfre() {
     done
 }
 
+# Validate with the user that a given path is their personal sgoinfre directory
+validate_sgoinfre_path() {
+    local path=$1
+
+    # Get real absolute path
+    if [[ -d "$path" ]]; then
+        pretty_print "Dereferencing all symbolic links in the path..."
+        path=$(realpath "$path" 2>/dev/null)
+    fi
+
+    pretty_print "Validating '$path'..."
+    # Check if directory exists
+    if [[ ! -d "$path" ]]; then
+        pretty_print " ✖ Not an existing directory."
+
+    # Check if sgoinfre directory
+    elif [[ ! "$path" =~ sgoinfre ]]; then
+        pretty_print "There is no mention of 'sgoinfre' in the path:"
+        pretty_print "'${bold}$path${reset}'"
+        if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+            sgoinfre="$path"
+            return 0
+        fi
+        pretty_print " ✖ Not a sgoinfre directory."
+
+    # Check if user's directory
+    elif [[ ! "$path" =~ $USER ]]; then
+        pretty_print "There is no mention of your username in the path:"
+        pretty_print "'${bold}$path${reset}'"
+        if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+            sgoinfre="$path"
+            return 0
+        fi
+        pretty_print " ✖ Not your personal sgoinfre directory."
+
+    # Prompt user for confirmation
+    else
+        pretty_print " ✔ Directory exists."
+        pretty_print "'${bold}$path${reset}'"
+        if prompt_single_key "$prompt_correct_path"; then
+            sgoinfre="$path"
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
 # Prompt the user for a valid path to their personal sgoinfre directory
 prompt_sgoinfre_path() {
+    local prompt=$1
     local reply
 
-    pretty_print "$1"
     while true; do
+        pretty_print "$prompt"
         read -rp "> "
         # Expand all variables in reply
         reply=$(eval echo "$REPLY" 2>/dev/null)
 
-        # Get real absolute path
-        if [[ -d "$reply" ]]; then
-            pretty_print "Dereferencing all symbolic links in the path..."
+        if validate_sgoinfre_path "$reply"; then
+            break
         fi
-        reply=$(realpath "$reply" 2>/dev/null)
-
-        # Check if directory exists
-        if [[ ! -d "$reply" ]]; then
-            pretty_print " ✖ Not an existing directory."
-            pretty_print "Please try again."
-
-        # Check if sgoinfre directory
-        elif [[ ! "$reply" =~ sgoinfre ]]; then
-            pretty_print "There is no mention of 'sgoinfre' in the path:"
-            pretty_print "'${bold}$reply${reset}'"
-            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
-                sgoinfre="$reply"
-                break
-            fi
-            pretty_print " ✖ Not a sgoinfre directory."
-            pretty_print "Please enter the path to your personal sgoinfre directory."
-
-        # Check if user's directory
-        elif [[ ! "$reply" =~ $USER ]]; then
-            pretty_print "There is no mention of your username in the path:"
-            pretty_print "'${bold}$reply${reset}'"
-            if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
-                sgoinfre="$reply"
-                break
-            fi
-            pretty_print " ✖ Not your personal sgoinfre directory."
-            pretty_print "Please enter the path to your personal sgoinfre directory."
-
-        # Prompt user for confirmation
-        else
-            pretty_print " ✔ Directory exists."
-            pretty_print "'${bold}$reply${reset}'"
-            if prompt_single_key "$prompt_correct_path"; then
-                sgoinfre="$reply"
-                break
-            fi
-            pretty_print "Please try again."
-        fi
+        prompt="Please enter the path to your personal sgoinfre directory:"
     done
 }
 
@@ -1252,6 +1262,7 @@ change_config() {
 }
 
 change_sgoinfre() {
+    local provided_path=$1
     local prompt
     local changed_sgoinfre
 
@@ -1262,7 +1273,14 @@ change_sgoinfre() {
         pretty_print "Your personal sgoinfre directory for 42free is currently not set."
         prompt="Please enter the path to your personal sgoinfre directory:"
     fi
-    prompt_sgoinfre_path "$prompt"
+    if [[ -n "$provided_path" ]]; then
+        prompt="Please enter the path to your personal sgoinfre directory:"
+    fi
+
+    if [[ -z "$provided_path" ]] || ! validate_sgoinfre_path "$provided_path"; then
+        prompt_sgoinfre_path "$prompt"
+    fi
+
     # Change SGOINFRE in all shell config files
     pretty_print "Saving the path of your sgoinfre directory..."
     changed_sgoinfre=false
@@ -1390,7 +1408,7 @@ while (( $# )); do
             restore=true
             ;;
         -s|--sgoinfre)
-            change_sgoinfre
+            change_sgoinfre "$2"
             ft_exit $success
             ;;
         -m|--max-size)
