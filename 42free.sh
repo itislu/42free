@@ -712,6 +712,10 @@ stat_human_readable() {
     fi
 }
 
+abspath() {
+    python3 -c "import os; print(os.path.abspath('$1'))"
+}
+
 # If realpath command is not available, define a custom function as a replacement
 if ! command -v realpath &>/dev/null; then
     realpath() {
@@ -1608,6 +1612,9 @@ for arg in "${args[@]}"; do
         invalid_path_msg="$indicator_error The current directory is not in your ${bold}home${reset} or ${bold}sgoinfre${reset} directory."
     fi
 
+    # Normalize path without resolving symbolic links
+    arg_path=$(abspath "$arg_path" 2>/dev/null)
+
     # Make sure all defined mount points of sgoinfre work with the script
     if [[ "$arg_path" == $sgoinfre_alt/* ]]; then
         sgoinfre="$sgoinfre_alt"
@@ -1640,15 +1647,15 @@ for arg in "${args[@]}"; do
         continue
     fi
 
-    # Print progress out of total amount of arguments
-    pretty_print "${bold}${underlined}${bright_yellow}[$args_index/$args_amount]${reset}"
-    pretty_print "'$arg' ➜ $target_name"
-    echo
-
     # Construct useful variables from the paths
     source_dirpath=$(dirname "$source_path")
     source_basename=$(basename "$source_path")
     target_dirpath=$(dirname "$target_path")
+
+    # Print progress out of total amount of arguments
+    pretty_print "${bold}${underlined}${bright_yellow}[$args_index/$args_amount]${reset}"
+    pretty_print "'$source_subpath' ➜ $target_name"
+    echo
 
     # Check if the source directory or file exists
     if [[ ! -e "$source_path" ]]; then
