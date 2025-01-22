@@ -69,6 +69,7 @@ jobs:
             refactor: Refactors
             chore: Chores
             style: Code Style
+            devops: DevOps
             ci: CI
             cd: CD
             revert: Reverts
