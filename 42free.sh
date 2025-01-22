@@ -233,8 +233,9 @@ msg_manual_reminder="To see the full manual, run '${bold}42free --help${reset}'.
 
 msg_manual_short="\
 ${underlined}Usage:${reset} ${bold}42free${reset} [TARGET]...
-Free up space of TARGETs, or make suggestions if no arguments are given.
-${underlined}Example:${reset} '42free /path/to/large/directory largeFileInCurDir ...'
+Free up space of TARGETs, or get suggestions if no arguments given.
+\n\
+${underlined}Example:${reset} '42free /path/to/large/directory ...'
 Paths can be absolute or relative to the current directory.
 \n\
 $msg_manual_reminder"
@@ -1853,7 +1854,7 @@ for arg in "${args[@]}"; do
     if ! $restore; then
         # Restore parent directory in case it was cleaned up as an empty directory after move
         mkdir -p "$source_dirpath" 2>/dev/null
-        # Remove any file that was created the very short meantime between moving a file successfully and creating the symlink in its place
+        # Remove any file that was created in the very short meantime between moving a file successfully and creating the symlink in its place
         rm -rf "$source_path" 2>/dev/null
         # Create the symbolic link
         if stderr=$(symlink "$target_path" "$source_path" 2>&1); then
