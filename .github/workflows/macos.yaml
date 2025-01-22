@@ -18,6 +18,10 @@ jobs:
         run: |
           mkdir -p "/tmp/sgoinfre/$USER"
 
+      - name: Install Oh My Zsh
+        run: |
+          sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
       - name: Set up tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 180
