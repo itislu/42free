@@ -1724,7 +1724,7 @@ for arg in "${args[@]}"; do
     fi
 
     # Check if an existing directory or file would get replaced
-    if [[ -e "$target_path" ]] && ! ($restore && [[ -L "$target_path" ]]); then
+    if [[ -e "$target_path" ]] && ! { $restore && [[ -L "$target_path" ]]; }; then
         pretty_print "$indicator_warning '${bold}$source_subpath${reset}' already exists in the $target_name directory."
         if [[ -d "$target_path" ]]; then
             prompt="$prompt_merge"
