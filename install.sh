@@ -274,7 +274,7 @@ for config_file in "$bash_config" "$zsh_config" "$fish_config"; do
 done
 
 # Check user's default shell
-if [[ "$SHELL" != *"bash"* && "$SHELL" != *"zsh"* && "$SHELL" != *"fish"* ]]; then
+if [[ "$SHELL" != *"bash"* ]] && [[ "$SHELL" != *"zsh"* ]] && [[ "$SHELL" != *"fish"* ]]; then
     pretty_print "${bold}${bright_yellow}Could not set up 42free for $(basename "$SHELL"). Please do it manually.${reset}"
     pretty_print "${bold}${bright_yellow}You can paste the following lines into your shell's configuration file:"
     pretty_print "${bold}alias 42free='bash $dest_dir/$dest_file'${reset}"

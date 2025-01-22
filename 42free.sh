@@ -1010,14 +1010,14 @@ wait_for_jobs() {
         shift
     fi
     # Check for mode, default to "all"
-    if [[ "$1" == "any" || "$1" == "all" ]]; then
+    if [[ "$1" == "any" ]] || [[ "$1" == "all" ]]; then
         mode=$1
         shift
     else
         mode="all"
     fi
     # Check for animation, default to simple spinner
-    if [[ "$1" == "moving" || "$1" == "restoring" || "$1" == "searching" || "$1" == "searching_dir" ]]; then
+    if [[ "$1" == "moving" ]] || [[ "$1" == "restoring" ]] || [[ "$1" == "searching" ]] || [[ "$1" == "searching_dir" ]]; then
         animation=$1
         shift
     fi
@@ -1214,7 +1214,7 @@ update() {
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
         if prompt_single_key "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts_stdout" "$install_script") "update"; update_status=$?; if [[ $update_status -eq 0 && "$1" != "exit" ]]; then exec "$0" "${args[@]}"; fi; ft_exit $update_status
+            bash <("$downloader" "$downloader_opts_stdout" "$install_script") "update"; update_status=$?; if [[ $update_status -eq 0 ]] && [[ "$1" != "exit" ]]; then exec "$0" "${args[@]}"; fi; ft_exit $update_status
         else
             pretty_print "Not updating."
         fi
