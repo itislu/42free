@@ -1857,6 +1857,7 @@ for arg in "${args[@]}"; do
             if stderr=$(symlink "$target_path" "$source_path~42free_tmp~" 2>&1); then
                 pretty_print "Symbolic link left behind with a tmp name."
             else
+                pretty_print "$indicator_warning Cannot create symbolic link with name '$source_basename~42free_tmp~'."
                 print_stderr
             fi
             # If not last argument, ask user if they want to continue with the other arguments
