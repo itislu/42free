@@ -1844,6 +1844,8 @@ for arg in "${args[@]}"; do
     pretty_print "$indicator_success '${bright_yellow}$source_basename${reset}' successfully $operation_success to '${bright_green}$target_dirpath${reset}'."
 
     if ! $restore; then
+        # Restore parent directory in case it was cleaned up as an empty directory after move
+        mkdir -p "$source_dirpath" 2>/dev/null
         # Remove any file that was created the very short meantime between moving a file successfully and creating the symlink in its place
         rm -rf "$source_path" 2>/dev/null
         # Create the symbolic link
