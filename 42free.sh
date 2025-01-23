@@ -104,6 +104,7 @@ install_script="https://raw.githubusercontent.com/itislu/42free/main/install.sh"
 current_dir=$(pwd)
 script_dir="$HOME/.scripts"
 script_path="$script_dir/42free.sh"
+script_args=("$@")
 sgoinfre="$SGOINFRE"
 sgoinfre_alt_mount="/nfs"
 sgoinfre_common_locations=(
@@ -1215,7 +1216,7 @@ update() {
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
         if prompt_single_key "$prompt_update"; then
-            bash <("$downloader" "$downloader_opts_stdout" "$install_script") "update"; update_status=$?; if [[ $update_status -eq 0 ]] && [[ "$1" != "exit" ]]; then exec "$0" "${args[@]}"; fi; ft_exit $update_status
+            bash <("$downloader" "$downloader_opts_stdout" "$install_script") "update"; update_status=$?; if [[ $update_status -eq 0 ]] && [[ "$1" != "exit" ]]; then exec "$0" "${script_args[@]}"; fi; ft_exit $update_status
         else
             pretty_print "Not updating."
         fi
