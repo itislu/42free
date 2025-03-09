@@ -59,12 +59,12 @@ fi
 changed_config=false
 
 # Text formatting
-reset="\e[0m"
-bold="\e[1m"
-red="\e[31m"
-yellow="\e[33m"
-bright_green="\e[92m"
-bright_yellow="\e[93m"
+reset="\033[0m"
+bold="\033[1m"
+red="\033[31m"
+yellow="\033[33m"
+bright_green="\033[92m"
+bright_yellow="\033[93m"
 
 # Automatically detect the size of the terminal window and preserve word boundaries
 pretty_print() {

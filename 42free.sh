@@ -146,16 +146,16 @@ changed_config=false
 printed_update_info=false
 
 # Text formatting
-reset="\e[0m"
-bold="\e[1m"
-underlined="\e[4m"
-red="\e[31m"
-yellow="\e[33m"
-bright_red="\e[91m"
-bright_green="\e[92m"
-bright_yellow="\e[93m"
-bright_blue="\e[94m"
-bright_cyan="\e[96m"
+reset="\033[0m"
+bold="\033[1m"
+underlined="\033[4m"
+red="\033[31m"
+yellow="\033[33m"
+bright_red="\033[91m"
+bright_green="\033[92m"
+bright_yellow="\033[93m"
+bright_blue="\033[94m"
+bright_cyan="\033[96m"
 
 header="\n\
                 ${bold}${bright_yellow}📁  42free  📁${reset}"
@@ -917,7 +917,7 @@ set_animation() {
 }
 
 clear_prev_line() {
-    printf "\e[1K\e[1A\n"
+    printf "\033[1K\033[1A\n"
 }
 
 restore_cursor_exit() {
@@ -978,7 +978,7 @@ animate_while_jobs_running() {
         done
     done
     # Clear line on completion
-    printf "\r\e[K"
+    printf "\r\033[K"
     # Restore cursor
     tput cnorm
 
@@ -1543,7 +1543,7 @@ if $usage_info_only; then
     restore=false
     set_directory_sizes "home_size_in_kb" "sgoinfre_size_in_kb" "$HOME" "$sgoinfre" "home" "sgoinfre"
     # Move cursor up and clear line
-    printf "\033[A\r\e[K"
+    printf "\033[A\r\033[K"
     print_available_space "$home_size_in_kb" "$sgoinfre_size_in_kb"
     ft_exit $success
 fi
