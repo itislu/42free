@@ -1171,7 +1171,7 @@ get_latest_version_number() {
         return $major_error
     fi
     echo "$latest_version"
-    return 0
+    return $success
 }
 
 print_update_info() {
