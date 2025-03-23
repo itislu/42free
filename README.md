@@ -36,7 +36,7 @@
 
 - [🛠️ Installation](#%EF%B8%8F-installation)
 
-- [👩‍💻 Usage](#-usage)
+- [🧑‍💻 Usage](#-usage)
 
 - [💡 How it works](#-how-it-works)
 
@@ -106,7 +106,7 @@ It will also add the `42free` alias to your shells' config files (`.bashrc`, `.z
 
 <br>
 
-## 👩‍💻 Usage
+## 🧑‍💻 Usage
 
 ```bash
 42free [TARGET]... [OPTION]...
