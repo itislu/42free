@@ -182,11 +182,9 @@ Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
 
 ## 🤝 Contributing
 
-- If this script worked for you and your peers, please let me (and others) know by posting or reacting to already existing posts in the [💬 Discussions](https://github.com/itislu/42free/discussions) page.
-
-- If the storage layout on your campus is different, you can post in [here](https://github.com/itislu/42free/discussions/5). A template is already prepared for you 😊
-  <br>
-  All confirmed campuses will be added to the 🌍 table above.
+- If this script worked for you and your peers, please let me (and others) know by posting and reacting in the [💬 Discussions](https://github.com/itislu/42free/discussions) page.
+  - A template is already prepared for you in [Share and confirm the storage layout of your campus 🤝](https://github.com/itislu/42free/discussions/5).
+  - All confirmed campuses will be added to the 🌍 table above.
 
 - If you have ideas how 42free could be improved, checkout the [💡 Feedback & Ideas](https://github.com/itislu/42free/discussions/categories/feedback-ideas) section in the Discussions page and feel free to post there!
   <br>
