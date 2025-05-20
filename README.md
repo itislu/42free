@@ -172,7 +172,7 @@ Applications that need the moved files will just follow the symbolic link and ac
 | 🇹🇭 42 Bangkok  | 10GB | 15GB     | Linux |
 | 🇵🇹 42 Lisboa   | 5GB  | 30GB     | Linux |
 
-Confirm **your** campus [here](https://github.com/itislu/42free/discussions/11).
+Confirm **your** campus [here](https://github.com/itislu/42free/discussions/5).
 
 <br>
 
