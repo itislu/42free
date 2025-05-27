@@ -200,7 +200,8 @@ ${bold}${underlined}Options:${reset} You can pass options anywhere in the argume
     -r, --restore    Move the directories and files back to their original
                      location in home.
     -s, --sgoinfre   Change the path that 42free considers as your
-                     personal sgoinfre directory and exit.
+                     personal sgoinfre directory from now on and exit.
+                     Does not modify any existing symbolic links.
     -m, --max-size   Change the warning sizes for the home and sgoinfre
                      directories (in GB) and exit.
                      Current sizes:
@@ -1311,6 +1312,7 @@ change_sgoinfre() {
     done
     if $changed_sgoinfre; then
         pretty_print "$indicator_success Your personal sgoinfre directory for 42free is now set to '${bold}$sgoinfre${reset}'."
+        pretty_print "$indicator_info Existing symbolic links and data in the old sgoinfre directory stay unmodified."
     else
         pretty_print "Your personal sgoinfre directory for 42free was already set to '${bold}$sgoinfre${reset}'."
     fi

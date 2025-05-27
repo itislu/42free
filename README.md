@@ -131,16 +131,16 @@ It will also add the `42free` alias to your shells' config files (`.bashrc`, `.z
 > - You can pass options anywhere in your command to change the behavior of 42free.
 >   - Example: `42free -r /path/to/large/directory/in/sgoinfre symLinkInCurDir`
 >
-> | Option        | Description                                                                                    |
-> | ------------- | ---------------------------------------------------------------------------------------------- |
-> | `--restore`   | Use the `-r` option to move directories and files back to their original location.             |
-> | `--sgoinfre`  | To change the path that 42free considers as your personal sgoinfre directory, run `42free -s`. |
-> | `--max-size`  | To change the warning sizes for the home and sgoinfre directories, run `42free -m`.            |
-> | `--info`      | To see the current storage usage of your home and sgoinfre directories, run `42free -i`.       |
-> | `--update`    | To update to the latest version, run `42free -u`.                                              |
-> | `--version`   | To see the version information, run `42free -v`.                                               |
-> | `--uninstall` | To uninstall 42free, run `42free --uninstall`.                                                 |
-> | `--help`      | To see the manual, run `42free --help` (or `42free -h` for the short version).                 |
+> | Option        | Description                                                                                                                                                |
+> | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+> | `--restore`   | Use the `-r` option to move directories and files back to their original location.                                                                         |
+> | `--sgoinfre`  | To change the path that 42free considers as your personal sgoinfre directory from now on, run `42free -s`.<br>Does not modify any existing symbolic links. |
+> | `--max-size`  | To change the warning sizes for the home and sgoinfre directories, run `42free -m`.                                                                        |
+> | `--info`      | To see the current storage usage of your home and sgoinfre directories, run `42free -i`.                                                                   |
+> | `--update`    | To update to the latest version, run `42free -u`.                                                                                                          |
+> | `--version`   | To see the version information, run `42free -v`.                                                                                                           |
+> | `--uninstall` | To uninstall 42free, run `42free --uninstall`.                                                                                                             |
+> | `--help`      | To see the manual, run `42free --help` (or `42free -h` for the short version).                                                                             |
 
 <br>
 
