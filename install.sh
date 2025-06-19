@@ -17,15 +17,16 @@ fi
 latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Array of supported campuses
-# Add new campuses to end of list before "Other" (will be printed alphanumerically sorted)
+# ! Add new campuses to END of list ! (will be sorted alphanumerically later)
 # Format: "Campus Name;home_max_size;sgoinfre_max_size"
 campuses=(
+    "Other;-;-"
     "42 Vienna;5;30"
     "42 Berlin;5;30"
     "19 Brussels;5;15"
     "42 Bangkok;10;15"
     "42 Lisboa;5;30"
-    "Other;-;-"
+    "42 Gyeongsan;5;0"
 )
 
 # Define the destination directory and filename
@@ -155,7 +156,7 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
     # Sort the campuses array alphanumerically
     IFS=$'\n' read -rd '' -a campuses_sorted <<< "$(printf "%s\n" "${campuses[@]}" | sort -f)"
 
-    # Iterate through the sorted campuses array and split the strings at the semicolon into separate arrays
+    # Iterate through the sorted campuses array and split the strings by semicolon into separate arrays
     for campus in "${campuses_sorted[@]}"; do
         IFS=';' read -r campus_name home_max_size sgoinfre_max_size <<< "$campus"
         campus_names+=("$campus_name")
