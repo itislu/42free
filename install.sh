@@ -17,7 +17,7 @@ fi
 latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Array of supported campuses
-# Add new campuses to end of list before "Other" (will be printed alphanumerically sorted anyway)
+# Add new campuses to end of list before "Other" (will be printed alphanumerically sorted)
 # Format: "Campus Name;home_max_size;sgoinfre_max_size"
 campuses=(
     "42 Vienna;5;30"
@@ -25,7 +25,7 @@ campuses=(
     "19 Brussels;5;15"
     "42 Bangkok;10;15"
     "42 Lisboa;5;30"
-    "Other;0;0"
+    "Other;-;-"
 )
 
 # Define the destination directory and filename
@@ -149,9 +149,8 @@ if [[ -z "$downloader" ]]; then
     exit $download_failed
 fi
 
-# Prompt user to choose their campus if max sizes are 0 or not known
-if { [[ -z "$home_max_size" ]] || [[ $home_max_size -eq 0 ]]; } &&
-   { [[ -z "$sgoinfre_max_size" ]] || [[ $sgoinfre_max_size -eq 0 ]]; }; then
+# Prompt user to choose their campus if both max sizes are not known
+if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
 
     # Sort the campuses array alphanumerically
     IFS=$'\n' read -rd '' -a campuses_sorted <<< "$(printf "%s\n" "${campuses[@]}" | sort -f)"
@@ -206,11 +205,10 @@ fi
 
 # If a max size still not known, prompt user to enter it
 for dir in home sgoinfre; do
-    # Construct variable name
     max_size_var_name="${dir}_max_size"
 
-    # If a max size still 0 or not known, prompt user to enter it
-    if [[ -z "${!max_size_var_name}" ]] || [[ ${!max_size_var_name} -eq 0 ]]; then
+    # Prompt until it is a number
+    if [[ ! ${!max_size_var_name} =~ ^[0-9]+$ ]]; then
         while true; do
             pretty_print "Enter the maximum allowed size of your ${bold}$dir${reset} directory in GB:"
             read -rp "> "
@@ -225,7 +223,7 @@ done
 
 pretty_print "${yellow}Downloading '$dest_file' into '$dest_dir'...${reset}"
 
-# Get the URL of the asset from the latest release or a dev version from the branch specified as an argument
+# Get the URL of a dev version from the branch specified as an argument, or the asset from the latest release
 if [[ -n $1 ]] && [[ $1 != "update" ]]; then
     pretty_print "${bold}${yellow}Using dev version from branch '$1'...${reset}"
     if git ls-remote --heads https://github.com/itislu/42free.git "$1" 2>/dev/null | grep -q "$1$"; then
