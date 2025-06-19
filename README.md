@@ -166,11 +166,11 @@ Applications that need the moved files will just follow the symbolic link and ac
 
 | Campus         | home | sgoinfre | OS    |
 | -------------- | ---- | -------- | ----- |
-| 🇦🇹 42 Vienna   | 5GB  | 30GB     | Linux |
-| 🇩🇪 42 Berlin   | 5GB  | 30GB     | Linux |
 | 🇧🇪 19 Brussels | 5GB  | 15GB     | macOS |
 | 🇹🇭 42 Bangkok  | 10GB | 15GB     | Linux |
+| 🇩🇪 42 Berlin   | 5GB  | 30GB     | Linux |
 | 🇵🇹 42 Lisboa   | 5GB  | 30GB     | Linux |
+| 🇦🇹 42 Vienna   | 5GB  | 30GB     | Linux |
 
 Confirm **your** campus [here](https://github.com/itislu/42free/discussions/5).
 
