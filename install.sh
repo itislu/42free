@@ -18,15 +18,15 @@ latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Array of supported campuses
 # Add new campuses to end of list before "Other" (will be printed alphanumerically sorted)
-# Format: "Campus Name;home_max_size;sgoinfre_max_size"
+# Format: "Campus Name;home_max_size;sgoinfre_max_size;home_upgrade_size;sgoinfre_upgrade_size"
 campuses=(
-    "42 Vienna;5;30"
-    "42 Berlin;5;30"
-    "19 Brussels;5;15"
-    "42 Bangkok;10;15"
-    "42 Gyeongsan;5;0"
-    "42 Lisboa;5;30"
-    "Other;-;-"
+    "42 Vienna;5;30;-;50"
+    "42 Berlin;5;30;-;50"
+    "19 Brussels;5;15;-;-"
+    "42 Bangkok;10;15;-;-"
+    "42 Gyeongsan;5;0;-;-"
+    "42 Lisboa;5;30;-;50"
+    "Other;-;-;-;-"
 )
 
 # Define the destination directory and filename
@@ -158,10 +158,12 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
 
     # Iterate through the sorted campuses array and split the strings at the semicolon into separate arrays
     for campus in "${campuses_sorted[@]}"; do
-        IFS=';' read -r campus_name home_max_size sgoinfre_max_size <<< "$campus"
+        IFS=';' read -r campus_name home_max_size sgoinfre_max_size home_upgrade_size sgoinfre_upgrade_size <<< "$campus"
         campus_names+=("$campus_name")
         home_max_sizes+=("$home_max_size")
         sgoinfre_max_sizes+=("$sgoinfre_max_size")
+        home_upgrade_sizes+=("$home_upgrade_size")
+        sgoinfre_upgrade_sizes+=("$sgoinfre_upgrade_size")
     done
 
     # Create list of campuses in this format: n) Campus Name
@@ -197,6 +199,38 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
         if [[ -n "$campus_choice" ]]; then
             home_max_size=${home_max_sizes[$campus_choice]}
             sgoinfre_max_size=${sgoinfre_max_sizes[$campus_choice]}
+            home_upgrade_size=${home_upgrade_sizes[$campus_choice]}
+            sgoinfre_upgrade_size=${sgoinfre_upgrade_sizes[$campus_choice]}
+
+            # Prompt for home storage upgrade
+            if [[ "$home_upgrade_size" =~ ^[0-9]+$ ]]; then
+                while true; do
+                    pretty_print "Have you upgraded your ${bold}home${reset} storage to ${bold}${home_upgrade_size}GB${reset}? (y/n)"
+                    read -rp "> "
+                    if [[ "$REPLY" =~ ^y$ ]]; then
+                        home_max_size=$home_upgrade_size
+                        break
+                    elif [[ "$REPLY" =~ ^n$ ]]; then
+                        break
+                    fi
+                    pretty_print "${bold}${red}Invalid input. Please enter 'y' or 'n'.${reset}"
+                done
+            fi
+
+            # Prompt for sgoinfre storage upgrade
+            if [[ "$sgoinfre_upgrade_size" =~ ^[0-9]+$ ]]; then
+                while true; do
+                    pretty_print "Have you upgraded your ${bold}sgoinfre${reset} storage to ${bold}${sgoinfre_upgrade_size}GB${reset}? (y/n)"
+                    read -rp "> "
+                    if [[ "$REPLY" =~ ^y$ ]]; then
+                        sgoinfre_max_size=$sgoinfre_upgrade_size
+                        break
+                    elif [[ "$REPLY" =~ ^n$ ]]; then
+                        break
+                    fi
+                    pretty_print "${bold}${red}Invalid input. Please enter 'y' or 'n'.${reset}"
+                done
+            fi
             break
         fi
         pretty_print "${bold}${red}Invalid input. Please enter a valid number or your campus name.${reset}"
