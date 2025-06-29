@@ -102,6 +102,15 @@ ft_exit() {
     exit "$1"
 }
 
+ft_read() {
+    read "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        echo
+    fi
+    return $status
+}
+
 sed_inplace() {
     local script=$1
     local file=$2
@@ -177,7 +186,7 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
         pretty_print "${bold}Choose your campus:${reset}"
         printf "%b\n" "${prompt_campuses[@]}"
         printf "\n"
-        read -rp "> "
+        ft_read -rp "> "
 
         # Check if input is a valid number of the list
         if [[ $REPLY =~ ^[0-9]+$ ]] && [[ $REPLY -ge 1 ]] && [[ $REPLY -le ${#campus_names[@]} ]]; then
@@ -212,7 +221,7 @@ for dir in home sgoinfre; do
     if [[ ! ${!max_size_var_name} =~ ^[0-9]+$ ]]; then
         while true; do
             pretty_print "Enter the maximum allowed size of your ${bold}$dir${reset} directory in GB:"
-            read -rp "> "
+            ft_read -rp "> "
             if [[ $REPLY =~ ^[0-9]+$ ]]; then
                 declare "$max_size_var_name=$REPLY"
                 break
