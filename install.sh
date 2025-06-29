@@ -18,15 +18,15 @@ latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 
 # Array of supported campuses
 # ! Add new campuses to END of list ! (will be sorted alphanumerically later)
-# Format: "Campus Name;home_max_size;sgoinfre_max_size"
+# Format: "Campus Name;home_max_size;sgoinfre_max_size;home_upgraded_size;sgoinfre_upgraded_size"
 campuses=(
-    "Other;-;-"
-    "42 Vienna;5;30"
-    "42 Berlin;5;30"
-    "19 Brussels;5;15"
-    "42 Bangkok;10;15"
-    "42 Lisboa;5;30"
-    "42 Gyeongsan;5;0"
+    "Other;-;-;-;-"
+    "42 Vienna;5;30;10;-"
+    "42 Berlin;5;30;-;-"
+    "19 Brussels;5;15;-;-"
+    "42 Bangkok;10;15;20;-"
+    "42 Lisboa;5;30;-;-"
+    "42 Gyeongsan;5;0;-;10"
 )
 
 # Define the destination directory and filename
@@ -111,6 +111,32 @@ ft_read() {
     return $status
 }
 
+# Prompt the user for confirmation
+# If optional second parameter contains 'y' or 'Y', default to 'yes'
+# Otherwise, default to 'no' and 'yes' needs y/Y/yes,Yup,ya,... + Enter key
+# Regex: Match Y/y, optionally followed by one valid char, or 2+ valid chars after which one invalid is allowed
+prompt_user() {
+    local prompt_text=$1
+    local default_yes=$2
+    local indicator
+    local chset="YyEeAaUuSsHhPp"
+
+    if [[ -n "$default_yes" ]] && [[ "$default_yes" =~ [Yy] ]]; then
+        indicator="[${bold}Y${reset}/${bold}n${reset}]"
+    else
+        indicator="[${bold}y${reset}/${bold}N${reset}]"
+        unset default_yes
+    fi
+
+    pretty_print "$prompt_text $indicator"
+    ft_read -rp "> "
+    if [[ "$REPLY" =~ ^[Yy]([$chset]|[$chset]{2,}([^$chset][$chset]*)?)?$ ]] ||
+        { [[ -n "$default_yes" ]] && [[ "$REPLY" =~ ^$ ]]; }; then
+        return 0
+    fi
+    return 1
+}
+
 sed_inplace() {
     local script=$1
     local file=$2
@@ -167,10 +193,12 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
 
     # Iterate through the sorted campuses array and split the strings by semicolon into separate arrays
     for campus in "${campuses_sorted[@]}"; do
-        IFS=';' read -r campus_name home_max_size sgoinfre_max_size <<< "$campus"
+        IFS=';' read -r campus_name home_max_size sgoinfre_max_size home_upgraded_size sgoinfre_upgraded_size <<< "$campus"
         campus_names+=("$campus_name")
         home_max_sizes+=("$home_max_size")
         sgoinfre_max_sizes+=("$sgoinfre_max_size")
+        home_upgraded_sizes+=("$home_upgraded_size")
+        sgoinfre_upgraded_sizes+=("$sgoinfre_upgraded_size")
     done
 
     # Create list of campuses in this format: n) Campus Name
@@ -202,10 +230,12 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
             done
         fi
 
-        # If valid choice, set max size variables
+        # If valid choice, set size variables
         if [[ -n "$campus_choice" ]]; then
             home_max_size=${home_max_sizes[$campus_choice]}
             sgoinfre_max_size=${sgoinfre_max_sizes[$campus_choice]}
+            home_upgraded_size=${home_upgraded_sizes[$campus_choice]}
+            sgoinfre_upgraded_size=${sgoinfre_upgraded_sizes[$campus_choice]}
             break
         fi
         pretty_print "${bold}${red}Invalid input. Please enter a valid number or your campus name.${reset}"
@@ -213,12 +243,14 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
     shopt -u nocasematch
 fi
 
-# If a max size still not known, prompt user to enter it
+# Prompt user for max sizes if still not known or if storage was upgraded
 for dir in home sgoinfre; do
     max_size_var_name="${dir}_max_size"
+    upgraded_size_var_name="${dir}_upgraded_size"
 
-    # Prompt until it is a number
+    # If a max size still not known, prompt user to enter it
     if [[ ! ${!max_size_var_name} =~ ^[0-9]+$ ]]; then
+        # Prompt until it is a number
         while true; do
             pretty_print "Enter the maximum allowed size of your ${bold}$dir${reset} directory in GB:"
             ft_read -rp "> "
@@ -228,6 +260,12 @@ for dir in home sgoinfre; do
             fi
             pretty_print "${bold}${red}Invalid input. Please enter a number.${reset}"
         done
+
+    # Prompt if storage upgraded
+    elif [[ "${!upgraded_size_var_name}" =~ ^[0-9]+$ ]]; then
+        if prompt_user "Have you upgraded your ${bold}$dir${reset} storage to ${bold}${!upgraded_size_var_name}GB${reset}? (default: ${!max_size_var_name}GB)"; then
+            declare "$max_size_var_name=${!upgraded_size_var_name}"
+        fi
     fi
 done
 
