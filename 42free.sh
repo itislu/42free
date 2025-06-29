@@ -351,28 +351,26 @@ ft_read() {
 }
 
 # Prompt the user for confirmation
-# Default is 'no', for 'yes' needs y/Y/yes,Yup,ya,... + Enter key
+# If optional second parameter contains 'y' or 'Y', default to 'yes'
+# Otherwise, default to 'no' and 'yes' needs y/Y/yes,Yup,ya,... + Enter key
 # Regex: Match Y/y, optionally followed by one valid char, or 2+ valid chars after which one invalid is allowed
-prompt_with_enter() {
-    local cset="EeAaUuSsHhPp"
+prompt_user() {
+    local prompt_text=$1
+    local default_yes=$2
+    local indicator
+    local chset="EeAaUuSsHhPp"
 
-    pretty_print "$1 [${bold}y${reset}/${bold}N${reset}]"
+    if [[ -n "$default_yes" ]] && [[ "$default_yes" =~ [Yy] ]]; then
+        indicator="[${bold}Y${reset}/${bold}n${reset}]"
+    else
+        indicator="[${bold}y${reset}/${bold}N${reset}]"
+        unset default_yes
+    fi
+
+    pretty_print "$prompt_text $indicator"
     ft_read -rp "> "
-    if [[ "$REPLY" =~ ^[Yy]([$cset]|[$cset]{2,}([^$cset][$cset]*)?)?$ ]]; then
-        return 0
-    fi
-    return 1
-}
-
-# Prompt the user for confirmation
-# Default is 'yes', only needs y/Y key
-prompt_single_key() {
-    pretty_print "$1 [${bold}Y${reset}/${bold}n${reset}]"
-    ft_read -n 1 -rp "> "
-    if [[ -n "$REPLY" ]]; then
-        echo
-    fi
-    if [[ "$REPLY" =~ ^([Yy]?)$|^$ ]]; then
+    if [[ "$REPLY" =~ ^[Yy]([$chset]|[$chset]{2,}([^$chset][$chset]*)?)?$ ]] ||
+        { [[ -n "$default_yes" ]] && [[ "$REPLY" =~ ^$ ]]; }; then
         return 0
     fi
     return 1
@@ -615,7 +613,7 @@ validate_sgoinfre_path() {
     elif [[ ! "$path" =~ sgoinfre ]]; then
         pretty_print "There is no mention of 'sgoinfre' in the path:"
         pretty_print "'${bold}$path${reset}'"
-        if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+        if prompt_user "Are you sure this is the correct path to your personal sgoinfre directory?" "default_no"; then
             sgoinfre="$path"
             return 0
         fi
@@ -625,7 +623,7 @@ validate_sgoinfre_path() {
     elif [[ ! "$path" =~ $USER ]]; then
         pretty_print "There is no mention of your username in the path:"
         pretty_print "'${bold}$path${reset}'"
-        if prompt_with_enter "Are you sure this is the correct path to your personal sgoinfre directory?"; then
+        if prompt_user "Are you sure this is the correct path to your personal sgoinfre directory?" "default_no"; then
             sgoinfre="$path"
             return 0
         fi
@@ -635,7 +633,7 @@ validate_sgoinfre_path() {
     else
         pretty_print " ✔ Directory exists."
         pretty_print "'${bold}$path${reset}'"
-        if prompt_single_key "$prompt_correct_path"; then
+        if prompt_user "$prompt_correct_path" "default_yes"; then
             sgoinfre="$path"
             return 0
         fi
@@ -666,14 +664,14 @@ change_sgoinfre_permissions() {
     pretty_print "$indicator_warning The permissions of your personal sgoinfre directory are not set to '${bold}rwx------${reset}'."
     pretty_print "They are currently set to '${bold}$sgoinfre_permissions${reset}'."
     pretty_print "It is ${bold}highly${reset} recommended to change the permissions so that other students cannot access the files you will move to sgoinfre."
-    if prompt_single_key "Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'?"; then
+    if prompt_user "Do you wish to change the permissions of '$sgoinfre' to '${bold}rwx------${reset}'?" "default_yes"; then
         if stderr=$(chmod 700 "$sgoinfre" 2>&1); then
             pretty_print "$indicator_success The permissions of '$sgoinfre' have been changed to '${bold}rwx------${reset}'."
         else
             pretty_print "$indicator_error Failed to change the permissions of '$sgoinfre'."
             print_stderr
             syscmd_failed=true
-            if ! prompt_with_enter "$prompt_continue_still"; then
+            if ! prompt_user "$prompt_continue_still" "default_no"; then
                 return 1
             fi
             pretty_print "Keeping the permissions of '$sgoinfre' as '$sgoinfre_permissions'."
@@ -687,14 +685,14 @@ change_sgoinfre_permissions() {
 create_sgoinfre_symlink() {
     pretty_print "$indicator_info Could not find a symbolic link to your sgoinfre directory in your home directory."
     pretty_print "It can be useful to have one there for easy access."
-    if prompt_single_key "Do you wish to create it?"; then
+    if prompt_user "Do you wish to create it?" "default_yes"; then
         if stderr=$(symlink "$sgoinfre" "$HOME/sgoinfre" 2>&1); then
             pretty_print "$indicator_success Created a symbolic link named 'sgoinfre' in your home directory."
         else
             pretty_print "$indicator_error Cannot create symbolic link."
             print_stderr
             syscmd_failed=true
-            if ! prompt_with_enter "$prompt_continue_still"; then
+            if ! prompt_user "$prompt_continue_still" "default_no"; then
                 return 1
             fi
         fi
@@ -1216,7 +1214,7 @@ update() {
     # Prompt for update if current version number is not the latest
     if [[ "${current_version#v}" != "${latest_version#v}" ]]; then
         print_update_info
-        if prompt_single_key "$prompt_update"; then
+        if prompt_user "$prompt_update" "default_yes"; then
             bash <("$downloader" "$downloader_opts_stdout" "$install_script") "update"
             update_status=$?
             if [[ $update_status -eq 0 ]] && [[ "$1" != "exit" ]]; then 
@@ -1393,7 +1391,7 @@ clean_config_files() {
 }
 
 uninstall() {
-    if prompt_with_enter "$prompt_uninstall"; then
+    if prompt_user "$prompt_uninstall" "default_no"; then
         pretty_print "Uninstalling 42free..."
         if stderr=$(rm -f "$script_path" 2>&1); then
             pretty_print "${yellow}Script deleted.${reset}"
@@ -1598,7 +1596,7 @@ for arg in "${args[@]}"; do
             printf "%s\n" "  ▸ $default_arg"
         done
         echo
-        if prompt_single_key "$prompt_agree_all"; then
+        if prompt_user "$prompt_agree_all" "default_yes"; then
             no_user_args=false
         fi
         echo
@@ -1672,7 +1670,7 @@ for arg in "${args[@]}"; do
         if ! $restore && [[ -e "$target_path" ]]; then
             pretty_print "'${bright_yellow}$source_path${reset}' has already been moved to sgoinfre."
             pretty_print "It is located at '${bright_green}$target_path${reset}'."
-            if prompt_single_key "$prompt_symlink"; then
+            if prompt_user "$prompt_symlink" "default_yes"; then
                 if stderr=$(symlink "$target_path" "$source_path" 2>&1); then
                     pretty_print "$indicator_success Symbolic link created."
                 else
@@ -1723,7 +1721,7 @@ for arg in "${args[@]}"; do
     # If no user arguments, ask user if they want to process the current argument
     if $no_user_args && [[ -e "$source_path" ]]; then
         pretty_print "This will move '${bold}$source_path${reset}' to the $target_name directory."
-        if ! prompt_single_key "$prompt_continue"; then
+        if ! prompt_user "$prompt_continue" "default_yes"; then
             print_skip_arg "$arg"
             continue
         fi
@@ -1732,7 +1730,7 @@ for arg in "${args[@]}"; do
     # Check if the source file is a symbolic link
     if [[ -L "$source_path" ]]; then
         pretty_print "$indicator_warning '${bold}${bright_cyan}$source_path${reset}' is a symbolic link."
-        if ! prompt_single_key "$prompt_continue_still"; then
+        if ! prompt_user "$prompt_continue_still" "default_yes"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -1747,7 +1745,7 @@ for arg in "${args[@]}"; do
         else
             prompt="$prompt_replace"
         fi
-        if ! prompt_with_enter "$prompt"; then
+        if ! prompt_user "$prompt" "default_no"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -1773,7 +1771,7 @@ for arg in "${args[@]}"; do
     # Check if the target directory would go above its maximum recommended size
     if (( target_base_size_in_kb + source_size_in_kb - existing_target_size_in_kb > max_size_in_kb )); then
         pretty_print "$indicator_warning $(capitalize_initial "$operation") '${bold}$source_subpath${reset}' would cause the ${bold}$target_name${reset} directory to go above ${bold}${target_max_size}GB${reset}."
-        if ! prompt_single_key "$prompt_continue_still"; then
+        if ! prompt_user "$prompt_continue_still" "default_yes"; then
             print_skip_arg "$arg"
             arg_skipped=true
             continue
@@ -1796,7 +1794,7 @@ for arg in "${args[@]}"; do
         print_stderr
         syscmd_failed=true
         # If not last argument, ask user if they want to continue with the other arguments
-        if [[ $args_index -lt $args_amount ]] && ! prompt_with_enter "$prompt_continue_with_rest"; then
+        if [[ $args_index -lt $args_amount ]] && ! prompt_user "$prompt_continue_with_rest" "default_no"; then
             pretty_print "Skipping the rest of the arguments."
             break
         fi
@@ -1829,7 +1827,7 @@ for arg in "${args[@]}"; do
             pretty_print "${bold}$outcome_size${reset} of ${bold}$source_size${reset} $outcome."
 
             # Ask user if they wish to restore what was already moved or leave the partial copy
-            if prompt_single_key "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory?"; then
+            if prompt_user "Do you wish to restore what was partially moved to the $target_name directory back to the $source_name directory?" "default_yes"; then
                 rm -f "$link_path" 2>/dev/null;
                 mv -T "$source_old" "$source_path" 2>/dev/null
                 if ! move_files "$target_path" "$source_dirpath" "restoring"; then
@@ -1848,7 +1846,7 @@ for arg in "${args[@]}"; do
         fi
 
         # If not last argument, ask user if they want to continue with the other arguments
-        if [[ $args_index -lt $args_amount ]] && ! prompt_with_enter "$prompt_continue_with_rest"; then
+        if [[ $args_index -lt $args_amount ]] && ! prompt_user "$prompt_continue_with_rest" "default_no"; then
             pretty_print "Skipping the rest of the arguments."
             break
         fi
@@ -1879,7 +1877,7 @@ for arg in "${args[@]}"; do
                 print_stderr
             fi
             # If not last argument, ask user if they want to continue with the other arguments
-            if [[ $args_index -lt $args_amount ]] && ! prompt_with_enter "$prompt_continue_with_rest"; then
+            if [[ $args_index -lt $args_amount ]] && ! prompt_user "$prompt_continue_with_rest" "default_no"; then
                 pretty_print "Skipping the rest of the arguments."
                 break
             fi
