@@ -358,7 +358,7 @@ prompt_user() {
     local prompt_text=$1
     local default_yes=$2
     local indicator
-    local chset="EeAaUuSsHhPp"
+    local chset="YyEeAaUuSsHhPp"
 
     if [[ -n "$default_yes" ]] && [[ "$default_yes" =~ [Yy] ]]; then
         indicator="[${bold}Y${reset}/${bold}n${reset}]"
