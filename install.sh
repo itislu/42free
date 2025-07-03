@@ -243,7 +243,7 @@ if [[ -z "$home_max_size" ]] && [[ -z "$sgoinfre_max_size" ]]; then
     shopt -u nocasematch
 fi
 
-# Prompt user for max sizes if still not known or if storage was upgraded
+# Prompt user for max sizes if still not known, or if storage was upgraded
 for dir in home sgoinfre; do
     max_size_var_name="${dir}_max_size"
     upgraded_size_var_name="${dir}_upgraded_size"
