@@ -3,6 +3,7 @@
   # 📁&nbsp; 42free &nbsp;📁
 
   ### 42free is a shell script that helps you manage your limited storage on 42 campuses.
+  ### Solve `No space left on device` once and for all.
 
   #### ⚙️ 42free supports Linux and macOS.
 
