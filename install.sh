@@ -26,7 +26,7 @@ campuses=(
     "19 Brussels;5;15;-;-"
     "42 Bangkok;10;15;20;-"
     "42 Lisboa;5;30;-;-"
-    "42 Gyeongsan;5;0;-;10"
+    "42 Gyeongsan;5;0;-;42"
 )
 
 # Define the destination directory and filename
