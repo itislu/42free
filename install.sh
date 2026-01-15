@@ -21,7 +21,7 @@ latest_release_url="https://api.github.com/repos/itislu/42free/releases/latest"
 # Format: "Campus Name;home_max_size;sgoinfre_max_size;home_upgraded_size;sgoinfre_upgraded_size"
 campuses=(
     "Other;-;-;-;-"
-    "42 Vienna;5;30;10;-"
+    "42 Vienna;10;30;-;-"
     "42 Berlin;5;30;-;-"
     "19 Brussels;5;15;-;-"
     "42 Bangkok;10;15;20;-"
